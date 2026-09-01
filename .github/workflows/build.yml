@@ -43,6 +43,8 @@ jobs:
         run: |
           mkdir -p Payload
           cp -r build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
+          cp ../app/index.html Payload/GymPlanner.app/index.html
+          test -f Payload/GymPlanner.app/index.html
           zip -r GymPlanner.ipa Payload
 
       - name: Upload IPA artifact
