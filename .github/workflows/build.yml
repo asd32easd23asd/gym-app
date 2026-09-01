@@ -45,6 +45,8 @@ jobs:
           cp -r build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
           cp ../app/index.html Payload/GymPlanner.app/index.html
           test -f Payload/GymPlanner.app/index.html
+          codesign --force --deep --sign - Payload/GymPlanner.app
+          codesign --verify Payload/GymPlanner.app
           zip -r GymPlanner.ipa Payload
 
       - name: Upload IPA artifact
