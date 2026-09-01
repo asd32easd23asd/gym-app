@@ -1,4 +1,5 @@
 <title>Gym and Peptide Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
 <style>
   :root {
@@ -18,7 +19,7 @@
   #app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
   main { flex: 1; padding: 18px 20px 120px 20px; display: flex; flex-direction: column; gap: 14px; }
   h1 { font-size: 30px; font-weight: 900; margin: 0; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 20px 0 20px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: calc(22px + env(safe-area-inset-top, 0px)) 20px 0 20px; }
   .card { background: linear-gradient(180deg, #1e1e1e, #191919); border: 1px solid #252525; border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
   .row { display: flex; align-items: center; gap: 12px; }
   .between { display: flex; justify-content: space-between; align-items: center; }
