@@ -8,10 +8,11 @@ targets:
     type: application
     platform: iOS
     sources:
-      - Sources
-    resources:
-      - path: Resources
+      - path: Sources
       - path: Assets.xcassets
+      - path: Resources
+        buildPhase: resources
+        optional: true
     info:
       path: Info.plist
       properties:
