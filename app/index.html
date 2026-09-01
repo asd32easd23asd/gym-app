@@ -159,7 +159,7 @@ function day(dateISO) {
   if (!state.days[dateISO]) state.days[dateISO] = { workoutName: "", exercises: [], doses: [], tplV: -1 };
   const d = state.days[dateISO];
   if (d.tplV === undefined) d.tplV = -1;
-  const untouched = !d.userEdited && !d.exercises.some(e => e.done) && !d.doses.some(x => x.done);
+  const untouched = !d.userEdited && !d.exercises.some(e => e.done) && !d.doses.some(x => x.done) && !(d.reminders || []).some(r => r.done);
   if (d.tplV !== schedVer() && untouched && dateISO >= todayISO()) {
     const ap = activePlan();
     const pd = ap && ap.days ? ap.days[wdOf(dateISO)] : null;
@@ -170,9 +170,13 @@ function day(dateISO) {
         const p = pep(ds.pepId);
         return p ? { id: uid(), pepId: ds.pepId, mg: doseFor(p, dateISO), time: ds.time || "", done: false } : null;
       }).filter(Boolean);
-    } else { d.workoutName = ""; d.exercises = []; d.doses = []; }
+      d.notes = pd.notes || "";
+      d.reminders = (pd.reminders || []).map(r => ({ id: uid(), text: r.text, time: r.time || "", done: false }));
+    } else { d.workoutName = ""; d.exercises = []; d.doses = []; d.notes = ""; d.reminders = []; }
     d.tplV = schedVer();
   }
+  if (!d.reminders) d.reminders = [];
+  if (d.notes === undefined) d.notes = "";
   return d;
 }
 
@@ -316,7 +320,48 @@ function viewHome() {
     }).join("");
   } else h += `<div class="empty">No doses planned today</div>`;
   h += `</div>`;
+
+  // notes & reminders
+  h += `<div class="card"><div class="between"><span class="title">Notes &amp; reminders</span>
+    <div class="row" style="gap:8px">
+      <button class="linkish" onclick="dlgDayNote()">Note</button>
+      <button class="iconbtn" onclick="dlgReminder()">+</button></div></div>`;
+  if (d.notes) h += `<div style="font-size:14px;font-weight:700;white-space:pre-line;background:var(--inner);border-radius:14px;padding:12px 14px">${esc(d.notes)}</div>`;
+  if (d.reminders.length) {
+    h += d.reminders.map(r => `<div class="item">
+      <div class="check ${r.done ? "done" : ""}" onclick="toggleReminder('${r.id}')">${r.done ? chk() : ""}</div>
+      <div style="flex:1">
+        <div class="${r.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(r.text)}</div>
+        ${r.time ? `<div class="muted small">at ${esc(r.time)}</div>` : ""}</div>
+      <button class="linkish plain" onclick="delReminder('${r.id}')">✕</button></div>`).join("");
+  }
+  if (!d.notes && !d.reminders.length) h += `<div class="empty">No notes for this day</div>`;
+  h += `</div>`;
   return h;
+}
+function toggleReminder(id) { const r = day(selDate || todayISO()).reminders.find(x => x.id === id); if (r) { r.done = !r.done; save(); render(); } }
+function delReminder(id) { const d = day(selDate || todayISO()); d.reminders = d.reminders.filter(x => x.id !== id); d.userEdited = true; save(); render(); }
+function dlgDayNote() {
+  const d = day(selDate || todayISO());
+  openDlg(`<h2>Note for this day</h2>
+    <form class="fields" onsubmit="event.preventDefault();saveDayNote(this)">
+    <textarea name="n" style="width:100%;height:110px;font-size:14px;font-family:inherit;font-weight:700" placeholder="e.g. use reta in the evening">${esc(d.notes)}</textarea>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Save</button></div></form>`);
+}
+function saveDayNote(f) { const d = day(selDate || todayISO()); d.notes = f.n.value.trim(); d.userEdited = true; closeDlg(); save(); render(); }
+function dlgReminder() {
+  openDlg(`<h2>Reminder</h2>
+    <form class="fields" onsubmit="event.preventDefault();saveReminder(this)">
+    <label class="f">Reminder<input name="t" required placeholder="Pin 1 hour before gym" autofocus></label>
+    <label class="f">Time (optional — sends a notification)<input name="tm" type="time"></label>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Add</button></div></form>`);
+}
+function saveReminder(f) {
+  const d = day(selDate || todayISO());
+  d.reminders.push({ id: uid(), text: f.t.value.trim(), time: f.tm.value, done: false });
+  d.userEdited = true; closeDlg(); save(); render();
 }
 function toggleEx(id) { const e = day(selDate || todayISO()).exercises.find(x => x.id === id); if (e) { e.done = !e.done; save(); render(); } }
 function dlgExtraExercise() {
@@ -416,13 +461,16 @@ Reply with ONLY one JSON code block, exactly this format:
   "days": {
     "0": { "workoutName": "Legs",
            "exercises": [ { "name": "Squat", "detail": "4 x 8 - 100 kg" } ],
-           "doses": [ { "peptide": "Retatrutide", "time": "09:00" } ] },
+           "doses": [ { "peptide": "Retatrutide", "time": "09:00" } ],
+           "notes": "Use reta in the evening",
+           "reminders": [ { "text": "Pin 1 hour before gym", "time": "17:00" } ] },
     "1": { "workoutName": "Push", "exercises": [], "doses": [] }
   }
 }
 
 Rules:
 - day keys are "0" to "6" where 0 = Monday and 6 = Sunday; omit rest days.
+- "notes" (free text) and "reminders" (text + optional "time" HH:MM, which triggers a notification) are optional per day.
 - "peptides" is optional: only include peptides that are new or whose dose schedule you are setting; "steps" are future dose increases (date + mg per dose).
 - "doses" reference peptides by name; the dose in mg follows the peptide's schedule automatically, so do not put mg on a dose.
 - "detail" is free text like "4 x 8 - 80 kg".
@@ -484,6 +532,8 @@ function importClaudePlan(f) {
       const p = ds && ds.peptide ? state.peptides.find(x => x.name.toLowerCase() === String(ds.peptide).toLowerCase()) : null;
       return p ? { id: uid(), pepId: p.id, time: String(ds.time || "") } : null;
     }).filter(Boolean);
+    pd.notes = String(src.notes || "");
+    pd.reminders = (Array.isArray(src.reminders) ? src.reminders : []).map(r => ({ text: String(r.text || ""), time: String(r.time || "") })).filter(r => r.text);
   }
   state.plans.push(pl);
   bumpSched(); closeDlg(); editPlanId = pl.id; editWd = null; save(); render();
@@ -584,9 +634,48 @@ function viewDayEditor() {
     }).join("");
   } else h += `<div class="empty">No doses on this day</div>`;
   h += `</div>`;
+
+  // notes & reminders in het weekplan (herhalen elke week)
+  h += `<div class="card"><div class="between"><span class="title">Notes &amp; reminders</span>
+    <div class="row" style="gap:8px">
+      <button class="linkish" onclick="dlgPdNote()">Note</button>
+      <button class="iconbtn" onclick="dlgPdReminder()">+</button></div></div>`;
+  if (pd.notes) h += `<div style="font-size:14px;font-weight:700;white-space:pre-line;background:var(--inner);border-radius:14px;padding:12px 14px">${esc(pd.notes)}</div>`;
+  if ((pd.reminders || []).length) {
+    h += pd.reminders.map((r, i) => `<div class="item"><div style="flex:1">
+      <div style="font-size:14px;font-weight:800">${esc(r.text)}</div>
+      ${r.time ? `<div class="muted small">at ${esc(r.time)}</div>` : ""}</div>
+      <button class="linkish plain" onclick="delPdReminder(${i})">✕</button></div>`).join("");
+  }
+  if (!pd.notes && !(pd.reminders || []).length) h += `<div class="empty">Repeats every ${DWL[editWd]} — add a note or reminder</div>`;
+  h += `</div>`;
   h += `<button class="pill ghost" style="padding:13px 0" onclick="goBack()">‹ Back to week overview</button>`;
   return h;
 }
+function dlgPdNote() {
+  const pd = planDay(plan(editPlanId), editWd);
+  openDlg(`<h2>Note · ${DWL[editWd]}</h2>
+    <form class="fields" onsubmit="event.preventDefault();savePdNote(this)">
+    <textarea name="n" style="width:100%;height:110px;font-size:14px;font-family:inherit;font-weight:700" placeholder="e.g. use reta in the evening">${esc(pd.notes || "")}</textarea>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Save</button></div></form>`);
+}
+function savePdNote(f) { planDay(plan(editPlanId), editWd).notes = f.n.value.trim(); closeDlg(); pdChanged(); }
+function dlgPdReminder() {
+  openDlg(`<h2>Reminder · every ${DWL[editWd]}</h2>
+    <form class="fields" onsubmit="event.preventDefault();savePdReminder(this)">
+    <label class="f">Reminder<input name="t" required placeholder="Pin 1 hour before gym" autofocus></label>
+    <label class="f">Time (optional — sends a notification)<input name="tm" type="time"></label>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Add</button></div></form>`);
+}
+function savePdReminder(f) {
+  const pd = planDay(plan(editPlanId), editWd);
+  if (!pd.reminders) pd.reminders = [];
+  pd.reminders.push({ text: f.t.value.trim(), time: f.tm.value });
+  closeDlg(); pdChanged();
+}
+function delPdReminder(i) { const pd = planDay(plan(editPlanId), editWd); pd.reminders.splice(i, 1); pdChanged(); }
 function pdChanged() { if (editPlanId === state.activePlanId) bumpSched(); save(); render(); }
 function dlgPdName() {
   const pd = planDay(plan(editPlanId), editWd);
@@ -877,6 +966,9 @@ function pushNativeSchedule() {
           items.push({ date: iso, time: x.time, title: "Time for your dose", body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg" });
         }
       });
+      (d.reminders || []).forEach(r => {
+        if (!r.done && r.time) items.push({ date: iso, time: r.time, title: "Reminder", body: r.text });
+      });
     }
     nb.postMessage(JSON.stringify(items));
   } catch (e) {}
@@ -913,6 +1005,12 @@ function checkNotif() {
         const p = pep(x.pepId);
         new Notification("Time for your dose", { body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg (" + x.time + ")" });
         x.notified = true; dirty = true;
+      }
+    });
+    (d.reminders || []).forEach(r => {
+      if (!r.done && r.time && r.time <= now && !r.notified) {
+        new Notification("Reminder", { body: r.text });
+        r.notified = true; dirty = true;
       }
     });
     if (dirty) save();
