@@ -388,8 +388,105 @@ function viewPlans() {
 }
 
 function createPlan() {
+  openDlg(`<h2>New plan</h2>
+    <p class="muted" style="margin:0 0 14px 0">Build it yourself, or let Claude write the whole week for you.</p>
+    <div class="btnrow col">
+      <button class="pill" onclick="closeDlg();createCustomPlan()">Custom plan</button>
+      <button class="pill ghost" onclick="dlgClaudePlan()">Claude plan</button>
+      <button class="pill ghost" onclick="closeDlg()">Cancel</button></div>`);
+}
+function createCustomPlan() {
   const pl = { id: uid(), name: "Plan " + ((state.plans || []).length + 1), status: "draft", days: {} };
   state.plans.push(pl); editPlanId = pl.id; save(); render();
+}
+
+// ---------- Claude plan ----------
+function claudePrompt() {
+  const peps = state.peptides.map(p => `- ${p.name}: current dose ${fmtMg(doseFor(p, todayISO()))} mg`).join("\n") || "- (none yet — you may propose peptides too)";
+  return `Write a weekly gym + peptide plan for my planner app.
+
+Reply with ONLY one JSON code block, exactly this format:
+
+{
+  "name": "Plan name",
+  "peptides": [
+    { "name": "Retatrutide", "vialMg": 20, "doseMg": 2,
+      "steps": [ { "from": "2026-10-01", "mg": 4 } ] }
+  ],
+  "days": {
+    "0": { "workoutName": "Legs",
+           "exercises": [ { "name": "Squat", "detail": "4 x 8 - 100 kg" } ],
+           "doses": [ { "peptide": "Retatrutide", "time": "09:00" } ] },
+    "1": { "workoutName": "Push", "exercises": [], "doses": [] }
+  }
+}
+
+Rules:
+- day keys are "0" to "6" where 0 = Monday and 6 = Sunday; omit rest days.
+- "peptides" is optional: only include peptides that are new or whose dose schedule you are setting; "steps" are future dose increases (date + mg per dose).
+- "doses" reference peptides by name; the dose in mg follows the peptide's schedule automatically, so do not put mg on a dose.
+- "detail" is free text like "4 x 8 - 80 kg".
+
+My current peptides:
+${peps}
+
+My goals: [DESCRIBE YOUR GOALS, DAYS AVAILABLE, EQUIPMENT, EXPERIENCE HERE]`;
+}
+function dlgClaudePlan() {
+  openDlg(`<h2>Claude plan</h2>
+    <p class="muted" style="margin:0 0 12px 0">1. Copy the prompt and send it to Claude with your goals.<br>2. Paste Claude&#39;s JSON answer below and import.</p>
+    <button class="pill ghost" style="margin-bottom:10px" onclick="copyClaudePrompt(this)">Copy prompt</button>
+    <form class="fields" onsubmit="event.preventDefault();importClaudePlan(this)">
+      <textarea name="j" style="width:100%;height:140px;font-size:12px;font-family:monospace" placeholder="Paste Claude's JSON here"></textarea>
+      <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+      <button class="pill">Import plan</button></div></form>`);
+}
+function copyClaudePrompt(btn) {
+  const txt = claudePrompt();
+  const done = () => { btn.textContent = "Copied ✓"; setTimeout(() => { btn.textContent = "Copy prompt"; }, 2000); };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done)); }
+    else fallbackCopy(txt, done);
+  } catch (e) { fallbackCopy(txt, done); }
+}
+function fallbackCopy(txt, done) {
+  const ta = document.createElement("textarea");
+  ta.value = txt; document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { alert(txt); }
+  document.body.removeChild(ta);
+}
+function importClaudePlan(f) {
+  let raw = f.j.value.trim();
+  const m = raw.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) raw = m[1].trim();
+  let data;
+  try { data = JSON.parse(raw); } catch (e) { alert("That's not valid JSON. Paste exactly the code block Claude replied with."); return; }
+  if (!data || typeof data !== "object" || !data.days) { alert("The JSON is missing the \"days\" part."); return; }
+  // peptides: create or update by name
+  (Array.isArray(data.peptides) ? data.peptides : []).forEach(np => {
+    if (!np || !np.name) return;
+    let p = state.peptides.find(x => x.name.toLowerCase() === String(np.name).toLowerCase());
+    if (!p) {
+      p = { id: uid(), name: String(np.name), vialMg: parseFloat(np.vialMg) || 10, doseMg: parseFloat(np.doseMg) || 1, remainingMg: parseFloat(np.vialMg) || 10, plan: [] };
+      state.peptides.push(p);
+    }
+    (Array.isArray(np.steps) ? np.steps : []).forEach(s => {
+      if (s && s.from && s.mg) p.plan.push({ id: uid(), from: String(s.from), mg: parseFloat(s.mg) });
+    });
+  });
+  const pl = { id: uid(), name: String(data.name || "Claude plan"), status: "draft", days: {} };
+  for (let wd = 0; wd < 7; wd++) {
+    const src = data.days[String(wd)] || data.days[wd];
+    if (!src) continue;
+    const pd = planDay(pl, wd);
+    pd.workoutName = String(src.workoutName || "");
+    pd.exercises = (Array.isArray(src.exercises) ? src.exercises : []).map(e => ({ name: String(e.name || ""), detail: String(e.detail || "") })).filter(e => e.name);
+    pd.doses = (Array.isArray(src.doses) ? src.doses : []).map(ds => {
+      const p = ds && ds.peptide ? state.peptides.find(x => x.name.toLowerCase() === String(ds.peptide).toLowerCase()) : null;
+      return p ? { id: uid(), pepId: p.id, time: String(ds.time || "") } : null;
+    }).filter(Boolean);
+  }
+  state.plans.push(pl);
+  bumpSched(); closeDlg(); editPlanId = pl.id; editWd = null; save(); render();
 }
 function activatePlan(id) {
   const pl = plan(id); if (!pl) return;
