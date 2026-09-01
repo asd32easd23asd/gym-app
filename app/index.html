@@ -1,0 +1,887 @@
+<title>Gym and Peptide Planner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+  :root {
+    --bg: #0a0a0a; --card: #1b1b1b; --inner: #141414; --line: #333;
+    --text: #f2f2f2; --muted: #8a8a8a; --dim: #6a6a6a;
+    --green: #7ddb6f; --green-bg: #24301f; --blue: #6fb1ff; --blue-bg: #1f2733;
+    --orange: #e8945a;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; color: var(--text);
+    background: radial-gradient(ellipse 120% 30% at 50% 0%, #142016 0%, var(--bg) 60%) fixed var(--bg);
+    font-family: 'Nunito', system-ui, sans-serif; font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+  main { flex: 1; padding: 18px 20px 120px 20px; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: 30px; font-weight: 900; margin: 0; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 20px 0 20px; }
+  .card { background: linear-gradient(180deg, #1e1e1e, #191919); border: 1px solid #252525; border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .between { display: flex; justify-content: space-between; align-items: center; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .small { font-size: 12px; }
+  .title { font-size: 17px; font-weight: 900; }
+  .item { display: flex; align-items: center; gap: 12px; background: var(--inner); border-radius: 14px; padding: 12px 14px; }
+  .check { width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 2px solid #444; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .check.done { background: var(--green); border-color: var(--green); }
+  .done-text { color: var(--muted); text-decoration: line-through; }
+  .pill { border: none; font-family: inherit; background: linear-gradient(180deg, #8fe382, #6ccb5e); color: #08120a; font-size: 13px; font-weight: 900; border-radius: 999px; padding: 10px 16px; cursor: pointer; box-shadow: 0 6px 18px rgba(125,219,111,0.22); }
+  .pill.ghost { background: #242424; color: var(--text); border: 1px solid #303030; box-shadow: none; }
+  .pill.danger { background: #341d1d; color: #ff9d9d; border: 1px solid #4a2626; box-shadow: none; }
+  .iconbtn { width: 34px; height: 34px; min-width: 34px; border: none; border-radius: 50%; background: #262626; color: var(--green); font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--green); border-radius: 4px; }
+  .badge { font-size: 12px; font-weight: 900; border-radius: 999px; padding: 5px 12px; }
+  .badge.g { background: var(--green-bg); color: var(--green); }
+  .badge.b { background: var(--blue-bg); color: var(--blue); }
+  .badge.o { background: #33261b; color: var(--orange); }
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: #101010cc; backdrop-filter: blur(14px);
+    display: flex; justify-content: space-around; padding: 12px 10px calc(14px + env(safe-area-inset-bottom)) 10px;
+  }
+  nav button { border: none; background: none; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; }
+  nav button.on { color: var(--green); }
+  nav svg { stroke: currentColor; }
+  dialog {
+    border: none; border-radius: 22px; background: var(--card); color: var(--text);
+    padding: 22px; width: min(92vw, 380px); font-family: 'Nunito', system-ui, sans-serif; font-weight: 700;
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
+  dialog h2 { margin: 0 0 14px 0; font-size: 19px; font-weight: 900; }
+  form.fields { display: flex; flex-direction: column; gap: 10px; }
+  label.f { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--muted); font-weight: 800; }
+  input, select, textarea {
+    background: var(--inner); border: 1px solid #2a2a2a; border-radius: 12px; color: var(--text);
+    font-family: inherit; font-weight: 700; font-size: 16px; padding: 12px 14px; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--green); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .btnrow { display: flex; gap: 10px; margin-top: 8px; }
+  .btnrow .pill { flex: 1; padding: 13px 0; text-align: center; font-size: 14px; }
+  .btnrow.col { flex-direction: column; }
+  .ring { position: relative; width: 92px; height: 92px; min-width: 92px; }
+  .ring .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .empty { text-align: center; color: var(--dim); font-size: 14px; padding: 8px 0; }
+  .stat { flex: 1; }
+  .stat .n { font-size: 25px; font-weight: 900; }
+  .stat .n span { font-size: 15px; color: var(--muted); }
+  .linkish { background: #242424; border: 1px solid #303030; border-radius: 999px; color: #cfcfcf; font-family: inherit; font-weight: 800; font-size: 12px; cursor: pointer; padding: 7px 13px; }
+  .linkish.plain { background: none; border: none; padding: 4px; color: var(--muted); }
+  .weeknav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .weeknav .label { flex: 1; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 0.3px; }
+  .navarrow { width: 38px; height: 38px; min-width: 38px; border: 1px solid #2c2c2c; border-radius: 50%; background: #1d1d1d; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+  .dayrow { display: flex; align-items: center; gap: 14px; background: var(--inner); border-radius: 16px; padding: 14px; cursor: pointer; }
+  .dayrow .dw { width: 34px; font-size: 13px; font-weight: 900; color: var(--green); }
+  .daystrip { display: flex; gap: 7px; }
+  .day { flex: 1; border: none; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--card); border-radius: 16px; padding: 10px 0; cursor: pointer; color: var(--text); }
+  .day .dwl { font-size: 11px; font-weight: 800; color: var(--muted); }
+  .day .dn { font-size: 17px; font-weight: 900; }
+  .day.sel { background: var(--green); }
+  .day.sel .dwl, .day.sel .dn { color: #0a0a0a; }
+  .day.today:not(.sel) .dn { color: var(--green); }
+  @media (prefers-reduced-motion: no-preference) { .pill { transition: transform .1s; } .pill:active { transform: scale(.96); } }
+</style>
+
+<div id="app">
+  <div class="topbar">
+    <div class="row" style="gap:12px">
+      <button id="backbtn" class="iconbtn" style="display:none;width:38px;height:38px;min-width:38px;color:var(--text)" onclick="goBack()" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h1 id="pagetitle">Today</h1>
+    </div>
+    <span id="topright" class="muted"></span>
+  </div>
+  <main id="main"></main>
+  <nav>
+    <button id="nav-home" onclick="go('home')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>
+      Today</button>
+    <button id="nav-plan" onclick="go('plan')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>
+      Plan</button>
+    <button id="nav-hist" onclick="go('hist')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+      History</button>
+  </nav>
+</div>
+
+<dialog id="dlg"></dialog>
+
+<script>
+"use strict";
+// ---------- state ----------
+const LS_KEY = "gympep-state-v1";
+let state = { peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 };
+let db = null, saveTimer = null;
+let tab = "home";
+let editPlanId = null, editWd = null;
+let selDate = null; // selected day on Today tab (null = today)
+
+const DW = ["MO","TU","WE","TH","FR","SA","SU"];
+const DWL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function todayISO(d) { const x = d || new Date(); return x.getFullYear() + "-" + String(x.getMonth()+1).padStart(2,"0") + "-" + String(x.getDate()).padStart(2,"0"); }
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmtMg(v) { return (Math.round(v * 1000) / 1000).toString().replace(".", ","); }
+function wdOf(dateISO) { return (new Date(dateISO).getDay() + 6) % 7; }
+function fmtDate(iso) { return new Date(iso).toLocaleDateString("en-US", { day: "numeric", month: "short" }); }
+
+function pep(id) { return state.peptides.find(p => p.id === id); }
+function plan(id) { return (state.plans || []).find(p => p.id === id); }
+function activePlan() { return plan(state.activePlanId); }
+function doseFor(p, dateISO) {
+  let mg = p.doseMg;
+  (p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1).forEach(s => { if (s.from <= dateISO) mg = s.mg; });
+  return mg;
+}
+function nextStep(p, dateISO) {
+  const fut = (p.plan || []).filter(s => s.from > dateISO).sort((a, b) => a.from < b.from ? -1 : 1);
+  return fut[0] || null;
+}
+function schedVer() { return state.schedVer || 0; }
+function bumpSched() { state.schedVer = schedVer() + 1; }
+function planDay(pl, wd) {
+  if (!pl.days) pl.days = {};
+  if (!pl.days[wd]) pl.days[wd] = { workoutName: "", exercises: [], doses: [] };
+  return pl.days[wd];
+}
+
+// day materialization from the active plan
+function day(dateISO) {
+  if (!state.days[dateISO]) state.days[dateISO] = { workoutName: "", exercises: [], doses: [], tplV: -1 };
+  const d = state.days[dateISO];
+  if (d.tplV === undefined) d.tplV = -1;
+  const untouched = !d.userEdited && !d.exercises.some(e => e.done) && !d.doses.some(x => x.done);
+  if (d.tplV !== schedVer() && untouched && dateISO >= todayISO()) {
+    const ap = activePlan();
+    const pd = ap && ap.days ? ap.days[wdOf(dateISO)] : null;
+    if (pd) {
+      d.workoutName = pd.workoutName || "";
+      d.exercises = (pd.exercises || []).map(e => ({ id: uid(), name: e.name, detail: e.detail, done: false }));
+      d.doses = (pd.doses || []).map(ds => {
+        const p = pep(ds.pepId);
+        return p ? { id: uid(), pepId: ds.pepId, mg: doseFor(p, dateISO), time: ds.time || "", done: false } : null;
+      }).filter(Boolean);
+    } else { d.workoutName = ""; d.exercises = []; d.doses = []; }
+    d.tplV = schedVer();
+  }
+  return d;
+}
+
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (db) db.doc("app/state").set(JSON.parse(JSON.stringify(state))).catch(() => {});
+  }, 600);
+}
+
+async function init() {
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) state = Object.assign(state, JSON.parse(raw)); } catch (e) {}
+  migrate(); render();
+  try {
+    if (window.claude && window.claude.use) {
+      db = await claude.use("db");
+      if (db) {
+        const snap = await db.doc("app/state").get();
+        if (snap.exists) { state = Object.assign({ peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }, snap.data()); migrate(); render(); }
+        else if (state.peptides.length || Object.keys(state.days).length) save();
+      }
+    }
+  } catch (e) { db = null; }
+}
+function migrate() {
+  if (!state.plans) state.plans = [];
+  if (!state.planLog) state.planLog = [];
+  // old weekday-template model -> one plan
+  if (state.tpl && Object.keys(state.tpl).length && !state.plans.length) {
+    const pl = { id: uid(), name: "Mijn plan", status: "active", days: {} };
+    Object.keys(state.tpl).forEach(wd => {
+      pl.days[wd] = { workoutName: state.tpl[wd].name, exercises: state.tpl[wd].exercises.slice(), doses: [] };
+    });
+    (state.rules || []).forEach(r => {
+      const wds = r.days === "daily" ? [0,1,2,3,4,5,6] : r.days;
+      wds.forEach(wd => { planDay(pl, wd).doses.push({ id: uid(), pepId: r.pepId, time: r.time || "" }); });
+    });
+    state.plans.push(pl); state.activePlanId = pl.id;
+    state.planLog.push({ planId: pl.id, from: todayISO() });
+    bumpSched();
+  }
+  delete state.tpl; delete state.rules;
+}
+
+// ---------- navigation ----------
+function go(t) { tab = t; if (t !== "plan") { editPlanId = null; editWd = null; } render(); window.scrollTo(0, 0); }
+function goBack() {
+  if (tab === "plan" && editWd !== null) { editWd = null; render(); return; }
+  if (tab === "plan" && editPlanId) { editPlanId = null; render(); return; }
+  if (tab === "set") go("hist");
+}
+
+function render() {
+  if (tab === "pep") tab = "plan";
+  ["home","plan","hist"].forEach(t => document.getElementById("nav-" + t).classList.toggle("on", tab === t || (tab === "set" && t === "hist")));
+  const main = document.getElementById("main");
+  const title = document.getElementById("pagetitle");
+  const tr = document.getElementById("topright");
+  const showBack = (tab === "set") || (tab === "plan" && editPlanId);
+  document.getElementById("backbtn").style.display = showBack ? "flex" : "none";
+  if (tab === "home") {
+    const sd = selDate || todayISO();
+    title.textContent = sd === todayISO() ? "Today" : new Date(sd).toLocaleDateString("en-US", { weekday: "long" });
+    tr.textContent = new Date(sd).toLocaleDateString("en-US", { day: "numeric", month: "long" });
+    main.innerHTML = viewHome();
+  }
+  if (tab === "plan") {
+    if (editPlanId && editWd !== null) { const pl = plan(editPlanId); title.textContent = DWL[editWd]; tr.textContent = pl ? pl.name : ""; main.innerHTML = viewDayEditor(); }
+    else if (editPlanId) { title.textContent = "Edit plan"; tr.textContent = ""; main.innerHTML = viewPlanEditor(); }
+    else { title.textContent = "Plan"; tr.textContent = ""; main.innerHTML = viewPlans() + viewPep(); }
+  }
+  if (tab === "hist") {
+    title.textContent = "History";
+    tr.innerHTML = `<button class="iconbtn" onclick="go('set')" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.2.63.78 1.07 1.44 1.11H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.89z"/></svg></button>`;
+    main.innerHTML = viewHist();
+  }
+  if (tab === "set") { title.textContent = "Settings"; tr.textContent = ""; main.innerHTML = viewSettings(); }
+}
+
+// ---------- vandaag ----------
+function chk() { return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>`; }
+
+function weekDates(anchor) {
+  const d = new Date(anchor); const dow = (d.getDay() + 6) % 7; d.setDate(d.getDate() - dow);
+  return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return todayISO(x); });
+}
+function shiftWeek(n) { const d = new Date(selDate || todayISO()); d.setDate(d.getDate() + n); selDate = todayISO(d); render(); }
+
+function viewHome() {
+  const t = selDate || todayISO(), d = day(t);
+  const exDone = d.exercises.filter(e => e.done).length, exTot = d.exercises.length;
+  const doseDone = d.doses.filter(x => x.done).length, doseTot = d.doses.length;
+  const ap = activePlan();
+  let h = "";
+
+  // week-navigatie + dagstrip
+  const week = weekDates(t), td = todayISO();
+  const wkLabel = fmtDate(week[0]) + " – " + fmtDate(week[6]);
+  h += `<div class="weeknav" style="margin:-2px 0">
+    <button class="navarrow" onclick="shiftWeek(-7)" aria-label="Previous week">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="label">${t !== td ? `<button class="linkish" style="color:#0a0a0a;background:var(--green);border-color:var(--green)" onclick="selDate=null;render()">↩ back to today</button>` : wkLabel}</div>
+    <button class="navarrow" onclick="shiftWeek(7)" aria-label="Next week">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>`;
+  h += `<div class="daystrip">` + week.map((iso, i) =>
+    `<button class="day ${iso === t ? "sel" : ""} ${iso === td ? "today" : ""}" onclick="selDate='${iso}';render()">
+      <span class="dwl">${DW[i]}</span><span class="dn">${parseInt(iso.slice(8), 10)}</span></button>`).join("") + `</div>`;
+
+  if (!ap) h += `<div class="card"><div class="empty">No active plan yet.</div>
+    <button class="pill" onclick="go('plan')">Create a plan</button></div>`;
+
+  // workout checklist
+  h += `<div class="card"><div class="between">
+    <span class="title">Workout${d.workoutName ? " · <span style='color:var(--green)'>" + esc(d.workoutName) + "</span>" : ""}</span>
+    <button class="iconbtn" onclick="dlgExtraExercise()">+</button></div>`;
+  if (exTot) {
+    h += `<div class="bar"><div style="width:${Math.round(exDone/exTot*100)}%"></div></div>
+      <div class="between small"><span style="color:var(--green);font-weight:800">${exDone} of ${exTot} exercises</span></div>`;
+    h += d.exercises.map(e => `<div class="item">
+      <div class="check ${e.done ? "done" : ""}" onclick="toggleEx('${e.id}')">${e.done ? chk() : ""}</div>
+      <div style="flex:1">
+        <div class="${e.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(e.name)}</div>
+        <div class="muted small">${esc(e.detail || "")}</div></div></div>`).join("");
+  } else h += `<div class="empty">${ap ? "Rest day — no workout planned for " + DWL[wdOf(t)] : "No workout today"}</div>`;
+  h += `</div>`;
+
+  // peptide checklist
+  h += `<div class="card"><div class="between"><span class="title">Peptides</span>
+    <span class="muted small">${doseDone}/${doseTot} taken</span></div>`;
+  if (doseTot) {
+    h += d.doses.map(x => {
+      const p = pep(x.pepId);
+      return `<div class="item">
+        <div class="check ${x.done ? "done" : ""}" onclick="${x.done ? `undoDose('${t}','${x.id}')` : `setDose('${t}','${x.id}')`}">${x.done ? chk() : ""}</div>
+        <div style="flex:1">
+          <div class="${x.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(p ? p.name : "?")} · ${fmtMg(x.mg)} mg</div>
+          <div class="muted small">${[x.done ? "taken" + (x.at ? " at " + esc(x.at) : "") : (x.time ? "planned " + esc(x.time) : ""), p ? fmtMg(p.remainingMg) + " mg left in vial" : ""].filter(Boolean).join(" · ")}</div></div>
+        ${x.done ? "" : `<button class="pill" style="padding:8px 14px;font-size:12px" onclick="setDose('${t}','${x.id}')">Log</button>`}</div>`;
+    }).join("");
+  } else h += `<div class="empty">No doses planned today</div>`;
+  h += `</div>`;
+  return h;
+}
+function toggleEx(id) { const e = day(selDate || todayISO()).exercises.find(x => x.id === id); if (e) { e.done = !e.done; save(); render(); } }
+function dlgExtraExercise() {
+  openDlg(`<h2>Extra exercise for this day</h2>
+    <form class="fields" onsubmit="event.preventDefault();saveExtraExercise(this)">
+    <label class="f">Exercise<input name="n" required placeholder="Bench press" autofocus></label>
+    <label class="f">Sets × reps · weight<input name="d" placeholder="4 × 8 · 80 kg"></label>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Add</button></div></form>`);
+}
+function saveExtraExercise(f) {
+  const d = day(selDate || todayISO());
+  d.exercises.push({ id: uid(), name: f.n.value.trim(), detail: f.d.value.trim(), done: false });
+  d.userEdited = true; closeDlg(); save(); render();
+}
+
+function setDose(dateISO, id) {
+  const x = day(dateISO).doses.find(z => z.id === id); if (!x || x.done) return;
+  const p = pep(x.pepId);
+  x.done = true; x.at = new Date().toTimeString().slice(0, 5);
+  if (p) p.remainingMg = Math.max(0, Math.round((p.remainingMg - x.mg) * 1000) / 1000);
+  state.history.unshift({ id: uid(), date: dateISO, at: x.at, name: p ? p.name : "?", mg: x.mg });
+  state.history = state.history.slice(0, 500);
+  save(); render();
+}
+function undoDose(dateISO, id) {
+  const x = day(dateISO).doses.find(z => z.id === id); if (!x || !x.done) return;
+  const p = pep(x.pepId);
+  x.done = false; if (p) p.remainingMg = Math.round((p.remainingMg + x.mg) * 1000) / 1000;
+  const hi = state.history.findIndex(hh => hh.date === dateISO && hh.mg === x.mg && hh.name === (p ? p.name : "?"));
+  if (hi >= 0) state.history.splice(hi, 1);
+  save(); render();
+}
+
+// ---------- plan tab: overview ----------
+function viewPlans() {
+  let h = "";
+  const ap = activePlan();
+  if (ap) {
+    h += `<div class="card"><div class="between">
+      <div><span class="title">${esc(ap.name)}</span> <span class="badge g" style="margin-left:6px">active</span></div>
+      <button class="linkish" onclick="editPlanId='${ap.id}';render()">Edit</button></div>`;
+    for (let wd = 0; wd < 7; wd++) {
+      const pd = ap.days ? ap.days[wd] : null;
+      const doses = pd ? (pd.doses || []) : [];
+      h += `<div class="dayrow" onclick="editPlanId='${ap.id}';editWd=${wd};render()">
+        <span class="dw">${DW[wd]}</span>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:800;${pd && pd.workoutName ? "" : "color:var(--muted)"}">${pd && pd.workoutName ? esc(pd.workoutName) : "Rest day"}</div>
+          <div class="muted small">${pd && pd.exercises.length ? pd.exercises.length + " exercises" : ""}${pd && pd.exercises.length && doses.length ? " · " : ""}${doses.length ? doses.map(ds => { const p = pep(ds.pepId); return p ? esc(p.name) : ""; }).filter(Boolean).join(", ") : ""}</div></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>`;
+    }
+    h += `</div>`;
+  } else {
+    h += `<div class="card"><span class="title">No active plan</span>
+      <div class="muted small">Build a weekly plan: your workout and peptides per day. Once activated it repeats every week — months ahead.</div></div>`;
+  }
+  // drafts + other plans
+  const others = (state.plans || []).filter(p => p.id !== state.activePlanId);
+  if (others.length) {
+    h += `<div class="card"><span class="title">Other plans</span>` + others.map(p =>
+      `<div class="item"><div style="flex:1">
+        <div style="font-size:14px;font-weight:800">${esc(p.name)} <span class="badge o" style="padding:2px 8px;font-size:10px;margin-left:4px">${p.status === "draft" ? "draft" : "archived"}</span></div></div>
+        <button class="linkish" onclick="editPlanId='${p.id}';render()">Edit</button>
+        <button class="pill" style="padding:8px 14px;font-size:12px" onclick="activatePlan('${p.id}')">Activate</button></div>`).join("") + `</div>`;
+  }
+  h += `<button class="pill" style="padding:14px 0;font-size:15px" onclick="createPlan()">+ Create new plan</button>`;
+  return h;
+}
+
+function createPlan() {
+  const pl = { id: uid(), name: "Plan " + ((state.plans || []).length + 1), status: "draft", days: {} };
+  state.plans.push(pl); editPlanId = pl.id; save(); render();
+}
+function activatePlan(id) {
+  const pl = plan(id); if (!pl) return;
+  const old = activePlan(); if (old && old.id !== id) old.status = "archived";
+  pl.status = "active"; state.activePlanId = id;
+  const log = state.planLog || (state.planLog = []);
+  if (!log.length || log[log.length - 1].planId !== id) log.push({ planId: id, from: todayISO() });
+  bumpSched(); editPlanId = null; editWd = null; save(); render();
+}
+function delPlan(id) {
+  state.plans = state.plans.filter(p => p.id !== id);
+  if (state.activePlanId === id) { state.activePlanId = null; bumpSched(); }
+  editPlanId = null; editWd = null; closeDlg(); save(); render();
+}
+
+// ---------- plan editor ----------
+function viewPlanEditor() {
+  const pl = plan(editPlanId); if (!pl) { editPlanId = null; return viewPlans(); }
+  const isActive = pl.id === state.activePlanId;
+  let h = `<div class="card"><div class="between">
+    <div class="row"><span class="title">${esc(pl.name)}</span>
+      <span class="badge ${isActive ? "g" : "o"}" style="padding:3px 10px;font-size:11px">${isActive ? "active" : "draft"}</span></div>
+    <button class="linkish" onclick="dlgPlanName()">Name</button></div>
+    <div class="muted small">Tap a day to set its workout and peptides. ${isActive ? "Changes apply to upcoming days right away." : "This is a draft — activate it when it&#39;s ready."}</div>`;
+  for (let wd = 0; wd < 7; wd++) {
+    const pd = pl.days ? pl.days[wd] : null;
+    const doses = pd ? (pd.doses || []) : [];
+    h += `<div class="dayrow" onclick="editWd=${wd};render()">
+      <span class="dw">${DW[wd]}</span>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;${pd && pd.workoutName ? "" : "color:var(--muted)"}">${pd && pd.workoutName ? esc(pd.workoutName) : "Rest day"}</div>
+        <div class="muted small">${pd && pd.exercises.length ? pd.exercises.length + " exercises" : ""}${pd && pd.exercises.length && doses.length ? " · " : ""}${doses.length ? doses.length + " doses" : ""}</div></div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>`;
+  }
+  h += `</div>`;
+
+  // peptide-instellingen (ophoging)
+  h += `<div class="card"><div class="between"><span class="title">Peptide settings</span>
+    <button class="iconbtn" onclick="dlgPeptide()">+</button></div>
+    <div class="muted small">Increasing every few weeks? Put it in the dose plan — the plan automatically uses the right dose per day.</div>`;
+  if (state.peptides.length) {
+    h += state.peptides.map(p => {
+      const ns = nextStep(p, todayISO());
+      return `<div class="item"><div style="flex:1">
+        <div style="font-size:14px;font-weight:800">${esc(p.name)} · now ${fmtMg(doseFor(p, todayISO()))} mg</div>
+        <div class="muted small">${ns ? "from " + fmtDate(ns.from) + " → " + fmtMg(ns.mg) + " mg" : "no increase planned"}</div></div>
+        <button class="pill ghost" style="padding:8px 14px;font-size:12px" onclick="dlgSteps('${p.id}')">Dose plan</button></div>`;
+    }).join("");
+  } else h += `<div class="empty">No peptides yet — add one with +</div>`;
+  h += `</div>`;
+
+  h += `<div class="btnrow" style="margin-top:0">
+    ${isActive ? "" : `<button class="pill" onclick="activatePlan('${pl.id}')">Create plan · repeats weekly</button>`}
+    <button class="pill ghost" style="flex:0 0 auto;padding:13px 18px" onclick="goBack()">${isActive ? "Done" : "Save draft"}</button>
+    <button class="pill danger" style="flex:0 0 auto;padding:13px 18px" onclick="confirmAction('Delete plan?','${esc(pl.name)} will be permanently deleted.',()=>delPlan('${pl.id}'))">✕</button>
+  </div>`;
+  return h;
+}
+function dlgPlanName() {
+  const pl = plan(editPlanId); if (!pl) return;
+  openDlg(`<h2>Plan name</h2><form class="fields" onsubmit="event.preventDefault();savePlanName(this)">
+    <label class="f">Name<input name="n" required value="${esc(pl.name)}" autofocus></label>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Save</button></div></form>`);
+}
+function savePlanName(f) { const pl = plan(editPlanId); if (pl) pl.name = f.n.value.trim(); closeDlg(); save(); render(); }
+
+// ---------- day editor ----------
+function viewDayEditor() {
+  const pl = plan(editPlanId); if (!pl) { editPlanId = null; return viewPlans(); }
+  const pd = planDay(pl, editWd);
+  let h = `<div class="card"><div class="between">
+    <span class="title">Workout${pd.workoutName ? " · <span style='color:var(--green)'>" + esc(pd.workoutName) + "</span>" : ""}</span>
+    <div class="row" style="gap:8px">
+      <button class="linkish" onclick="dlgPdName()">Name</button>
+      <button class="iconbtn" onclick="dlgPdExercise()">+</button></div></div>`;
+  if (pd.exercises.length) {
+    h += pd.exercises.map((e, i) => `<div class="item" onclick="dlgPdExercise(${i})" style="cursor:pointer">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800">${esc(e.name)}</div>
+        <div class="muted small">${esc(e.detail || "")}</div></div>
+      <span class="muted small">Edit ›</span></div>`).join("");
+  } else h += `<div class="empty">Rest day — or add exercises with +</div>`;
+  h += `</div>`;
+
+  h += `<div class="card"><div class="between"><span class="title">Peptides on ${DWL[editWd]}</span>
+    <button class="iconbtn" onclick="dlgPdDose()">+</button></div>`;
+  if (pd.doses.length) {
+    h += pd.doses.map((ds, i) => {
+      const p = pep(ds.pepId);
+      return `<div class="item"><div style="flex:1">
+        <div style="font-size:14px;font-weight:800">${esc(p ? p.name : "?")} · follows dose plan (now ${p ? fmtMg(doseFor(p, todayISO())) : "?"} mg)</div>
+        <div class="muted small">${ds.time ? "at " + esc(ds.time) : "no time"}</div></div>
+        <button class="linkish plain" onclick="delPdDose(${i})">✕</button></div>`;
+    }).join("");
+  } else h += `<div class="empty">No doses on this day</div>`;
+  h += `</div>`;
+  h += `<button class="pill ghost" style="padding:13px 0" onclick="goBack()">‹ Back to week overview</button>`;
+  return h;
+}
+function pdChanged() { if (editPlanId === state.activePlanId) bumpSched(); save(); render(); }
+function dlgPdName() {
+  const pd = planDay(plan(editPlanId), editWd);
+  openDlg(`<h2>Workout name · ${DWL[editWd]}</h2><form class="fields" onsubmit="event.preventDefault();savePdName(this)">
+    <label class="f">Name (e.g. Legs)<input name="n" value="${esc(pd.workoutName)}" autofocus placeholder="Legs"></label>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Save</button></div></form>`);
+}
+function savePdName(f) { planDay(plan(editPlanId), editWd).workoutName = f.n.value.trim(); closeDlg(); pdChanged(); }
+function dlgPdExercise(i) {
+  const pd = planDay(plan(editPlanId), editWd);
+  const e = i != null ? pd.exercises[i] : null;
+  openDlg(`<h2>${e ? "Edit exercise" : "Add exercise"}</h2>
+    <form class="fields" onsubmit="event.preventDefault();savePdExercise(this,${i != null ? i : -1})">
+    <label class="f">Exercise<input name="n" required value="${esc(e ? e.name : "")}" placeholder="Squat" autofocus></label>
+    <label class="f">Sets × reps · weight<input name="d" value="${esc(e ? e.detail : "")}" placeholder="4 × 8 · 100 kg"></label>
+    <div class="btnrow">${e ? `<button type="button" class="pill danger" onclick="delPdExercise(${i})">Delete</button>` : `<button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>`}
+    <button class="pill">Save</button></div></form>`);
+}
+function savePdExercise(f, i) {
+  const pd = planDay(plan(editPlanId), editWd);
+  if (i >= 0) { pd.exercises[i].name = f.n.value.trim(); pd.exercises[i].detail = f.d.value.trim(); }
+  else pd.exercises.push({ name: f.n.value.trim(), detail: f.d.value.trim() });
+  closeDlg(); pdChanged();
+}
+function delPdExercise(i) { const pd = planDay(plan(editPlanId), editWd); pd.exercises.splice(i, 1); closeDlg(); pdChanged(); }
+function dlgPdDose() {
+  if (!state.peptides.length) { openDlg(`<h2>No peptides</h2><p class="muted" style="margin:0 0 14px 0">Add a peptide first under Peptide settings.</p><div class="btnrow"><button class="pill" onclick="closeDlg()">OK</button></div>`); return; }
+  const opts = state.peptides.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+  openDlg(`<h2>Peptide on ${DWL[editWd]}</h2><form class="fields" onsubmit="event.preventDefault();savePdDose(this)">
+    <label class="f">Peptide<select name="p">${opts}</select></label>
+    <label class="f">Time (optional)<input name="t" type="time"></label>
+    <div class="muted small">The dose (mg) automatically follows the peptide's dose plan — even when you increase later.</div>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Add</button></div></form>`);
+}
+function savePdDose(f) {
+  planDay(plan(editPlanId), editWd).doses.push({ id: uid(), pepId: f.p.value, time: f.t.value });
+  closeDlg(); pdChanged();
+}
+function delPdDose(i) { planDay(plan(editPlanId), editWd).doses.splice(i, 1); pdChanged(); }
+
+// ---------- vials (voorraad) ----------
+function viewPep() {
+  const t = todayISO();
+  let h = `<div class="between" style="margin-top:8px"><span class="title" style="font-size:20px">Inventory</span>
+    <button class="iconbtn" onclick="dlgPeptide()">+</button></div>`;
+  if (!state.peptides.length) h += `<div class="card"><div class="empty">No peptides yet — add your first vial with +</div></div>`;
+  state.peptides.forEach(p => {
+    const cur = doseFor(p, t), ns = nextStep(p, t);
+    const frac = p.vialMg > 0 ? Math.max(0, Math.min(1, p.remainingMg / p.vialMg)) : 0;
+    const dosesLeft = cur > 0 ? Math.floor(p.remainingMg / cur + 1e-9) : 0;
+    const C = 251, off = C * (1 - frac);
+    h += `<div class="card">
+      <div class="between"><div><div style="font-size:17px;font-weight:900">${esc(p.name)}</div>
+        <div class="muted small">vial ${fmtMg(p.vialMg)} mg · now ${fmtMg(cur)} mg per dose</div></div>
+        <button class="linkish" onclick="dlgPeptide('${p.id}')">Edit</button></div>
+      ${ns ? `<div class="row"><span class="badge b">from ${fmtDate(ns.from)} → ${fmtMg(ns.mg)} mg</span></div>` : ""}
+      <div class="row" style="gap:16px">
+        <div class="ring"><svg width="92" height="92" viewBox="0 0 92 92">
+          <circle cx="46" cy="46" r="40" fill="none" stroke="#333" stroke-width="9"/>
+          <circle cx="46" cy="46" r="40" fill="none" stroke="var(--green)" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 46 46)"/></svg>
+          <div class="in"><span style="font-size:19px;font-weight:900;color:var(--green)">${fmtMg(p.remainingMg)}</span>
+          <span class="muted" style="font-size:11px">mg left</span></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:7px">
+          <div class="between small"><span class="muted">Used</span><span>${fmtMg(Math.max(0, p.vialMg - p.remainingMg))} mg</span></div>
+          <div class="between small"><span class="muted">Doses left (at ${fmtMg(cur)} mg)</span><span>${dosesLeft}</span></div>
+        </div></div>
+      <div class="btnrow" style="margin-top:0">
+        <button class="pill" onclick="quickDose('${p.id}')">Log dose −${fmtMg(cur)} mg</button>
+        <button class="pill ghost" style="flex:0 0 auto;padding:13px 16px" onclick="refillVial('${p.id}')">New vial</button>
+      </div></div>`;
+  });
+  return h;
+}
+function quickDose(pid) {
+  const p = pep(pid); if (!p) return;
+  const t = todayISO(), at = new Date().toTimeString().slice(0, 5), mgd = doseFor(p, t);
+  p.remainingMg = Math.max(0, Math.round((p.remainingMg - mgd) * 1000) / 1000);
+  const d = day(t);
+  d.doses.push({ id: uid(), pepId: pid, mg: mgd, time: "", done: true, at });
+  d.userEdited = true;
+  state.history.unshift({ id: uid(), date: t, at, name: p.name, mg: mgd });
+  state.history = state.history.slice(0, 500);
+  save(); render();
+}
+function refillVial(pid) { const p = pep(pid); if (!p) return; p.remainingMg = p.vialMg; save(); render(); }
+
+// ---------- historie + stats ----------
+function histDate(iso) { const t = todayISO(); if (iso === t) return "today"; const y = new Date(); y.setDate(y.getDate() - 1); if (iso === todayISO(y)) return "yesterday"; return fmtDate(iso); }
+
+function lastWeekStarts(n) {
+  const out = [], mon = new Date(weekDates(todayISO())[0]);
+  for (let i = n - 1; i >= 0; i--) { const d = new Date(mon); d.setDate(mon.getDate() - 7 * i); out.push(todayISO(d)); }
+  return out;
+}
+// simpele staafgrafiek (één kleur), SVG
+function barChart(data, color, unit) {
+  const W = 340, H = 130, padB = 22, padT = 16, n = data.length;
+  const max = Math.max(1, ...data.map(d => d.value));
+  const slot = W / n, bw = Math.min(26, slot * 0.55);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
+  s += `<line x1="0" y1="${H - padB}" x2="${W}" y2="${H - padB}" stroke="#2c2c2c" stroke-width="1"/>`;
+  data.forEach((d, i) => {
+    const x = slot * i + (slot - bw) / 2;
+    const bh = Math.max(d.value > 0 ? 4 : 0, (H - padB - padT) * d.value / max);
+    const y = H - padB - bh;
+    if (bh > 0) s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${color}"><title>${esc(d.label)}: ${fmtMg(d.value)} ${unit}</title></rect>`;
+    else s += `<rect x="${x.toFixed(1)}" y="${H - padB - 2}" width="${bw.toFixed(1)}" height="2" rx="1" fill="#2c2c2c"><title>${esc(d.label)}: 0 ${unit}</title></rect>`;
+    if (d.value === max && max > 0 || i === n - 1 && d.value > 0)
+      s += `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="800" fill="#cfcfcf" font-family="inherit">${fmtMg(d.value)}</text>`;
+    s += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 7}" text-anchor="middle" font-size="9" font-weight="700" fill="#8a8a8a" font-family="inherit">${esc(d.label)}</text>`;
+  });
+  return s + `</svg>`;
+}
+
+function viewHist() {
+  const t = todayISO();
+  let h = "";
+
+  // grafiek: workouts per week (8 weken)
+  const wk = lastWeekStarts(8);
+  const wkData = wk.map(ws => {
+    const days = weekDates(ws);
+    let v = 0;
+    days.forEach(iso => { const d = state.days[iso]; if (d && d.exercises.some(e => e.done)) v++; });
+    return { label: fmtDate(ws).replace(".", ""), value: v };
+  });
+  h += `<div class="card"><div class="between"><span class="title">Workouts per week</span>
+    <span class="muted small">last 8 weeks</span></div>${barChart(wkData, "var(--green)", "workouts")}</div>`;
+
+  // grafiek per peptide: mg per week
+  state.peptides.forEach((p, pi) => {
+    const col = pi % 2 === 0 ? "var(--blue)" : "var(--orange)";
+    const data = wk.map(ws => {
+      const days = weekDates(ws);
+      const v = state.history.filter(x => x.name === p.name && days.includes(x.date)).reduce((s2, x) => s2 + x.mg, 0);
+      return { label: fmtDate(ws).replace(".", ""), value: Math.round(v * 1000) / 1000 };
+    });
+    if (data.some(d => d.value > 0))
+      h += `<div class="card"><div class="between"><span class="title">${esc(p.name)} · mg per week</span>
+        <span class="muted small">last 8 weeks</span></div>${barChart(data, col, "mg")}</div>`;
+  });
+
+  // stats per maand (laatste 3)
+  const months = [];
+  for (let i = 0; i < 3; i++) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); months.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")); }
+  h += `<div class="card"><span class="title">Per month</span>`;
+  months.forEach(m => {
+    const label = new Date(m + "-01").toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const doses = state.history.filter(x => x.date.slice(0, 7) === m);
+    const perPep = {};
+    doses.forEach(x => { perPep[x.name] = (perPep[x.name] || 0) + x.mg; });
+    let workouts = 0;
+    Object.keys(state.days).forEach(iso => { if (iso.slice(0, 7) === m && state.days[iso].exercises.some(e => e.done)) workouts++; });
+    h += `<div style="border-top:1px solid #262626;padding-top:10px">
+      <div style="font-size:14px;font-weight:900;text-transform:capitalize">${label}</div>
+      <div class="between small" style="margin-top:6px"><span class="muted">Workouts done</span><span>${workouts}</span></div>
+      <div class="between small"><span class="muted">Doses taken</span><span>${doses.length}</span></div>` +
+      Object.keys(perPep).map(n => `<div class="between small"><span class="muted">${esc(n)}</span><span>${fmtMg(perPep[n])} mg</span></div>`).join("") +
+      `</div>`;
+  });
+  h += `</div>`;
+
+  // welk plan wanneer
+  h += `<div class="card"><span class="title">Plan history</span>`;
+  const log = (state.planLog || []).slice().reverse();
+  if (log.length) {
+    h += log.map((l, i) => {
+      const pl = plan(l.planId);
+      const till = i === 0 ? "now" : fmtDate(log[i - 1].from);
+      return `<div class="between" style="font-size:14px"><span>${esc(pl ? pl.name : "deleted plan")}${l.planId === state.activePlanId && i === 0 ? ` <span class="badge g" style="padding:2px 8px;font-size:10px">actief</span>` : ""}</span>
+        <span class="muted">${fmtDate(l.from)} → ${till}</span></div>`;
+    }).join("");
+  } else h += `<div class="empty">No plan activated yet</div>`;
+  h += `</div>`;
+
+  // doseplan-tijdlijnen
+  state.peptides.forEach(p => {
+    const steps = [{ id: "start", from: null, mg: p.doseMg }].concat((p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1));
+    const taken = state.history.filter(x => x.name === p.name);
+    const totMg = taken.reduce((s, x) => s + x.mg, 0);
+    let activeIdx = 0;
+    steps.forEach((s, i) => { if (!s.from || s.from <= t) activeIdx = i; });
+    h += `<div class="card"><div class="between">
+      <span class="title">${esc(p.name)} · dose plan</span>
+      <button class="linkish" onclick="dlgSteps('${p.id}')">Edit</button></div>
+      <div style="display:flex;flex-direction:column;gap:0">` +
+      steps.map((s, i) => {
+        const st = i < activeIdx ? "done" : (i === activeIdx ? "act" : "next");
+        const dot = st === "act"
+          ? `<div style="width:14px;height:14px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px var(--green-bg)"></div>`
+          : st === "done"
+            ? `<div style="width:14px;height:14px;border-radius:50%;background:#3a5c34"></div>`
+            : `<div style="width:14px;height:14px;border-radius:50%;border:2px solid #444"></div>`;
+        return `<div style="display:flex;gap:14px">
+          <div style="display:flex;flex-direction:column;align-items:center;width:14px">
+            ${dot}${i < steps.length - 1 ? `<div style="width:2px;flex:1;background:#2c2c2c;min-height:18px"></div>` : ""}</div>
+          <div style="padding-bottom:${i < steps.length - 1 ? 14 : 0}px">
+            <div style="font-size:14px;font-weight:800;${st === "next" ? "color:var(--muted)" : ""}${st === "act" ? "color:var(--green)" : ""}">${fmtMg(s.mg)} mg per dose${st === "act" ? " · now" : ""}</div>
+            <div class="muted small">${s.from ? "from " + fmtDate(s.from) : "starting dose"}</div>
+          </div></div>`;
+      }).join("") + `</div>
+      <div class="between small" style="border-top:1px solid #262626;padding-top:10px">
+        <span class="muted">Total taken</span><span>${taken.length} doses · ${fmtMg(totMg)} mg</span></div>
+    </div>`;
+  });
+
+  // alle doses
+  h += `<div class="card"><span class="title">All doses</span>`;
+  if (state.history.length) {
+    h += state.history.slice(0, 40).map(x =>
+      `<div class="between" style="font-size:14px"><span>${esc(x.name)} · ${fmtMg(x.mg)} mg</span>
+       <span class="muted">${histDate(x.date)} ${esc(x.at || "")}</span></div>`).join("");
+  } else h += `<div class="empty">No doses taken yet</div>`;
+  h += `</div>`;
+  return h;
+}
+
+// ---------- settings ----------
+function viewSettings() {
+  const nDays = Object.keys(state.days).length;
+  return `<div class="card"><span class="title">Data</span>
+      <div class="between small"><span class="muted">Peptides</span><span>${state.peptides.length}</span></div>
+      <div class="between small"><span class="muted">Plans</span><span>${(state.plans || []).length}</span></div>
+      <div class="between small"><span class="muted">Days with data</span><span>${nDays}</span></div>
+      <div class="between small"><span class="muted">History items</span><span>${state.history.length}</span></div>
+      <div class="between small"><span class="muted">Storage</span><span>${db ? "cloud + this device" : "this device only"}</span></div>
+    </div>
+    <div class="card"><span class="title">Notifications</span>
+      <div class="muted small">You get a notification when a planned dose time is reached. ${notifSupported() ? "" : "Not available in this environment — works in the real app."}</div>
+      <div class="between small"><span class="muted">Status</span><span>${notifStatus()}</span></div>
+      ${notifSupported() && !state.notifyOn ? `<button class="pill ghost" onclick="enableNotif()">Enable notifications</button>` : ""}
+      ${state.notifyOn ? `<button class="pill ghost" onclick="state.notifyOn=false;save();render()">Disable notifications</button>` : ""}
+    </div>
+    <div class="card"><span class="title">Backup</span>
+      <div class="muted small">Copy this text to keep your data safe, or paste a backup to restore.</div>
+      <button class="pill ghost" onclick="dlgExport()">Export data</button>
+      <button class="pill ghost" onclick="dlgImport()">Import data</button>
+    </div>
+    <div class="card"><span class="title">Clean up</span>
+      <button class="pill ghost" onclick="confirmAction('Clear history?','The dose history will be emptied. Vials and plans stay.',clearHistory)">Clear history</button>
+      <button class="pill danger" onclick="confirmAction('Erase everything?','All peptides, plans and history will be deleted. This cannot be undone.',wipeAll)">Erase everything</button>
+    </div>`;
+}
+function dlgExport() {
+  openDlg(`<h2>Export data</h2>
+    <textarea readonly style="width:100%;height:150px;font-size:12px;font-family:monospace" onclick="this.select()">${esc(JSON.stringify(state))}</textarea>
+    <div class="btnrow"><button class="pill" onclick="closeDlg()">Close</button></div>`);
+}
+function dlgImport() {
+  openDlg(`<h2>Import data</h2>
+    <form class="fields" onsubmit="event.preventDefault();doImport(this)">
+    <textarea name="j" style="width:100%;height:150px;font-size:12px;font-family:monospace" placeholder="Paste your backup here"></textarea>
+    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill">Import</button></div></form>`);
+}
+function doImport(f) {
+  try {
+    const s = JSON.parse(f.j.value);
+    if (!s || typeof s !== "object" || !Array.isArray(s.peptides)) throw 0;
+    state = Object.assign({ peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }, s);
+    migrate(); closeDlg(); save(); render();
+  } catch (e) { alert("That's not a valid backup."); }
+}
+let pendingAction = null;
+function confirmAction(titel, tekst, fn) {
+  pendingAction = fn;
+  openDlg(`<h2>${esc(titel)}</h2><p class="muted" style="margin:0 0 14px 0">${esc(tekst)}</p>
+    <div class="btnrow"><button class="pill ghost" onclick="closeDlg()">Cancel</button>
+    <button class="pill danger" onclick="pendingAction();closeDlg()">Yes, do it</button></div>`);
+}
+function clearHistory() { state.history = []; save(); render(); }
+
+// ---------- notifications ----------
+function nativeNotify() { try { return window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.notify || null; } catch (e) { return null; } }
+function pushNativeSchedule() {
+  const nb = nativeNotify(); if (!nb) return;
+  try {
+    const items = [];
+    for (let i = 0; i < 7; i++) {
+      const dt = new Date(); dt.setDate(dt.getDate() + i);
+      const iso = todayISO(dt), d = day(iso);
+      d.doses.forEach(x => {
+        if (!x.done && x.time) {
+          const p = pep(x.pepId);
+          items.push({ date: iso, time: x.time, title: "Time for your dose", body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg" });
+        }
+      });
+    }
+    nb.postMessage(JSON.stringify(items));
+  } catch (e) {}
+}
+function notifSupported() { try { if (nativeNotify()) return true; return typeof Notification !== "undefined" && !!Notification.requestPermission; } catch (e) { return false; } }
+function notifStatus() {
+  if (nativeNotify()) return state.notifyOn ? "on (native)" : "off";
+  if (!notifSupported()) return "not available";
+  if (state.notifyOn && Notification.permission === "granted") return "on";
+  if (Notification.permission === "denied") return "denied in system settings";
+  return "off";
+}
+function enableNotif() {
+  if (!notifSupported()) return;
+  if (nativeNotify()) { state.notifyOn = true; save(); render(); pushNativeSchedule(); return; }
+  try {
+    Notification.requestPermission().then(p => {
+      state.notifyOn = (p === "granted");
+      save(); render();
+    });
+  } catch (e) {}
+}
+function checkNotif() {
+  if (!state.notifyOn) return;
+  if (nativeNotify()) { pushNativeSchedule(); return; }
+  if (!notifSupported()) return;
+  try {
+    if (Notification.permission !== "granted") return;
+    const t = todayISO(), now = new Date().toTimeString().slice(0, 5);
+    const d = state.days[t]; if (!d) return;
+    let dirty = false;
+    d.doses.forEach(x => {
+      if (!x.done && x.time && x.time <= now && !x.notified) {
+        const p = pep(x.pepId);
+        new Notification("Time for your dose", { body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg (" + x.time + ")" });
+        x.notified = true; dirty = true;
+      }
+    });
+    if (dirty) save();
+  } catch (e) {}
+}
+setInterval(checkNotif, 30000);
+function wipeAll() { state = { peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }; editPlanId = null; editWd = null; save(); render(); }
+
+// ---------- peptide dialogs ----------
+const dlg = document.getElementById("dlg");
+function openDlg(html) { dlg.innerHTML = html; dlg.showModal(); }
+function closeDlg() { dlg.close(); }
+
+function dlgPeptide(id) {
+  const p = id ? pep(id) : null;
+  openDlg(`<h2>${p ? "Edit peptide" : "Add peptide"}</h2>
+    <form class="fields" onsubmit="event.preventDefault();savePeptide(this,'${id || ""}')">
+    <label class="f">Name<input name="n" required value="${esc(p ? p.name : "")}" placeholder="Retatrutide" autofocus></label>
+    <div class="grid2">
+      <label class="f">Vial (mg)<input name="v" type="number" step="0.001" min="0.001" required value="${p ? p.vialMg : ""}" placeholder="20"></label>
+      <label class="f">Starting dose (mg)<input name="d" type="number" step="0.001" min="0.001" required value="${p ? p.doseMg : ""}" placeholder="2"></label></div>
+    ${p ? `<label class="f">Left in vial (mg)<input name="r" type="number" step="0.001" min="0" value="${p.remainingMg}"></label>` : ""}
+    <div class="btnrow">${p ? `<button type="button" class="pill danger" onclick="delPeptide('${id}')">Delete</button>` : `<button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>`}
+    <button class="pill">Save</button></div></form>`);
+}
+function savePeptide(f, id) {
+  const v = parseFloat(f.v.value), d = parseFloat(f.d.value);
+  if (id) { const p = pep(id); if (p) { p.name = f.n.value.trim(); p.vialMg = v; p.doseMg = d; p.remainingMg = Math.max(0, parseFloat(f.r.value) || 0); } }
+  else state.peptides.push({ id: uid(), name: f.n.value.trim(), vialMg: v, doseMg: d, remainingMg: v, plan: [] });
+  bumpSched(); closeDlg(); save(); render();
+}
+function delPeptide(id) {
+  state.peptides = state.peptides.filter(p => p.id !== id);
+  (state.plans || []).forEach(pl => { Object.values(pl.days || {}).forEach(pd => { pd.doses = (pd.doses || []).filter(ds => ds.pepId !== id); }); });
+  bumpSched(); closeDlg(); save(); render();
+}
+
+function dlgSteps(pid) {
+  const p = pep(pid); if (!p) return;
+  const t = todayISO();
+  const steps = (p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1);
+  const rows = steps.length ? steps.map(s =>
+    `<div class="item" style="padding:10px 14px"><div style="flex:1">
+      <div style="font-size:14px;font-weight:800">${fmtMg(s.mg)} mg per dose</div>
+      <div class="muted small">from ${fmtDate(s.from)}${s.from <= t ? " · active" : ""}</div></div>
+      <button class="linkish plain" onclick="delStep('${pid}','${s.id}')">✕</button></div>`).join("")
+    : `<div class="empty">No steps yet — starting dose is ${fmtMg(p.doseMg)} mg</div>`;
+  openDlg(`<h2>Dose plan · ${esc(p.name)}</h2>
+    <div class="muted small" style="margin-bottom:10px">Now: ${fmtMg(doseFor(p, t))} mg per dose. Add a step for every increase.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${rows}</div>
+    <form class="fields" onsubmit="event.preventDefault();addStep(this,'${pid}')">
+      <div class="grid2">
+        <label class="f">From<input name="f" type="date" required value="${t}"></label>
+        <label class="f">Dose (mg)<input name="mg" type="number" step="0.001" min="0.001" required placeholder="4"></label></div>
+      <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Close</button>
+      <button class="pill">Add step</button></div></form>`);
+}
+function addStep(f, pid) {
+  const p = pep(pid); if (!p) return;
+  if (!p.plan) p.plan = [];
+  p.plan.push({ id: uid(), from: f.f.value, mg: parseFloat(f.mg.value) });
+  bumpSched(); save(); dlgSteps(pid); render();
+}
+function delStep(pid, sid) {
+  const p = pep(pid); if (!p) return;
+  p.plan = (p.plan || []).filter(s => s.id !== sid);
+  bumpSched(); save(); dlgSteps(pid); render();
+}
+
+init();
+</script>
