@@ -10,7 +10,7 @@ targets:
     sources:
       - Sources
     resources:
-      - path: ../app/index.html
+      - path: Resources
     info:
       path: Info.plist
       properties:

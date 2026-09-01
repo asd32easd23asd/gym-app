@@ -17,6 +17,12 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Bundle web app
+        working-directory: ios
+        run: |
+          mkdir -p Resources
+          cp ../app/index.html Resources/index.html
+
       - name: Generate Xcode project
         working-directory: ios
         run: xcodegen generate
