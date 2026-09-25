@@ -1,0 +1,14 @@
+{
+  "name": "gym-planner-local",
+  "private": true,
+  "version": "2.0.0",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "start": "node scripts/serve.cjs",
+    "check": "node scripts/check.cjs"
+  },
+  "description": "Offline iPhone gym planner with local progress photos",
+  "dependencies": {
+    "lucide": "1.48.0"
+  }
+}

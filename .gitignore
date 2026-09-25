@@ -1,0 +1,9 @@
+node_modules/
+artifacts/
+ios/build/
+ios/Resources/
+ios/Payload/
+ios/*.ipa
+ios/*.xcodeproj/
+ios/Info.plist
+.DS_Store

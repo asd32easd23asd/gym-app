@@ -2,7 +2,7 @@ name: GymPlanner
 options:
   bundleIdPrefix: com.s.gymplanner
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "15.4"
 targets:
   GymPlanner:
     type: application
@@ -11,23 +11,29 @@ targets:
       - path: Sources
       - path: Assets.xcassets
       - path: Resources
+        type: folder
         buildPhase: resources
         optional: true
     info:
       path: Info.plist
       properties:
-        CFBundleDisplayName: Planner
+        CFBundleDisplayName: Gym Planner
         CFBundleIconName: AppIcon
         CFBundleIcons:
           CFBundlePrimaryIcon:
             CFBundleIconName: AppIcon
             CFBundleIconFiles: [AppIcon60x60]
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "2.0"
+        CFBundleVersion: "2"
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UIViewControllerBasedStatusBarAppearance: true
+        NSCameraUsageDescription: Maak een voortgangsfoto die lokaal op je iPhone wordt bewaard.
+        NSPhotoLibraryUsageDescription: Kies een voortgangsfoto voor je lokale logboek.
+        NSPhotoLibraryAddUsageDescription: Bewaar een door jou gekozen foto in je fotobibliotheek.
+        UIFileSharingEnabled: false
+        LSSupportsOpeningDocumentsInPlace: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.s.gymplanner.app
@@ -36,3 +42,4 @@ targets:
         CODE_SIGN_STYLE: Manual
         CODE_SIGNING_ALLOWED: "NO"
         CODE_SIGNING_REQUIRED: "NO"
+        SWIFT_VERSION: "5.0"

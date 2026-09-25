@@ -2,26 +2,41 @@ name: Build unsigned IPA
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'codex/**']
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: macos-15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Node for offline app checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate app and run data-model tests
+        run: |
+          npm run check
+          npm test
 
       - name: Install XcodeGen
         run: brew install xcodegen
 
-      - name: Bundle web app
-        working-directory: ios
+      - name: Bundle every offline web resource
         run: |
-          mkdir -p Resources
-          cp ../app/index.html Resources/index.html
+          mkdir -p ios/Resources/WebApp
+          cp -R app/. ios/Resources/WebApp/
+          test -s ios/Resources/WebApp/index.html
 
       - name: Generate Xcode project
         working-directory: ios
@@ -30,36 +45,32 @@ jobs:
       - name: Build (unsigned)
         working-directory: ios
         run: |
+          set -o pipefail
           xcodebuild -project GymPlanner.xcodeproj \
             -scheme GymPlanner \
             -configuration Release \
             -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             build
 
-      - name: Package IPA
+      - name: Package IPA for user-controlled signing
         working-directory: ios
         run: |
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
-          cp ../app/index.html Payload/GymPlanner.app/index.html
-          test -f Payload/GymPlanner.app/index.html
-          codesign --force --deep --sign - Payload/GymPlanner.app
-          codesign --verify Payload/GymPlanner.app
-          zip -r GymPlanner.ipa Payload
+          cp -R build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
+          test -s Payload/GymPlanner.app/Resources/WebApp/index.html
+          /usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' Payload/GymPlanner.app/Info.plist
+          zip -q -r GymPlanner.ipa Payload
+          shasum -a 256 GymPlanner.ipa > GymPlanner.ipa.sha256
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GymPlanner-ipa
-          path: ios/GymPlanner.ipa
-
-      - name: Release latest
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Latest build
-          files: ios/GymPlanner.ipa
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: GymPlanner-ipa-${{ github.run_number }}
+          path: |
+            ios/GymPlanner.ipa
+            ios/GymPlanner.ipa.sha256
+          if-no-files-found: error
+          retention-days: 14

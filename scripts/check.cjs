@@ -1,0 +1,3 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const dir=path.resolve(__dirname,'../app');for(const file of fs.readdirSync(dir).filter(f=>f.endsWith('.js'))){new vm.Script(fs.readFileSync(path.join(dir,file),'utf8'),{filename:file});console.log('Syntax OK:',file);}
+const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');for(const match of html.matchAll(/(?:src|href)="([^"]+)"/g)){if(/^https?:/.test(match[1]))throw Error('Remote asset: '+match[1]);if(!fs.existsSync(path.join(dir,match[1])))throw Error('Missing asset '+match[1]);}console.log('All assets bundled locally.');
