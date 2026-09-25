@@ -2,6 +2,8 @@ node_modules/
 artifacts/
 ios/build/
 ios/Resources/
+ios/WebApp/
+ios/build-simulator/
 ios/Payload/
 ios/*.ipa
 ios/*.xcodeproj/

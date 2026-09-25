@@ -39,7 +39,7 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         view.addSubview(webView)
 
-        guard let index = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Resources/WebApp") else {
+        guard let index = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "WebApp") else {
             showFailure("De appbestanden ontbreken. Installeer de app opnieuw.")
             return
         }

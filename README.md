@@ -17,13 +17,15 @@ Social bevat alleen duidelijk gemarkeerde lokale voorbeeldprofielen. Geen online
 
 ## IPA bouwen
 
-De bestaande GitHub Actions-workflow bouwt op macOS bij een push naar `main` of `codex/**`, of via handmatig starten. Hij test de logica, bundelt alle appbestanden en levert een **unsigned** `GymPlanner.ipa` met SHA-256 als workflow-artifact. Er wordt geen website, backend of publieke release gedeployd. Minimum: **iOS 15.4**.
+De bestaande GitHub Actions-workflow bouwt op macOS bij een push naar `main` of `codex/**`, of via handmatig starten. Hij test de logica, valideert de appbundel met Foundation, installeert en start een simulatorbuild en levert een **unsigned** `GymPlanner-2.0.1.ipa` met SHA-256 als workflow-artifact. Er wordt geen website, backend of publieke release gedeployd. Minimum: **iOS 15.4**.
+
+Versie 2.0.1 heeft een nieuw oranje appicoon en corrigeert de installatieverpakking: webbestanden staan direct onder `GymPlanner.app/WebApp`. Een iOS-app mag geen eigen map `Resources` aan de bundelroot bevatten; die kan de melding **Missing bundle ID** veroorzaken ondanks een geldige `Info.plist`. De simulatorcontrole reproduceert de fout met de oude structuur en controleert daarna installatie van de nieuwe structuur.
 
 ## Installeren met Sideloadly op Windows
 
 1. Pak de IPA uit het workflow-artifact uit.
 2. Open [Sideloadly](https://sideloadly.io/), sluit je iPhone met USB aan en vertrouw de computer.
-3. Selecteer je iPhone en sleep `GymPlanner.ipa` in Sideloadly.
+3. Selecteer je iPhone en sleep `GymPlanner-2.0.1.ipa` in Sideloadly.
 4. Vul je Apple ID zelf in Sideloadly in en kies **Start**. Sideloadly ondertekent en installeert de app; de IPA is vooraf niet voor een toestel ondertekend.
 5. Vertrouw zo nodig het ontwikkelaarsprofiel via **Instellingen → Algemeen → VPN en apparaatbeheer**. Schakel op iOS 16+ indien gevraagd **Ontwikkelaarsmodus** in via **Privacy en beveiliging**.
 

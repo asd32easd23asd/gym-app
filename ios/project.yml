@@ -10,10 +10,9 @@ targets:
     sources:
       - path: Sources
       - path: Assets.xcassets
-      - path: Resources
+      - path: WebApp
         type: folder
         buildPhase: resources
-        optional: true
     info:
       path: Info.plist
       properties:
@@ -23,8 +22,8 @@ targets:
           CFBundlePrimaryIcon:
             CFBundleIconName: AppIcon
             CFBundleIconFiles: [AppIcon60x60]
-        CFBundleShortVersionString: "2.0"
-        CFBundleVersion: "2"
+        CFBundleShortVersionString: "2.0.1"
+        CFBundleVersion: "3"
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

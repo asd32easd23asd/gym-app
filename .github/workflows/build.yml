@@ -28,15 +28,16 @@ jobs:
         run: |
           npm run check
           npm test
+          swift scripts/validate-bundle.swift --self-test
 
       - name: Install XcodeGen
         run: brew install xcodegen
 
       - name: Bundle every offline web resource
         run: |
-          mkdir -p ios/Resources/WebApp
-          cp -R app/. ios/Resources/WebApp/
-          test -s ios/Resources/WebApp/index.html
+          mkdir -p ios/WebApp
+          cp -R app/. ios/WebApp/
+          test -s ios/WebApp/index.html
 
       - name: Generate Xcode project
         working-directory: ios
@@ -60,17 +61,31 @@ jobs:
         run: |
           mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
-          test -s Payload/GymPlanner.app/Resources/WebApp/index.html
+          swift ../scripts/validate-bundle.swift Payload/GymPlanner.app
           /usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' Payload/GymPlanner.app/Info.plist
-          zip -q -r GymPlanner.ipa Payload
-          shasum -a 256 GymPlanner.ipa > GymPlanner.ipa.sha256
+          zip -q -r GymPlanner-2.0.1.ipa Payload
+          shasum -a 256 GymPlanner-2.0.1.ipa > GymPlanner-2.0.1.ipa.sha256
+
+      - name: Install and launch on an iPhone simulator
+        run: bash scripts/ios-smoke.sh
+
+      - name: Upload simulator screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iPhone-smoke-${{ github.run_number }}
+          path: |
+            artifacts/iPhone-smoke.png
+            artifacts/invalid-layout.log
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: GymPlanner-ipa-${{ github.run_number }}
           path: |
-            ios/GymPlanner.ipa
-            ios/GymPlanner.ipa.sha256
+            ios/GymPlanner-2.0.1.ipa
+            ios/GymPlanner-2.0.1.ipa.sha256
           if-no-files-found: error
           retention-days: 14
