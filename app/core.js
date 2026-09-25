@@ -9,7 +9,8 @@
  const weekday=s=>(new Date(s+'T12:00:00').getDay()+6)%7;
  const week=s=>Array.from({length:7},(_,i)=>addDays(s,i-weekday(s)));
  const emptyDay=()=>({name:'',time:'18:00',exercises:[],reminders:[]});
- function initial(){return {schema:2,profile:{name:'',heightCm:null},settings:{notifications:false},plan:{name:'Mijn trainingsweek',days:Array.from({length:7},emptyDay)},sessions:{},notes:{},products:[],usages:[],measurements:[],photos:[],reminders:[]};}
+ function initial(){return {schema:2,profile:{name:'',heightCm:null},settings:{notifications:false,onboardingVersion:0,premiumPreview:false,starterDismissed:false},plan:{name:'Mijn trainingsweek',days:Array.from({length:7},emptyDay)},sessions:{},notes:{},products:[],usages:[],measurements:[],photos:[],reminders:[]};}
+ function upgrade(d){if(d&&d.schema===2&&d.settings&&typeof d.settings==='object'){for(const [key,value] of Object.entries(initial().settings))if(d.settings[key]===undefined)d.settings[key]=value;}return d;}
  function sessionFor(data,date){if(data.sessions[date])return data.sessions[date];const t=data.plan.days[weekday(date)];return {name:t.name,time:t.time,exercises:t.exercises.map(e=>({id:e.id,name:e.name,detail:e.detail||'',sets:Array.from({length:e.sets},(_,i)=>({id:'planned-'+date+'-'+e.id+'-'+i,kg:e.kg,reps:e.reps,done:false}))}))};}
  function ensureSession(data,date){if(!data.sessions[date])data.sessions[date]=sessionFor(data,date);return data.sessions[date];}
  function records(data){const result=new Map();Object.entries(data.sessions).forEach(([date,s])=>s.exercises.forEach(e=>e.sets.filter(x=>x.done&&x.kg>0).forEach(x=>{const k=e.name.trim().toLocaleLowerCase(),old=result.get(k);if(!old||x.kg>old.kg||(x.kg===old.kg&&x.reps>old.reps))result.set(k,{name:e.name,kg:x.kg,reps:x.reps,date});})));return [...result.values()].sort((a,b)=>b.kg-a.kg);}
@@ -28,6 +29,8 @@
   if(!text(d.profile.name,80))fail('Ongeldige profielnaam.');
   if(d.profile.heightCm!==null&&!quantity(d.profile.heightCm,false,300))fail('Ongeldige lengte.');
   if(typeof d.settings.notifications!=='boolean')fail('Ongeldige instelling voor herinneringen.');
+  if(d.settings.onboardingVersion!==undefined&&![0,1].includes(d.settings.onboardingVersion))fail('Ongeldige introductiestatus.');
+  for(const key of ['premiumPreview','starterDismissed'])if(d.settings[key]!==undefined&&typeof d.settings[key]!=='boolean')fail('Ongeldige appinstelling: '+key);
   if(!text(d.plan.name,80,true))fail('Ongeldige naam van het weekplan.');
   for(const day of d.plan.days){
    if(!object(day)||!text(day.name,60)||!validTime(day.time)||!Array.isArray(day.exercises)||!Array.isArray(day.reminders))fail('Ongeldig weekplan.');
@@ -89,5 +92,5 @@
   }
   const d=initial();d.plan=plan;validate(d);return plan;
  }
- return {uid,today,parse,validDate,addDays,weekday,week,emptyDay,initial,sessionFor,ensureSession,records,validate,migrate,importPlan};
+ return {uid,today,parse,validDate,addDays,weekday,week,emptyDay,initial,upgrade,sessionFor,ensureSession,records,validate,migrate,importPlan};
 });

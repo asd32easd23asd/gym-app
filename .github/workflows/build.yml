@@ -63,8 +63,8 @@ jobs:
           cp -R build/Build/Products/Release-iphoneos/GymPlanner.app Payload/
           swift ../scripts/validate-bundle.swift Payload/GymPlanner.app
           /usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' Payload/GymPlanner.app/Info.plist
-          zip -q -r GymPlanner-2.0.1.ipa Payload
-          shasum -a 256 GymPlanner-2.0.1.ipa > GymPlanner-2.0.1.ipa.sha256
+          zip -q -r GymPlanner-2.1.0.ipa Payload
+          shasum -a 256 GymPlanner-2.1.0.ipa > GymPlanner-2.1.0.ipa.sha256
 
       - name: Install and launch on an iPhone simulator
         run: bash scripts/ios-smoke.sh
@@ -85,7 +85,7 @@ jobs:
         with:
           name: GymPlanner-ipa-${{ github.run_number }}
           path: |
-            ios/GymPlanner-2.0.1.ipa
-            ios/GymPlanner-2.0.1.ipa.sha256
+            ios/GymPlanner-2.1.0.ipa
+            ios/GymPlanner-2.1.0.ipa.sha256
           if-no-files-found: error
           retention-days: 14

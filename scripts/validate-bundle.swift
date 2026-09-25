@@ -12,7 +12,9 @@ let fileManager = FileManager.default
 let webAssets = [
     "index.html", "app.css", "core.js", "product-model.js", "storage.js",
     "app.js", "photo-store.js", "products.js", "body.js", "bootstrap.js",
-    "vendor/lucide.min.js", "vendor/LICENSE-lucide"
+    "vendor/lucide.min.js", "vendor/LICENSE-lucide", "preferences.js", "preferences.css",
+    "onboarding.js", "onboarding.css", "ai-plan-model.js", "ai-plan.js", "ai-plan.css",
+    "social-model.js", "social.js", "social.css"
 ]
 
 func require(_ condition: Bool, _ message: String) throws {

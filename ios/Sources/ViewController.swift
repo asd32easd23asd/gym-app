@@ -101,6 +101,15 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
               let id = body["id"], id is String || id is NSNumber,
               let action = body["action"] as? String else { return }
         let payload = body["payload"] as? [String: Any] ?? [:]
+        if action == "copyText" {
+            guard let text = payload["text"] as? String, !text.isEmpty, text.utf8.count <= 100_000 else {
+                reply(id, result: .failure(GymError.invalid("De tekst is leeg of te groot om te kopiëren."))); return
+            }
+            // User-initiated copy only; localOnly prevents Universal Clipboard sync.
+            UIPasteboard.general.setItems([["public.utf8-plain-text": text]], options: [.localOnly: true])
+            reply(id, result: .success(["copied": true]))
+            return
+        }
         if action == "notifications" {
             guard let items = payload["items"] as? [[String: Any]] else {
                 reply(id, result: .failure(GymError.invalid("De lijst met herinneringen ontbreekt."))); return

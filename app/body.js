@@ -14,7 +14,7 @@
   const photo = id => G.data.photos.find(p => p.id === id);
   const weightLabel = value => value == null ? 'Geen gewicht gekoppeld' : G.fmt(value) + ' kg';
   const dateLabel = value => G.dateLabel(value);
-  const localNote = () => `<p class="photo-local-note">${G.icon('lock')} ${window.GymNative?.available ? 'Alleen op deze iPhone. Niet gedeeld of in iCloud geback-upt.' : 'Alleen in deze browser. Browsergegevens wissen verwijdert ook je foto’s.'}</p>`;
+  const localNote = () => `<aside class="photo-local-note">${G.icon('lock')}<span><strong>Je foto’s blijven privé.</strong><br>${window.GymNative?.available ? 'Alleen op deze iPhone bewaard. Nooit door deze app naar een server geüpload. Geen cloudback-up.' : 'Alleen in deze browser bewaard. Nooit naar een server geüpload. Browsergegevens wissen verwijdert ook je foto’s.'}</span></aside>`;
   const navButton = (text, page, params, className = 'secondary') => G.button(text, page, params || {}, className);
   const action = (text, name, attrs = '', className = 'secondary') => `<button type="button" class="${className}" data-action="${name}" ${attrs}>${text}</button>`;
   const fieldsError = '<p class="form-error" role="alert"></p>';
