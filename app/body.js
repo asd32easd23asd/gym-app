@@ -34,14 +34,16 @@
   }
   G.pages.body = () => {
     const list = weights(), latest = list[0], first = list.at(-1), delta = latest && first ? latest.weight - first.weight : 0;
-    const recent = photos().slice(0, 2);
-    return G.header('YOUR PROGRESS', 'Gewicht', 'stats') + `<div class="panel"><span class="eyebrow">${latest ? 'LAATSTE METING · ' + e(dateLabel(latest.date)) : 'JOUW STARTPUNT'}</span><div class="big">${latest ? G.fmt(latest.weight) : '—'} <small>kg</small></div>${list.length > 1 ? `<p class="muted">${delta > 0 ? '+' : ''}${G.fmt(delta)} kg sinds ${e(dateLabel(first.date))}</p>` : '<p class="muted">Volg je gewicht op je eigen tempo.</p>'}${navButton('Gewicht toevoegen', 'measurement', { measurementId: '' }, 'primary')}</div><div class="section-head"><h2>Gewichtsverloop</h2><span class="muted">${list.length} metingen</span></div>${chart(list)}<div class="section-head"><h2>Voortgangsfoto’s</h2>${navButton('Alle foto’s', 'photos', {}, 'text-button')}</div>${localNote()}${recent.length ? `<div class="photo-grid">${recent.map(tile).join('')}</div>${navButton('Foto toevoegen', 'photoAdd')}` : photoEmpty()}${list.length ? `<div class="section-head"><h2>Metingen</h2></div><div class="panel">${list.map(m => `<div class="row"><div class="grow"><strong>${e(dateLabel(m.date))}</strong>${m.note ? `<p class="muted">${e(m.note)}</p>` : ''}</div><strong>${G.fmt(m.weight)} kg</strong>${navButton('Wijzig', 'measurement', { measurementId: m.id }, 'text-button')}</div>`).join('')}</div>` : ''}${G.data.profile.heightCm ? `<p class="muted">Lengte: ${G.fmt(G.data.profile.heightCm)} cm</p>` : ''}`;
+    return G.header('JOUW VOORTGANG', 'Progressie') + G.progressTabs('body') + `<section class="panel weight-summary"><span class="eyebrow">${latest ? 'LAATSTE GEWICHT · ' + e(dateLabel(latest.date)) : 'JE EERSTE METING'}</span><div class="big">${latest ? G.fmt(latest.weight) : '—'} <small>kg</small></div>${list.length > 1 ? `<p class="muted">${delta > 0 ? '+' : ''}${G.fmt(delta)} kg sinds ${e(dateLabel(first.date))}</p>` : '<p>Voeg je gewicht toe om je verloop te zien.</p>'}${navButton(G.icon('plus') + ' Gewicht toevoegen', 'measurement', { measurementId: '' }, 'primary')}</section><div class="section-head"><h2>Gewichtsverloop</h2><span class="muted">${list.length} ${list.length === 1 ? 'meting' : 'metingen'}</span></div>${chart(list)}${list.length ? `<div class="section-head"><h2>Je metingen</h2></div><div class="panel">${list.map(m => `<div class="row"><div class="grow"><strong>${G.fmt(m.weight)} kg</strong><p class="muted">${e(dateLabel(m.date))}</p>${m.note ? `<p class="muted">${e(m.note)}</p>` : ''}</div>${navButton('Bewerken', 'measurement', { measurementId: m.id }, 'text-button')}</div>`).join('')}</div>` : ''}<aside class="task-photo-link"><div>${G.icon('images')}<span><strong>Je progressie in beeld</strong><p>Bewaar foto’s bij je gewichtsmetingen, alleen op je eigen toestel.</p></span></div>${navButton('Voortgangsfoto’s bekijken', 'photos', {}, 'secondary')}</aside>${G.data.profile.heightCm ? `<p class="muted">Lengte: ${G.fmt(G.data.profile.heightCm)} cm</p>` : ''}`;
   };
   G.pages.measurement = () => {
     const m = G.data.measurements.find(item => item.id === G.ui.measurementId);
-    return G.header('GEWICHT', m ? 'Meting wijzigen' : 'Nieuwe meting', 'body') + `<form data-form="saveMeasurement" class="fields"><input type="hidden" name="id" value="${e(m?.id || '')}"><div class="pair"><label>Gewicht (kg)<input name="weight" inputmode="decimal" autocomplete="off" value="${e(m?.weight == null ? '' : String(m.weight).replace('.', ','))}" placeholder="Bijv. 78,4" required></label><label>Datum<input name="date" type="date" value="${e(m?.date || G.today())}" max="${G.today()}" required></label></div><label>Lengte (cm) · optioneel<input name="height" inputmode="decimal" value="${e(G.data.profile.heightCm ?? '')}" placeholder="Bijv. 182"></label><label>Notitie · optioneel<textarea name="note" maxlength="300" placeholder="Bijv. ochtendmeting">${e(m?.note || '')}</textarea></label><label class="row"><input type="checkbox" name="addPhoto"><span class="grow">Hierna een voortgangsfoto toevoegen</span></label>${fieldsError}<button class="primary" type="submit">Meting bewaren</button></form>${m ? action('Meting verwijderen', 'deleteMeasurement', `data-id="${e(m.id)}"`, 'danger') : ''}`;
+    return G.header('PROGRESSIE · GEWICHT', m ? 'Gewicht aanpassen' : 'Gewicht toevoegen', 'body') + `<form data-form="saveMeasurement" class="fields weight-form"><input type="hidden" name="id" value="${e(m?.id || '')}"><label>Gewicht (kg)<input class="weight-value-input" name="weight" inputmode="decimal" autocomplete="off" value="${e(m?.weight == null ? '' : String(m.weight).replace('.', ','))}" placeholder="Bijv. 78,4" required></label><label>Datum<input name="date" type="date" value="${e(m?.date || G.today())}" max="${G.today()}" required></label><label class="row weight-photo-choice"><input type="checkbox" name="addPhoto"><span class="grow"><strong>Ook een foto toevoegen</strong><small>Na het opslaan kies of maak je een foto. Die blijft op je toestel.</small></span></label><details class="panel task-optional" ${m?.note ? 'open' : ''}><summary>Lengte of notitie toevoegen · optioneel</summary><div class="fields"><label>Lengte (cm)<input name="height" inputmode="decimal" value="${e(G.data.profile.heightCm ?? '')}" placeholder="Bijv. 182"></label><label>Notitie<textarea name="note" maxlength="300" placeholder="Bijv. ochtendmeting">${e(m?.note || '')}</textarea></label></div></details>${fieldsError}<button class="primary" type="submit">Gewicht opslaan</button></form>${m ? action('Meting verwijderen', 'deleteMeasurement', `data-id="${e(m.id)}"`, 'danger') : ''}`;
   };
-  G.pages.photos = () => G.header('ALLEEN VOOR JOU', 'Voortgangsfoto’s', 'body') + localNote() + angleChips() + `<div class="section-head"><span class="muted">${filtered().length} foto’s</span>${filtered().length >= 2 ? navButton('Vergelijken', 'photoCompare', {}, 'text-button') : ''}</div>` + (filtered().length ? `<div class="photo-grid">${filtered().map(tile).join('')}</div>` + navButton('Foto toevoegen', 'photoAdd', {}, 'primary') : photoEmpty());
+  G.pages.photos = () => {
+    const all = photos(), list = filtered();
+    return G.header('JOUW VOORTGANG', 'Progressie') + G.progressTabs('photos') + localNote() + (all.length ? navButton(G.icon('plus') + ' Foto toevoegen', 'photoAdd', {}, 'primary') + '<div class="section-head"><h2>Je foto’s</h2>' + (list.length >= 2 ? navButton('Foto’s vergelijken', 'photoCompare', {}, 'text-button') : '') + '</div>' + angleChips() + (list.length ? `<div class="photo-grid">${list.map(tile).join('')}</div>` : '<p class="notice">Nog geen foto’s met dit aanzicht. Kies een ander filter of voeg een foto toe.</p>') : photoEmpty());
+  };
   function freshDraft(overrides = {}) { return { blob: null, url: '', date: G.today(), weight: '', angle: G.ui.photoAngle && G.ui.photoAngle !== 'Alle' ? G.ui.photoAngle : 'Voorkant', note: '', linkWeight: true, ...overrides }; }
   function discardDraft() { if (draft?.url) URL.revokeObjectURL(draft.url); draft = null; }
   function captureDraft(form) {
@@ -49,9 +51,12 @@
     ['date', 'weight', 'angle', 'note'].forEach(key => { if (form.elements[key]) draft[key] = form.elements[key].value; });
     draft.linkWeight = !!form.elements.linkWeight?.checked;
   }
+  document.addEventListener('input', event => {
+    captureDraft(event.target.closest?.('form[data-form="savePhoto"]'));
+  });
   G.pages.photoAdd = () => {
     if (!draft) draft = freshDraft();
-    return G.header('ALLEEN OP JE TOESTEL', 'Foto toevoegen', 'photos') + localNote() + `<form class="fields" data-form="savePhoto"><div class="photo-picker">${draft.url ? `<div class="photo-focus"><div class="photo-frame"><img src="${e(draft.url)}" alt="Geselecteerde foto"></div></div>` : '<div class="empty"><p>Kies een foto of maak er een met je camera.</p></div>'}<div class="pair">${action(draft.url ? 'Andere foto' : 'Uit foto’s kiezen', 'choosePhoto', 'data-source="gallery"')}${action('Foto maken', 'choosePhoto', 'data-source="camera"')}</div><input id="photo-file" type="file" accept="image/*" hidden><input id="photo-camera" type="file" accept="image/*" capture="environment" hidden></div><div class="pair"><label>Datum<input name="date" type="date" value="${e(draft.date)}" max="${G.today()}" required></label><label>Gewicht (kg) · optioneel<input name="weight" inputmode="decimal" value="${e(draft.weight)}" placeholder="Bijv. 78,4"></label></div><label>Aanzicht<select name="angle">${angles.map(a => `<option ${a === draft.angle ? 'selected' : ''}>${a}</option>`).join('')}</select></label><label>Notitie · optioneel<textarea name="note" maxlength="300" placeholder="Bijv. zelfde houding en licht">${e(draft.note)}</textarea></label><label class="row"><input name="linkWeight" type="checkbox" ${draft.linkWeight ? 'checked' : ''}><span class="grow">Ingevuld gewicht ook als meting bewaren</span></label>${fieldsError}<button class="primary" type="submit" ${draft.blob && !photoBusy ? '' : 'disabled'}>${photoBusy ? 'Foto verwerken…' : 'Foto bewaren'}</button><p class="muted">De foto wordt op dit toestel verkleind om opslagruimte te besparen.</p></form>`;
+    return G.header('ALLEEN OP JE TOESTEL', 'Foto toevoegen', 'photos') + localNote() + `<form class="fields" data-form="savePhoto"><div class="photo-picker">${draft.url ? `<div class="photo-focus"><div class="photo-frame"><img src="${e(draft.url)}" alt="Geselecteerde foto"></div></div>` : '<div class="empty"><p>Kies een foto of maak er een met je camera.</p></div>'}<div class="pair">${action(draft.url ? 'Andere foto kiezen' : 'Foto kiezen', 'choosePhoto', 'data-source="gallery"')}${action('Camera openen', 'choosePhoto', 'data-source="camera"')}</div><input id="photo-file" type="file" accept="image/*" hidden><input id="photo-camera" type="file" accept="image/*" capture="environment" hidden></div><div class="pair"><label>Datum<input name="date" type="date" value="${e(draft.date)}" max="${G.today()}" required></label><label>Gewicht (kg) · optioneel<input name="weight" inputmode="decimal" value="${e(draft.weight)}" placeholder="Bijv. 78,4"></label></div><label>Aanzicht<select name="angle">${angles.map(a => `<option ${a === draft.angle ? 'selected' : ''}>${a}</option>`).join('')}</select></label><label>Notitie · optioneel<textarea name="note" maxlength="300" placeholder="Bijv. zelfde houding en licht">${e(draft.note)}</textarea></label><label class="row"><input name="linkWeight" type="checkbox" ${draft.linkWeight ? 'checked' : ''}><span class="grow">Ingevuld gewicht ook als meting bewaren</span></label>${fieldsError}<button class="primary" type="submit" ${draft.blob && !photoBusy ? '' : 'disabled'}>${photoBusy ? 'Foto verwerken…' : 'Foto opslaan'}</button>${!draft.blob && !photoBusy ? '<p class="task-field-help">Kies eerst een foto of open de camera om verder te gaan.</p>' : ''}<p class="muted">De foto wordt op dit toestel verkleind om opslagruimte te besparen.</p>${draft.blob ? action('Geselecteerde foto wissen', 'discardPhotoDraft', '', 'text-button') : ''}</form>`;
   };
   G.pages.photoDetail = () => {
     const p = photo(G.ui.photoId);
@@ -99,6 +104,12 @@
     const p = photo(element.dataset.id); if (!p) return;
     G.navigate('photoCompare', { photoAngle: p.angle, photoAfter: p.id, photoBefore: '' });
   };
+  G.actions.discardPhotoDraft = () => {
+    if (photoBusy) return;
+    G.confirm('Geselecteerde foto wissen?', 'De niet-opgeslagen foto en bijbehorende invoer worden gewist. Je bewaarde foto’s blijven behouden.', () => {
+      discardDraft(); G.render();
+    }, 'Invoer wissen');
+  };
   G.actions.choosePhoto = element => {
     if (photoBusy) return;
     captureDraft(element.closest('form'));
@@ -131,6 +142,7 @@
   document.addEventListener('change', async event => {
     const field = event.target;
     if (!field.closest?.('#app')) return;
+    captureDraft(field.closest?.('form[data-form="savePhoto"]'));
     if (field.dataset.photoCompare) {
       const key = field.dataset.photoCompare, other = key === 'photoBefore' ? 'photoAfter' : 'photoBefore', old = G.ui[key];
       G.ui[key] = field.value; if (G.ui[other] === field.value) G.ui[other] = old; G.render(); return;
@@ -141,11 +153,11 @@
     photoBusy = true; G.render();
     try {
       const blob = await compress(file);
-      if (draft !== selectedDraft || G.ui.page !== 'photoAdd') return;
+      if (draft !== selectedDraft) return;
       if (draft.url) URL.revokeObjectURL(draft.url);
       draft.blob = blob; draft.url = URL.createObjectURL(blob);
     } catch (error) { G.toast(error.message || 'De foto kan niet worden geopend.'); }
-    finally { photoBusy = false; G.render(); }
+    finally { photoBusy = false; if (G.ui.page === 'photoAdd') G.render(); }
   });
   G.forms.savePhoto = async form => {
     if (!draft?.blob || photoBusy) return;
@@ -185,7 +197,6 @@
   G.afterRender.push(() => {
     const generation = ++renderGeneration;
     liveURLs.forEach(url => window.GymPhotos.revoke(url)); liveURLs = [];
-    if (G.ui.page !== 'photoAdd' && !photoBusy) discardDraft();
     document.querySelectorAll('#app img[data-local-photo]').forEach(async img => {
       const status = img.parentElement.querySelector('.photo-load-status');
       try {

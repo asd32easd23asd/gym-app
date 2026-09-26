@@ -1,0 +1,52 @@
+/* Visible task navigation. Main destinations never move or disappear. */
+#nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding-left:8px;padding-right:8px}
+#nav button{min-width:0;gap:5px;font-size:11px;min-height:58px;padding:7px 2px}
+#nav button.active{color:var(--accent);background:#ff704312}
+#nav button.active span{font-weight:750}
+#screen{padding-top:calc(env(safe-area-inset-top,0px) + 16px)}
+.page-header{margin:6px 0 24px;align-items:center;gap:10px}
+.page-header h1{font-size:30px;letter-spacing:-.8px;line-height:1.12}
+.page-header .eyebrow{font-size:10px;letter-spacing:.08em}
+.settings-button{background:transparent;border:0;color:var(--muted);display:flex;align-items:center;flex-direction:column;justify-content:center;gap:5px;min-height:48px;padding:4px;flex-shrink:0;font-size:10px}
+.settings-button svg{width:21px;height:21px}
+.back-row{margin:-6px 0 6px}.back-row .text-button{font-size:13px;color:var(--text);padding-right:18px}
+.section-tabs{display:flex;gap:4px;background:#191b1e;border:1px solid var(--line);padding:4px;border-radius:12px;margin:0 0 24px}
+.section-tabs button{flex:1;min-width:0;min-height:44px;padding:10px 5px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:600}
+.section-tabs button.active{background:#34373d;color:var(--text);box-shadow:0 1px 3px #0002}
+.section-intro{margin:14px 0 16px}.section-intro h2{font-size:19px}.section-intro p{margin-bottom:0}
+.today-training{border:1px solid #614338;background:linear-gradient(135deg,#30251f,#1c1e21 72%);padding:20px;border-radius:18px;margin:4px 0 25px}
+.today-training h2{font-size:25px;letter-spacing:-.7px;margin:12px 0 8px;line-height:1.2}
+.today-training p{font-size:13px;line-height:1.5}
+.today-training .primary{margin:19px 0 4px;min-height:52px}
+.today-training>.text-button{display:flex;width:100%;font-size:13px;min-height:44px;margin-bottom:-8px}
+.task-icon{color:var(--accent);display:grid;place-items:center}
+.section-head{margin-top:22px;margin-bottom:4px}.section-head h2{font-size:17px}.section-head .text-button{font-size:12px;text-align:right}
+.compact-button{width:auto;min-height:44px;margin:0;padding:10px 13px;font-size:12px}
+.home-products{border:1px solid var(--line);border-radius:14px;padding:0 14px;background:var(--card)}
+.home-product{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.home-product:last-child{border-bottom:0}.home-product>div{min-width:0;flex:1}.home-product h3{font-size:14px}.home-product p{margin:4px 0 0;font-size:12px}
+.home-product .compact-button{flex:0 0 auto;color:var(--text);background:#282b30;font-size:12px}
+.home-empty p{margin:5px 0 10px}.home-empty .secondary{margin-bottom:0}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-action{display:flex;align-items:center;gap:10px;justify-content:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;min-height:64px;padding:14px 12px;text-align:left;font-size:13px;font-weight:650}
+.quick-action svg{color:var(--accent);flex-shrink:0}.quick-action span{line-height:1.4}
+.details summary::after{content:'+';margin-left:auto;color:var(--muted);font-size:19px;font-weight:400}.details[open]>summary::after{content:'−'}
+.training-date{display:flex;gap:12px;align-items:flex-end;margin:18px 0 22px}
+.training-date label{display:grid;gap:8px;font-size:12px;color:var(--muted);flex:1;min-width:0}
+.training-date input{min-height:46px}.training-date .compact-button{min-height:46px;margin:0}
+.history-notice{padding:12px 14px;border:1px solid #714332;border-radius:10px;background:#ff70430c;color:#efc4b8}
+.session-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin:24px 0 8px}
+.session-summary h2{font-size:22px;max-width:66%}.session-summary>span{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
+.workout-hint{font-size:13px;line-height:1.6;margin:8px 0 22px}
+.workout-section{padding:16px 14px 8px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:16px 0}
+.workout-section>.section-head{margin:0 0 16px;min-height:44px}.workout-section h2{font-size:17px}
+.set-row,.set-head{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr) 64px;gap:8px}
+.set-head{font-size:10px;letter-spacing:0;text-align:center}.set-row input{background:var(--bg);min-height:50px}
+.set-save{border:1px solid #74412f;border-radius:10px;background:#ff704316;color:#ffa486;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;padding:5px 2px}
+.set-save svg{width:17px;height:17px}.set-save.complete{color:#b2c2b4;border-color:#46534a;background:#29372d}
+.set-save.unsaved{color:var(--accent);border-color:var(--accent);background:#ff704316}
+.exercise-options{position:relative}.exercise-options>summary{font-size:12px;color:var(--muted);min-height:44px;padding:12px 0 12px 14px;cursor:pointer}.exercise-options[open]{z-index:1}.exercise-options button{font-size:12px}
+.exercise-menu{position:absolute;right:0;bottom:44px;width:min(250px,70vw);padding:6px;background:#25272b;border:1px solid #494b50;border-radius:12px;box-shadow:0 8px 30px #0008}.exercise-menu button{display:flex;width:100%;min-height:48px;padding:12px;text-align:left;justify-content:flex-start}
+.week-plan .weekly-row{padding:16px 2px;min-height:76px}.week-plan strong{font-size:15px}.week-plan small{font-size:12px;line-height:1.5}
+.settings-button:focus-visible,h1:focus-visible{outline-offset:4px}
+@media(max-width:370px){#nav{padding-left:4px;padding-right:4px}#nav button{font-size:10px}.quick-actions{gap:8px}.quick-action{gap:8px;padding:12px 9px;font-size:12px}.home-products{padding:0 12px}.home-product{gap:8px}.home-product .compact-button{padding:9px;font-size:11px}.today-training{padding:17px}.page-header h1{font-size:27px}.workout-section{padding-left:10px;padding-right:10px}.set-row,.set-head{grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) 58px;gap:6px}.set-head{font-size:9px}}

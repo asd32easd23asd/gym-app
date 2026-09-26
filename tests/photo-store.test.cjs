@@ -135,6 +135,74 @@ test('photo saves only after local bytes; linking the same date and weight avoid
   assert.equal(photoBytes.size, 1); assert.equal(photoBytes.get(G.data.photos[0].id).type, 'image/jpeg');
   assert.equal(G.data.photos[0].weight, 78.2); assert.equal(G.ui.page, 'photoDetail');
 });
+
+test('an unsaved photo survives opening settings and returning, without storing bytes before save', async () => {
+  const harness = bodyContext(), { G, photoBytes } = harness;
+  const form = await selectPhoto(harness);
+  const preview = G.pages.photoAdd().match(/src="([^"]+)" alt="Geselecteerde foto"/)[1];
+  assert.equal(photoBytes.size, 0);
+  G.navigate('settings');
+  for (const hook of G.afterRender) await hook();
+  G.navigate('photoAdd');
+  for (const hook of G.afterRender) await hook();
+  assert.ok(G.pages.photoAdd().includes(preview), 'the selected local preview is retained');
+  await G.forms.savePhoto(form);
+  assert.equal(photoBytes.size, 1);
+  assert.equal(G.data.photos[0].note, 'Eigen foto');
+  assert.equal(G.data.photos[0].weight, 78.2);
+});
+
+test('photo metadata edited after selecting a photo survives navigation in its own draft', async () => {
+  const harness = bodyContext(), { G, events, photoBytes } = harness;
+  const form = await selectPhoto(harness);
+  form.elements.date.value = '2026-09-24';
+  form.elements.weight.value = '79,4';
+  form.elements.note.value = 'Nieuwe notitie na het kiezen';
+  events.input({ target: { closest: () => form } });
+  form.elements.angle.value = 'Zijkant';
+  form.elements.linkWeight.checked = false;
+  await events.change({ target: { dataset: {}, closest: () => form } });
+  G.navigate('settings');
+  for (const hook of G.afterRender) await hook();
+  G.navigate('photoAdd');
+  const html = G.pages.photoAdd();
+  assert.ok(html.includes('value="2026-09-24"'));
+  assert.ok(html.includes('value="79,4"'));
+  assert.ok(html.includes('Nieuwe notitie na het kiezen'));
+  assert.ok(html.includes('<option selected>Zijkant</option>'));
+  assert.ok(!html.includes('name="linkWeight" type="checkbox" checked'));
+  assert.ok(html.includes('alt="Geselecteerde foto"'));
+  assert.equal(photoBytes.size, 0);
+});
+
+test('adding a photo after a new weight intentionally starts a fresh matching photo draft', async () => {
+  const harness = bodyContext(), { G } = harness;
+  await selectPhoto(harness);
+  await G.forms.saveMeasurement({ values: { weight: '81,3', date: '2026-09-23', height: '', note: '', addPhoto: 'on' } });
+  assert.equal(G.ui.page, 'photoAdd');
+  const html = G.pages.photoAdd();
+  assert.ok(html.includes('value="2026-09-23"'));
+  assert.ok(html.includes('value="81,3"'));
+  assert.ok(!html.includes('Eigen foto'));
+  assert.ok(!html.includes('alt="Geselecteerde foto"'));
+  assert.ok(!html.includes('name="linkWeight" type="checkbox" checked'));
+  assert.equal(G.data.measurements.length, 1);
+  assert.equal(G.data.measurements[0].weight, 81.3);
+  assert.equal(G.data.measurements[0].date, '2026-09-23');
+});
+
+test('explicitly clearing an unsaved photo removes its preview without touching saved photos', async () => {
+  const harness = bodyContext(), { G, photoBytes, deletedPhotos } = harness;
+  G.data.photos.push({ id: 'existing', date: '2026-09-25', weight: null, angle: 'Voorkant', note: '' });
+  const form = await selectPhoto(harness);
+  G.actions.discardPhotoDraft();
+  assert.ok(!G.pages.photoAdd().includes('alt="Geselecteerde foto"'));
+  await G.forms.savePhoto(form);
+  assert.equal(photoBytes.size, 0);
+  assert.equal(G.data.photos.length, 1);
+  assert.equal(G.data.photos[0].id, 'existing');
+  assert.equal(deletedPhotos.length, 0);
+});
 test('failed metadata save removes newly stored photo bytes and retains no phantom gallery entry', async () => {
   const harness = bodyContext(), { G, photoBytes, deletedPhotos } = harness;
   const form = await selectPhoto(harness);

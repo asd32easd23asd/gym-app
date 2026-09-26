@@ -161,6 +161,7 @@ test('product pages render real empty and populated data without seeding or unes
     data: { products: [], usages: [] }, ui: {}, pages: {}, actions: {}, forms: {}, afterRender: [], e: escape,
     fmt: value => String(value), dateLabel: value => value, today: () => '2026-09-25', uid: () => 'new-id', icon: () => '',
     header: (eyebrow, title) => '<h1>' + escape(title) + '</h1>',
+    productTabs: active => '<div data-product-tab="' + escape(active) + '"></div>',
     empty: (title, text, cta) => '<p>' + escape(title) + escape(text) + '</p>' + (cta || ''),
     button: label => '<button>' + escape(label) + '</button>'
   };

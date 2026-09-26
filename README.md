@@ -1,17 +1,29 @@
 # Gym Planner — lokale iPhone-app
 
-Functionele app voor dagelijks gebruik met grafiet/oranje ontwerp. Versie **2.1.0** werkt zonder hosting, account of internet. De iOS-app bundelt alle HTML, JavaScript, CSS en iconen; netwerkverkeer vanuit de webweergave is geblokkeerd.
+Functionele app voor dagelijks gebruik met grafiet/oranje ontwerp. Versie **2.2.0** werkt zonder hosting, account of internet. De iOS-app bundelt alle HTML, JavaScript, CSS en iconen; netwerkverkeer vanuit de webweergave is geblokkeerd.
+
+## Navigatie
+
+De vaste navigatie heeft vijf gelabelde bestemmingen: **Vandaag**, **Trainen**, **Producten**, **Progressie** en **Groepen**. Binnen een taak blijft de bijbehorende hoofdsectie herkenbaar.
+
+- **Vandaag:** snel beginnen met de dagelijkse handelingen.
+- **Trainen → Training / Weekplan:** een training per datum vastleggen of het herhalende weekschema aanpassen.
+- **Producten → Voorraad / Gebruik:** controleren wat je hebt en terugzien wat je hebt geregistreerd.
+- **Progressie → Kracht / Gewicht / Foto’s:** records, metingen en lokale voortgangsfoto’s bekijken.
+- **Groepen:** lokale groepen, challenges en scores.
+
+De keuzes zijn onderbouwd met [navigatieonderzoek en fitnessapp-onderzoek](docs/ux-navigation-research.md). Dit document bevat literatuur, een inspectie van de app en een plan voor toekomstige gebruikerstests; er is geen eigen klantonderzoek uitgevoerd.
 
 ## Eerste gebruik
 
-Een nieuwe installatie begint zonder voorbeeldtrainingen, producten, foto’s, vrienden of scores. De introductie legt in vier stappen uit hoe je trainingen afvinkt, producteenheden en voorraad instelt en je gegevens lokaal bewaart. Je voornaam invullen is optioneel; de introductie overslaan kan ook.
+Een nieuwe installatie begint zonder voorbeeldtrainingen, producten, foto’s, vrienden of scores. De introductie legt in drie stappen de belangrijkste taken en lokale opslag uit. Je voornaam invullen is optioneel; de introductie overslaan kan ook.
 
-Op Vandaag helpen de eerste-stappenknoppen je een training, product of gewichtsmeting toe te voegen. Je kunt deze kaart verbergen en via de hulp weer terugzetten. Via Instellingen kun je de uitleg openen en de introductie opnieuw bekijken, zonder opgeslagen gegevens te verwijderen. Bij een update blijven bestaande gegevens behouden; de nieuwe introductie verschijnt eenmalig als je die nog niet hebt afgerond.
+Op Vandaag staat een optionele, standaard ingeklapte eerste-stappenkaart met ingangen voor een training, product of gewichtsmeting. Via Instellingen kun je de uitleg openen en de introductie opnieuw bekijken, zonder opgeslagen gegevens te verwijderen. Bij een update blijven bestaande gegevens behouden; de introductie verschijnt als je die nog niet hebt afgerond.
 
 ## Wat werkt
 
 - Een herhalend weekplan met oefeningen, sets, herhalingen, gewicht en herinneringen.
-- Training per datum aanpassen en sets afvinken; PR’s en geschiedenis volgen uit afgeronde sets.
+- Training per datum aanpassen en sets bewaren; PR’s en geschiedenis volgen uit afgeronde sets. Een bewaarde set nogmaals bewaren maakt deze niet ongedaan en maakt geen dubbele set. Terugzetten is een expliciete handeling onder **Meer**.
 - Producten met g, mg, ml, liters, scoops, stuks, capsules, druppels en eigen eenheden. Eigen omrekeningen, voorraad aanvullen, gebruik loggen en ongedaan maken.
 - Gewicht invoeren, wijzigen, verwijderen en bekijken in een grafiek.
 - Foto’s via fotobibliotheek/camera toevoegen, lokaal verkleinen, dateren en vergelijken. Geen upload of cloudback-up vanuit de app.
@@ -25,24 +37,24 @@ Een barcode kan handmatig bij een product worden opgeslagen; automatische produc
 
 ## Gratis plannen met je eigen AI
 
-Open de AI-planner vanuit Planning of de eerste-stappenkaart. Kies je trainingsdoel, beschikbare dagen, tijd en materiaal. De app maakt een prompt die je zelf kopieert naar een AI-app naar keuze, bijvoorbeeld een lokaal model op je telefoon of computer. Gym Planner bevat geen ingebouwd AI-model en verstuurt geen aanvragen naar een AI-dienst. Of de gekozen AI-app lokaal of online werkt, bepaalt die andere app.
+Open de AI-planner via **Trainen → Weekplan**. Kies je trainingsdoel, beschikbare dagen, tijd en materiaal. De app maakt een prompt die je zelf kopieert naar een AI-app naar keuze, bijvoorbeeld een lokaal model op je telefoon of computer. Gym Planner bevat geen ingebouwd AI-model en verstuurt geen aanvragen naar een AI-dienst. Of de gekozen AI-app lokaal of online werkt, bepaalt die andere app.
 
 Plak het JSON-antwoord terug, controleer de leesbare weekweergave en bevestig voordat het schema wordt toegepast. Het startgewicht wordt op 0 kg gezet; je vult je eigen gewicht in tijdens de training. Toepassen vervangt je herhalende weekplan en de wekelijkse herinneringen daarin. Opgeslagen trainingen en afzonderlijke dagherinneringen blijven behouden. Foto’s, metingen en trainingsgeschiedenis worden niet in de prompt opgenomen.
 
-## Social en Premium uitproberen
+## Groepen en Premium uitproberen
 
 Via **Instellingen → Premium** kun je Premium aan- en uitzetten voor deze testversie. De schakelaar ontgrendelt functies op dit toestel en bewaart die keuze. **Dit is geen aankoop: er wordt niets afgeschreven en er start geen abonnement.**
 
 - **Gratis:** trainingen, producten, progressie, foto’s, AI-prompts en deelnemen via een ontvangen challengecode.
 - **Premium-test aan:** groepen en deelnemers aanmaken of aanpassen en eigen challenges maken.
 
-Social begint leeg. Je maakt zelf een groep, voert namen in en stelt bijvoorbeeld een doel voor de zwaarste lift of het totale aantal herhalingen in. Scores worden handmatig opgeslagen en de lokale ranglijst wordt daaruit berekend. Deelnemers zijn namen op jouw toestel; de app maakt geen accounts aan en verstuurt geen uitnodigingen.
+Groepen begint leeg. Je maakt zelf een groep, voert namen in en stelt bijvoorbeeld een doel voor de zwaarste lift of het totale aantal herhalingen in. Scores worden handmatig opgeslagen en de lokale ranglijst wordt daaruit berekend. Deelnemers zijn namen op jouw toestel; de app maakt geen accounts aan en verstuurt geen uitnodigingen.
 
 Je kunt een challengecode kopiëren en zelf delen. De code bevat het doel, de naam, de meeteenheid en de periode van de challenge, geen deelnemers of resultaten. Iemand zonder Premium kan de code importeren en eigen scores bijhouden. **Scores blijven op ieder toestel afzonderlijk: er is geen online groepsverbinding, automatische synchronisatie of gedeelde live ranglijst.**
 
 ## IPA bouwen
 
-De bestaande GitHub Actions-workflow bouwt op macOS bij een push naar `main` of `codex/**`, of via handmatig starten. Hij test de logica, valideert de appbundel met Foundation, installeert en start een simulatorbuild en levert een **unsigned** `GymPlanner-2.1.0.ipa` met SHA-256 als workflow-artifact. Er wordt geen website, backend of publieke release gedeployd. Minimum: **iOS 15.4**. Een geslaagde simulatorcontrole vervangt geen test op je eigen iPhone.
+De bestaande GitHub Actions-workflow bouwt op macOS bij een push naar `main` of `codex/**`, of via handmatig starten. Hij test de logica, valideert de appbundel met Foundation, installeert en start een simulatorbuild en levert een **unsigned** `GymPlanner-2.2.0.ipa` met SHA-256 als workflow-artifact. Er wordt geen website, backend of publieke release gedeployd. Minimum: **iOS 15.4**. Een geslaagde simulatorcontrole vervangt geen test op je eigen iPhone.
 
 Het oranje appicoon en de installatiecorrectie uit versie 2.0.1 blijven behouden: webbestanden staan direct onder `GymPlanner.app/WebApp`. Een eigen map `Resources` aan de bundelroot veroorzaakte eerder **Missing bundle ID**, ondanks een geldige `Info.plist`. De simulatorcontrole reproduceert de fout met de oude structuur en controleert daarna installatie van de nieuwe structuur.
 
@@ -50,7 +62,7 @@ Het oranje appicoon en de installatiecorrectie uit versie 2.0.1 blijven behouden
 
 1. Pak de IPA uit het workflow-artifact uit.
 2. Open [Sideloadly](https://sideloadly.io/), sluit je iPhone met USB aan en vertrouw de computer.
-3. Selecteer je iPhone en sleep `GymPlanner-2.1.0.ipa` in Sideloadly.
+3. Selecteer je iPhone en sleep `GymPlanner-2.2.0.ipa` in Sideloadly.
 4. Vul je Apple ID zelf in Sideloadly in en kies **Start**. Sideloadly ondertekent en installeert de app; de IPA is vooraf niet voor een toestel ondertekend.
 5. Vertrouw zo nodig het ontwikkelaarsprofiel via **Instellingen → Algemeen → VPN en apparaatbeheer**. Schakel op iOS 16+ indien gevraagd **Ontwikkelaarsmodus** in via **Privacy en beveiliging**.
 

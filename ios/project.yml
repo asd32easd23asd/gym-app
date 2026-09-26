@@ -22,8 +22,8 @@ targets:
           CFBundlePrimaryIcon:
             CFBundleIconName: AppIcon
             CFBundleIconFiles: [AppIcon60x60]
-        CFBundleShortVersionString: "2.1.0"
-        CFBundleVersion: "4"
+        CFBundleShortVersionString: "2.2.0"
+        CFBundleVersion: "5"
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
