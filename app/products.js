@@ -10,6 +10,7 @@
   const field = (label, name, value, extra = '', type = 'text') => '<label>' + e(label) + '<input type="' + type + '" name="' + e(name) + '" value="' + e(value == null ? '' : value) + '" ' + extra + '></label>';
   const errorSlot = '<p class="form-error" role="alert" aria-live="polite"></p>';
   const quantity = (value, unit, product) => fmt(value) + ' ' + M.unitLabel(unit, product);
+  const finish = (page, params) => G.finishQuick ? G.finishQuick(page, params) : G.navigate(page, params);
   const product = () => G.data.products.find(item => item.id === G.ui.productId);
   const productEmpty = () => G.empty('Product niet gevonden', 'Dit product is niet meer beschikbaar.', G.button('Naar je voorraad', 'inventory'));
   const clone = item => JSON.parse(JSON.stringify(item));
@@ -44,7 +45,7 @@
 
   G.pages.inventory = function () {
     const list = G.data.products;
-    return G.header('VOORRAAD EN GEBRUIK', 'Producten') + G.productTabs('inventory') + (list.length ? '<div class="section-head"><h2>Jouw voorraad</h2>' + action('product-new', G.icon('plus') + ' Product toevoegen', '', 'secondary') + '</div><p class="task-page-intro">Voer in wat je gebruikt. Je voorraad wordt direct bijgewerkt.</p><div class="product-cards">' + list.map(p => '<article class="panel product-stock-card"><button type="button" class="row-open" data-action="product-open" data-id="' + e(p.id) + '" aria-label="Voorraad van ' + e(p.name) + ' bekijken"><span><strong>' + e(p.name) + '</strong><span class="muted">' + e(quantity(p.stock, p.base, p)) + ' over' + (p.detail ? ' · ' + e(p.detail) : '') + '</span></span>' + G.icon('chevron-right') + '</button><div class="product-card-actions">' + action('usage-new', G.icon('plus') + ' Gebruik invoeren', p.id, 'secondary', 'aria-label="Gebruik van ' + e(p.name) + ' invoeren"') + action('product-open', 'Voorraad beheren', p.id, 'text-button') + '</div></article>').join('') + '</div>' : G.empty('Voeg je eerste product toe', 'Bijvoorbeeld creatine of pre-workout. Kies zelf gram, mg, ml, scoops of een eigen eenheid. Daarna kun je gebruik en voorraad bijhouden.', action('product-new', G.icon('plus') + ' Product toevoegen', '', 'primary')));
+    return G.header('VOORRAAD EN GEBRUIK', 'Producten') + G.productTabs('inventory') + '<div class="inventory-scan">' + action('inventory-scan', G.icon('scan-barcode') + ' Product scannen', '', 'secondary') + '</div>' + (list.length ? '<div class="section-head"><h2>Jouw voorraad</h2>' + action('product-new', G.icon('plus') + ' Product toevoegen', '', 'secondary') + '</div><p class="task-page-intro">Voer in wat je gebruikt. Je voorraad wordt direct bijgewerkt.</p><div class="product-cards">' + list.map(p => '<article class="panel product-stock-card"><button type="button" class="row-open" data-action="product-open" data-id="' + e(p.id) + '" aria-label="Voorraad van ' + e(p.name) + ' bekijken"><span><strong>' + e(p.name) + '</strong><span class="muted">' + e(quantity(p.stock, p.base, p)) + ' over' + (p.detail ? ' · ' + e(p.detail) : '') + '</span></span>' + G.icon('chevron-right') + '</button><div class="product-card-actions">' + action('usage-new', G.icon('plus') + ' Gebruik invoeren', p.id, 'secondary', 'aria-label="Gebruik van ' + e(p.name) + ' invoeren"') + action('product-open', 'Voorraad beheren', p.id, 'text-button') + '</div></article>').join('') + '</div>' : G.empty('Voeg je eerste product toe', 'Bijvoorbeeld creatine of pre-workout. Kies zelf gram, mg, ml, scoops of een eigen eenheid. Daarna kun je gebruik en voorraad bijhouden.', action('product-new', G.icon('plus') + ' Product toevoegen', '', 'primary')));
   };
   G.pages.products = G.pages.inventory;
 
@@ -63,13 +64,14 @@
     let r = null; try { r = M.rate(d, d.entryUnit); } catch (_) {}
     if (r === null && !ratioKeys.includes(d.entryUnit)) ratioKeys.push(d.entryUnit);
     const custom = d.base === 'custom' || d.entryUnit === 'custom' || ratioKeys.includes('custom');
-    return G.header('PRODUCTEN', existing ? 'Product aanpassen' : 'Product toevoegen', existing ? 'product' : 'inventory') + '<form data-form="product-save" id="product-form" novalidate>' +
-      '<section class="task-form-section"><h2>1. Welk product?</h2><div class="fields">' + field('Productnaam', 'name', d.name, 'maxlength="80" required autocomplete="off" placeholder="Bijvoorbeeld: creatine"') + '</div></section>' +
-      '<section class="task-form-section"><h2>2. Hoeveel heb je?</h2><p>Neem de inhoud over van je verpakking.</p><div class="fields"><label>Eenheid op de verpakking<select name="base" id="product-base"' + (hasUsage ? ' disabled' : '') + '>' + options(d.base, d) + '</select></label>' + (hasUsage ? '<p class="notice">Deze eenheid staat vast omdat je al gebruik hebt opgeslagen.</p>' : '') + (d.unitNotice ? '<p class="notice">' + e(d.unitNotice) + '</p>' : '') + '<div class="pair">' + field('Volle verpakking (' + M.unitLabel(d.base, d) + ')', 'total', d.total, 'inputmode="decimal" required placeholder="Bijv. 300"') + field('Nu nog over (' + M.unitLabel(d.base, d) + ')', 'stock', d.stock, 'inputmode="decimal" required placeholder="Bijv. 250"') + '</div><p class="task-field-help">Nieuwe verpakking? Vul bij beide velden dezelfde hoeveelheid in.</p></div></section>' +
-      '<section class="task-form-section"><h2>3. Hoe voer je gebruik in?</h2><p>Kies je eigen maat, bijvoorbeeld gram of scoops.</p><div class="fields"><label>Gebruik invoeren in<select name="entryUnit" id="product-entry-unit">' + options(d.entryUnit, d) + '</select></label>' + (custom ? field('Naam van je eigen eenheid', 'customLabel', d.customLabel, 'maxlength="24" required placeholder="Bijvoorbeeld: portie"') : '') + '</div>' +
+    return G.header('PRODUCTEN', existing ? 'Productinstellingen' : 'Product toevoegen', existing ? 'product' : 'inventory') + '<form data-form="product-save" id="product-form" class="quick-product-form" novalidate>' +
+      '<div class="product-scan-line">' + action('product-scan', G.icon('scan-barcode') + ' Barcode scannen', '', 'secondary') + '<p class="barcode-result" id="barcode-result" role="status">' + (d.barcode ? 'Barcode: ' + e(d.barcode) : '') + '</p></div>' +
+      '<div class="fields">' + field('Productnaam', 'name', d.name, 'maxlength="80" required autocomplete="off" placeholder="Bijvoorbeeld: creatine"') + '</div>' +
+      '<section class="task-form-section"><h2>Voorraad</h2><div class="fields"><label>Eenheid op de verpakking<select name="base" id="product-base"' + (hasUsage ? ' disabled' : '') + '>' + options(d.base, d) + '</select></label>' + (hasUsage ? '<p class="notice">Deze eenheid staat vast omdat je al gebruik hebt opgeslagen.</p>' : '') + (d.unitNotice ? '<p class="notice">' + e(d.unitNotice) + '</p>' : '') + '<div class="pair">' + field('Volle verpakking (' + M.unitLabel(d.base, d) + ')', 'total', d.total, 'inputmode="decimal" required placeholder="Bijv. 300"') + field('Nu nog over (' + M.unitLabel(d.base, d) + ')', 'stock', d.stock, 'inputmode="decimal" required placeholder="Bijv. 250"') + '</div><p class="task-field-help">Nieuwe verpakking? Vul bij beide velden dezelfde hoeveelheid in.</p></div></section>' +
+      '<section class="task-form-section"><h2>Gebruik</h2><div class="fields"><label>Gebruik invoeren in<select name="entryUnit" id="product-entry-unit">' + options(d.entryUnit, d) + '</select></label>' + (custom ? field('Naam van je eigen eenheid', 'customLabel', d.customLabel, 'maxlength="24" required placeholder="Bijvoorbeeld: portie"') : '') + '</div>' +
       (ratioKeys.length ? '<div class="task-conversion"><h3>Hoe groot is jouw maat?</h3><p>Gebruik de verhouding op jouw verpakking. Voor bijvoorbeeld scoops en ml verschilt die per product.</p><div class="fields">' + ratioKeys.map(key => '<label>1 ' + e(M.unitLabel(key, d)) + ' = hoeveel ' + e(M.unitLabel(d.base, d)) + '?<input inputmode="decimal" data-ratio="' + e(key) + '" value="' + e(d.ratios[key] == null ? '' : d.ratios[key]) + '" placeholder="Bijv. 12" aria-label="' + e(M.unitLabel(d.base, d) + ' per ' + M.unitLabel(key, d)) + '"></label>').join('') + '</div></div>' : '<p class="notice">' + (d.base === d.entryUnit ? 'Gebruik wordt direct van je voorraad afgehaald.' : 'De app rekent automatisch om: 1 ' + e(M.unitLabel(d.entryUnit, d)) + ' = ' + e(quantity(r, d.base, d)) + '.') + '</p>') +
       '<div class="fields">' + field('Standaard invullen (' + M.unitLabel(d.entryUnit, d) + ')', 'defaultAmount', d.defaultAmount, 'inputmode="decimal" required') + '<p class="task-field-help">Deze hoeveelheid staat straks alvast ingevuld. Je kunt die bij elke invoer veranderen.</p></div></section>' +
-      '<details class="panel task-optional"' + (d.detail || d.barcode ? ' open' : '') + '><summary>Merk en barcode · optioneel</summary><div class="fields">' + field('Merk of variant', 'detail', d.detail, 'maxlength="160" placeholder="Bijvoorbeeld: smaak of merk"') + field('Barcodenummer', 'barcode', d.barcode, 'maxlength="64" autocomplete="off" placeholder="Nummer onder de barcode"') + '</div><p class="notice">Het nummer blijft bij je product bewaard. Er wordt geen productinformatie online opgezocht.</p></details>' + errorSlot + '<button type="submit" class="primary">' + (existing ? 'Wijzigingen opslaan' : 'Product opslaan') + '</button></form>' + (existing ? action('product-delete', 'Product verwijderen', existing.id, 'secondary danger') : '');
+      '<details class="panel task-optional"><summary>Merk of barcode aanpassen</summary><div class="fields">' + field('Merk of variant', 'detail', d.detail, 'maxlength="160" placeholder="Bijvoorbeeld: smaak of merk"') + field('Barcode handmatig', 'barcode', d.barcode, 'maxlength="64" autocomplete="off" placeholder="Als scannen niet lukt"') + '</div></details>' + errorSlot + '<button type="submit" class="primary">' + (existing ? 'Wijzigingen opslaan' : 'Product opslaan') + '</button></form>' + (existing ? action('product-delete', 'Product verwijderen', existing.id, 'secondary danger') : '');
   };
 
   G.pages.usage = function () {
@@ -77,7 +79,13 @@
     const d = logDraft(p), available = M.availableUnits(p);
     if (!available.includes(d.enteredUnit)) { d.enteredUnit = p.entryUnit; d.enteredAmount = String(p.defaultAmount || 1); }
     let usual = p.defaultAmount || 1; try { usual = M.convert(p, usual, p.entryUnit, d.enteredUnit); } catch (_) {}
-    return G.header('PRODUCTEN', 'Gebruik invoeren', 'product') + '<form data-form="usage-save" id="usage-form" novalidate><div class="fields"><label>Product<select id="usage-product" name="productId">' + G.data.products.map(item => option(item.id, item.name, p.id)).join('') + '</select></label></div><section class="panel amount-panel"><div class="split"><label for="usage-amount" class="eyebrow">HOEVEELHEID</label><label class="usage-unit-label">Eenheid<select name="enteredUnit" id="usage-unit" class="unit-select">' + shortOptions(d.enteredUnit, p) + '</select></label></div><div class="amount-stepper">' + action('usage-step', G.icon('minus'), '-1', 'icon-button', 'aria-label="Hoeveelheid verlagen"') + '<input name="enteredAmount" id="usage-amount" inputmode="decimal" autocomplete="off" value="' + e(d.enteredAmount) + '" aria-describedby="usage-conversion usage-error" aria-label="Hoeveelheid in ' + e(M.unitLabel(d.enteredUnit, p)) + '">' + action('usage-step', G.icon('plus'), '1', 'icon-button', 'aria-label="Hoeveelheid verhogen"') + '</div><p class="notice" id="usage-conversion"></p><div class="chips amount-presets">' + [usual / 2, usual, usual * 1.5].map(n => action('usage-preset', e(quantity(n, d.enteredUnit, p)), n, 'chip')).join('') + '</div></section><div class="panel usage-stock-result"><span class="eyebrow">VOORRAAD NA OPSLAAN</span><h2 id="usage-remaining">' + e(quantity(p.stock, p.base, p)) + '</h2><p class="muted">Nu: ' + e(quantity(p.stock, p.base, p)) + '</p></div><details class="panel task-optional"><summary>Datum, tijd of notitie aanpassen</summary><p class="notice">Invoer voor ' + e(G.dateLabel(d.date)) + ' om ' + e(d.time) + '.</p><div class="fields pair">' + field('Datum', 'date', d.date, 'required', 'date') + field('Tijd', 'time', d.time, 'required', 'time') + '</div><div class="fields"><label>Notitie · optioneel<textarea name="note" maxlength="1000" placeholder="Jouw notitie">' + e(d.note) + '</textarea></label></div></details><p class="form-error" id="usage-error" role="alert" aria-live="polite"></p><button class="primary" type="submit" id="usage-submit">Gebruik registreren</button></form>' + action('product-edit', 'Eenheden instellen', p.id, 'text-button');
+    return G.header('PRODUCTEN', 'Gebruik invoeren', 'product') + '<form data-form="usage-save" id="usage-form" class="quick-usage-form" novalidate>' +
+      '<label class="quick-product-choice"><span class="quick-visually-hidden">Product</span><select id="usage-product" name="productId">' + G.data.products.map(item => option(item.id, item.name, p.id)).join('') + '</select></label>' +
+      '<div class="quick-amount"><label for="usage-amount">Hoeveelheid</label><div class="quick-amount-row">' + action('usage-step', G.icon('minus'), '-1', 'icon-button', 'aria-label="Hoeveelheid verlagen"') + '<input name="enteredAmount" id="usage-amount" inputmode="decimal" autocomplete="off" data-autofocus value="' + e(d.enteredAmount).replace('.', ',') + '" aria-describedby="usage-conversion usage-error" aria-label="Hoeveelheid in ' + e(M.unitLabel(d.enteredUnit, p)) + '">' + action('usage-step', G.icon('plus'), '1', 'icon-button', 'aria-label="Hoeveelheid verhogen"') + '<label class="quick-unit"><span class="quick-visually-hidden">Eenheid</span><select name="enteredUnit" id="usage-unit">' + shortOptions(d.enteredUnit, p) + '</select></label></div><p id="usage-conversion"></p></div>' +
+      '<div class="quick-presets" role="group" aria-label="Veelgebruikte hoeveelheden">' + [usual / 2, usual, usual * 1.5].map(n => action('usage-preset', e(quantity(n, d.enteredUnit, p)), n, 'chip')).join('') + '</div>' +
+      '<p class="quick-stock"><span>Voorraad</span><span>' + e(quantity(p.stock, p.base, p)) + '</span>' + G.icon('arrow-right') + '<strong id="usage-remaining" aria-live="polite">' + e(quantity(p.stock, p.base, p)) + '</strong></p>' +
+      '<details class="quick-usage-extra"><summary>Datum of notitie aanpassen</summary><div class="fields pair">' + field('Datum', 'date', d.date, 'required', 'date') + field('Tijd', 'time', d.time, 'required', 'time') + '</div><div class="fields"><label>Notitie · optioneel<textarea name="note" maxlength="1000" placeholder="Jouw notitie">' + e(d.note) + '</textarea></label></div></details>' +
+      '<p class="form-error" id="usage-error" role="alert" aria-live="polite"></p><button class="primary" type="submit" id="usage-submit">Gebruik opslaan</button></form>' + action('product-edit', G.icon('sliders-horizontal') + ' Productinstellingen', p.id, 'text-button quick-product-settings');
   };
 
   G.pages.usageHistory = function () {
@@ -94,6 +102,29 @@
     return G.header('VOORRAAD EN GEBRUIK', 'Producten') + G.productTabs('productStats') + '<p class="task-page-intro">Bekijk per maand hoeveel je hebt gebruikt.</p>' + (items.length ? '<div class="fields"><label>Maand<input type="month" id="product-stats-month" value="' + e(selected) + '" min="1900-01" max="9999-12"></label></div><div class="pair"><div class="panel"><span class="eyebrow">REGISTRATIES</span><h2>' + registrations + '</h2><p class="muted">In de gekozen maand</p></div><div class="panel"><span class="eyebrow">PRODUCTEN GEBRUIKT</span><h2>' + used + '</h2><p class="muted">Van je ' + items.length + ' producten</p></div></div><div class="list">' + items.map(({ product: p, stats }) => '<div class="row"><div class="grow"><strong>' + e(p.name) + '</strong><p>' + e(quantity(stats.total, p.base, p)) + ' gebruikt · ' + stats.count + ' ' + (stats.count === 1 ? 'registratie' : 'registraties') + '</p><p class="muted">' + e(quantity(p.stock, p.base, p)) + ' op voorraad</p>' + G.button('Gebruiksgeschiedenis', 'usageHistory', { productId: p.id }, 'text-button') + '</div></div>').join('') + '</div>' + (registrations ? '' : '<p class="notice">Voor deze maand heb je nog geen gebruik geregistreerd.</p>') + '<p class="notice">Hoeveelheden worden per product getoond in de eigen voorraadeenheid.</p>' : G.empty('Jouw producten, inzichtelijk.', 'Voeg een product toe en registreer gebruik om hier je maandtotalen te zien.', action('product-new', 'Product toevoegen', '', 'primary')));
   };
 
+  G.actions['product-scan'] = async el => {
+    const form = document.getElementById('product-form'); if (!form || !window.GymBarcode) return;
+    const draft = readProductForm(form); el.disabled = true;
+    try {
+      const result = await GymBarcode.scan();
+      if (result.cancelled || !form.isConnected || G.ui.productDraft !== draft) return;
+      draft.barcode = result.barcode; form.elements.barcode.value = result.barcode;
+      const status = document.getElementById('barcode-result');
+      if (status) status.textContent = 'Barcode: ' + result.barcode;
+      G.toast('Barcode ingevuld.');
+    } finally { el.disabled = false; }
+  };
+  G.actions['inventory-scan'] = async el => {
+    if (!window.GymBarcode) return; el.disabled = true;
+    try {
+      const result = await GymBarcode.scan(); if (result.cancelled) return;
+      const found = G.data.products.find(p => { try { return p.barcode && GymBarcode.key(p.barcode) === GymBarcode.key(result.barcode); } catch { return false; } });
+      if (found) { G.navigate('product', { productId: found.id }); return; }
+      G.ui.productDraft = draftFor(null); G.navigate('productEdit', { productId: null });
+      G.ui.productDraft.barcode = result.barcode; G.render();
+      G.toast('Nieuw product. Vul naam en verpakking één keer in.');
+    } finally { el.disabled = false; }
+  };
   G.actions['product-new'] = () => { G.ui.productDraft = draftFor(null); G.navigate('productEdit', { productId: null }); };
   G.actions['product-open'] = el => { G.ui.productDraft = null; G.navigate('product', { productId: el.dataset.id }); };
   G.actions['product-edit'] = el => { const p = G.data.products.find(item => item.id === el.dataset.id); if (!p) return G.toast('Product niet gevonden.'); G.ui.productDraft = draftFor(p); G.navigate('productEdit', { productId: p.id }); };
@@ -123,7 +154,7 @@
     const d = readProductForm(form), id = d.id || G.uid();
     try { M.validateProduct(d); } catch (err) { error(form, err.message); return; }
     const ok = await G.commit(data => { if (d.id) M.updateProduct(data, d.id, d); else M.createProduct(data, d, id); });
-    if (ok) { G.ui.productDraft = null; G.ui.usageDraft = null; G.navigate('product', { productId: id }); G.toast('Product opgeslagen.'); }
+    if (ok) { G.ui.productDraft = null; G.ui.usageDraft = null; finish('product', { productId: id }); G.toast('Product opgeslagen.'); }
   };
   G.forms['product-refill'] = async form => {
     const p = G.data.products.find(item => item.id === form.dataset.id); if (!p) return;
@@ -136,7 +167,7 @@
     const d = { ...readUsageForm(form) }, id = G.uid();
     try { M.addUsage(clone(G.data), d, id); } catch (err) { error(form, err.message); return; }
     const ok = await G.commit(data => M.addUsage(data, d, id));
-    if (ok) { G.ui.usageDraft = null; G.navigate('product', { productId: d.productId, lastUsageId: id }); G.toast('Gebruik geregistreerd.'); }
+    if (ok) { G.ui.usageDraft = null; finish('product', { productId: d.productId, lastUsageId: id }); G.toast('Gebruik opgeslagen.'); }
   };
 
   function updateUsage() {
@@ -145,13 +176,13 @@
     try {
       const amount = M.convert(p, M.parseAmount(d.enteredAmount), d.enteredUnit);
       if (amount > p.stock) throw new Error('Meer dan je voorraad. Pas de hoeveelheid aan of vul je voorraad bij.');
-      conversion.textContent = d.enteredUnit === p.base ? 'Voorraad bijgehouden in ' + M.unitLabel(p.base, p) : '≈ ' + quantity(amount, p.base, p);
+      conversion.textContent = d.enteredUnit === p.base ? '' : '= ' + quantity(amount, p.base, p);
       remaining.textContent = quantity(Math.max(0, p.stock - amount), p.base, p);
-      submit.textContent = quantity(M.parseAmount(d.enteredAmount), d.enteredUnit, p) + ' registreren';
+      submit.textContent = quantity(M.parseAmount(d.enteredAmount), d.enteredUnit, p) + ' opslaan';
       submit.disabled = false; error(form, ''); input.setAttribute('aria-invalid', 'false');
     } catch (err) {
       conversion.textContent = '1 ' + M.unitLabel(d.enteredUnit, p) + ' = ' + quantity(M.rate(p, d.enteredUnit), p.base, p);
-      remaining.textContent = quantity(p.stock, p.base, p); submit.textContent = 'Gebruik registreren'; submit.disabled = true; error(form, err.message); input.setAttribute('aria-invalid', 'true');
+      remaining.textContent = quantity(p.stock, p.base, p); submit.textContent = 'Gebruik opslaan'; submit.disabled = true; error(form, err.message); input.setAttribute('aria-invalid', 'true');
     }
   }
   G.afterRender.push(function () {
@@ -178,7 +209,7 @@
     const form = document.getElementById('usage-form');
     if (form) {
       form.addEventListener('input', event => { readUsageForm(form); if (event.target.name === 'enteredAmount') updateUsage(); });
-      form.elements.productId.addEventListener('change', () => { G.navigate('usage', { productId: form.elements.productId.value }); });
+      form.elements.productId.addEventListener('change', () => { G.navigate('usage', { productId: form.elements.productId.value }, { replace: true }); });
       form.elements.enteredUnit.addEventListener('change', () => {
         const p = product(), d = readUsageForm(form), next = form.elements.enteredUnit.value;
         try { d.enteredAmount = String(M.convert(p, d.enteredAmount, d.enteredUnit, next)).replace('.', ','); } catch (_) { d.enteredAmount = ''; }

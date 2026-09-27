@@ -22,13 +22,13 @@ targets:
           CFBundlePrimaryIcon:
             CFBundleIconName: AppIcon
             CFBundleIconFiles: [AppIcon60x60]
-        CFBundleShortVersionString: "2.2.0"
-        CFBundleVersion: "5"
+        CFBundleShortVersionString: "2.3.0"
+        CFBundleVersion: "6"
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UIViewControllerBasedStatusBarAppearance: true
-        NSCameraUsageDescription: Maak een voortgangsfoto die lokaal op je iPhone wordt bewaard.
+        NSCameraUsageDescription: Scan een barcode zonder beelden op te slaan, of maak een voortgangsfoto die alleen lokaal op je iPhone blijft. Beelden worden niet naar een server verstuurd.
         NSPhotoLibraryUsageDescription: Kies een voortgangsfoto voor je lokale logboek.
         NSPhotoLibraryAddUsageDescription: Bewaar een door jou gekozen foto in je fotobibliotheek.
         UIFileSharingEnabled: false

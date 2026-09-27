@@ -1,6 +1,8 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.GymNavigation=api;})(typeof window==='undefined'?this:window,function(){
  'use strict';
  const tabs=[['today','house','Vandaag'],['workout','dumbbell','Trainen'],['inventory','package','Producten'],['stats','chart-no-axes-combined','Progressie'],['social','users','Groepen']];
+ const quickPages=new Set(['usage','product','productEdit','usageHistory','measurement','exercise','reminder','photoAdd','photoDetail','planDay','settings','premium','privacy','help','socialGroupEdit','socialChallengeNew','socialJoin']);
+ const isQuick=page=>quickPages.has(page);
  const keys=['page','date','weekday','context','exerciseId','productId','measurementId','photoId','photoAngle','photoBefore','photoAfter','groupId','challengeId','productStatsMonth','navSection'];
  function snapshot(ui){return Object.fromEntries(keys.filter(k=>ui[k]!==undefined).map(k=>[k,ui[k]]));}
  function section(page,ui={}){
@@ -22,5 +24,5 @@
   peek(){return history.at(-1)||null;},
   clear(){history.length=0;}
  };}
- return {tabs,snapshot,section,key,create};
+ return {tabs,snapshot,section,key,create,isQuick};
 });

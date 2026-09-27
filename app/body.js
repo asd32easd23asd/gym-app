@@ -5,7 +5,7 @@
   let draft = null;
   let photoBusy = false;
   let renderGeneration = 0;
-  let liveURLs = [];
+  const liveImages = new Map();
   const e = value => G.e(String(value ?? ''));
   const parse = value => /^\d+(?:[.,]\d+)?$/.test(String(value).trim()) ? Number(String(value).trim().replace(',', '.')) : NaN;
   const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value + 'T12:00:00Z').getTime()) && new Date(value + 'T12:00:00Z').toISOString().slice(0, 10) === value && value <= G.today();
@@ -17,6 +17,7 @@
   const localNote = () => `<aside class="photo-local-note">${G.icon('lock')}<span><strong>Je foto’s blijven privé.</strong><br>${window.GymNative?.available ? 'Alleen op deze iPhone bewaard. Nooit door deze app naar een server geüpload. Geen cloudback-up.' : 'Alleen in deze browser bewaard. Nooit naar een server geüpload. Browsergegevens wissen verwijdert ook je foto’s.'}</span></aside>`;
   const navButton = (text, page, params, className = 'secondary') => G.button(text, page, params || {}, className);
   const action = (text, name, attrs = '', className = 'secondary') => `<button type="button" class="${className}" data-action="${name}" ${attrs}>${text}</button>`;
+  const finish = (page, params) => G.finishQuick ? G.finishQuick(page, params) : G.navigate(page, params);
   const fieldsError = '<p class="form-error" role="alert"></p>';
   const filtered = () => photos().filter(p => !G.ui.photoAngle || G.ui.photoAngle === 'Alle' || p.angle === G.ui.photoAngle);
   const angleChips = () => `<div class="chips" role="group" aria-label="Filter op aanzicht">${['Alle', ...angles].map(a => `<button type="button" class="chip ${(!G.ui.photoAngle ? a === 'Alle' : G.ui.photoAngle === a) ? 'active' : ''}" aria-pressed="${(!G.ui.photoAngle ? a === 'Alle' : G.ui.photoAngle === a)}" data-action="photoFilter" data-angle="${a}">${a}</button>`).join('')}</div>`;
@@ -38,7 +39,7 @@
   };
   G.pages.measurement = () => {
     const m = G.data.measurements.find(item => item.id === G.ui.measurementId);
-    return G.header('PROGRESSIE · GEWICHT', m ? 'Gewicht aanpassen' : 'Gewicht toevoegen', 'body') + `<form data-form="saveMeasurement" class="fields weight-form"><input type="hidden" name="id" value="${e(m?.id || '')}"><label>Gewicht (kg)<input class="weight-value-input" name="weight" inputmode="decimal" autocomplete="off" value="${e(m?.weight == null ? '' : String(m.weight).replace('.', ','))}" placeholder="Bijv. 78,4" required></label><label>Datum<input name="date" type="date" value="${e(m?.date || G.today())}" max="${G.today()}" required></label><label class="row weight-photo-choice"><input type="checkbox" name="addPhoto"><span class="grow"><strong>Ook een foto toevoegen</strong><small>Na het opslaan kies of maak je een foto. Die blijft op je toestel.</small></span></label><details class="panel task-optional" ${m?.note ? 'open' : ''}><summary>Lengte of notitie toevoegen · optioneel</summary><div class="fields"><label>Lengte (cm)<input name="height" inputmode="decimal" value="${e(G.data.profile.heightCm ?? '')}" placeholder="Bijv. 182"></label><label>Notitie<textarea name="note" maxlength="300" placeholder="Bijv. ochtendmeting">${e(m?.note || '')}</textarea></label></div></details>${fieldsError}<button class="primary" type="submit">Gewicht opslaan</button></form>${m ? action('Meting verwijderen', 'deleteMeasurement', `data-id="${e(m.id)}"`, 'danger') : ''}`;
+    return G.header('PROGRESSIE · GEWICHT', m ? 'Gewicht aanpassen' : 'Gewicht toevoegen', 'body') + `<form data-form="saveMeasurement" class="quick-weight-form"><input type="hidden" name="id" value="${e(m?.id || '')}"><label class="quick-weight-label">Gewicht<span class="quick-weight-value"><input name="weight" inputmode="decimal" autocomplete="off" data-autofocus value="${e(m?.weight == null ? '' : String(m.weight).replace('.', ','))}" placeholder="78,4" aria-label="Gewicht in kilogram" required><span aria-hidden="true">kg</span></span></label><label class="quick-weight-date">Datum<input name="date" type="date" value="${e(m?.date || G.today())}" max="${G.today()}" required></label><details class="quick-usage-extra" ${m?.note ? 'open' : ''}><summary>Foto, lengte of notitie</summary><label class="quick-photo-choice"><input type="checkbox" name="addPhoto"><span>Ook een foto toevoegen<small>Na opslaan kiezen. Blijft alleen op je toestel.</small></span></label><div class="fields"><label>Lengte (cm) · optioneel<input name="height" inputmode="decimal" value="${e(G.data.profile.heightCm ?? '')}" placeholder="Bijv. 182"></label><label>Notitie · optioneel<textarea name="note" maxlength="300" placeholder="Bijv. ochtendmeting">${e(m?.note || '')}</textarea></label></div></details>${fieldsError}<button class="primary" type="submit">Gewicht opslaan</button></form>${m ? action('Meting verwijderen', 'deleteMeasurement', `data-id="${e(m.id)}"`, 'text-button danger quick-weight-delete') : ''}`;
   };
   G.pages.photos = () => {
     const all = photos(), list = filtered();
@@ -89,14 +90,14 @@
       if (height != null) data.profile.heightCm = height;
     })) {
       if (addPhoto) { discardDraft(); draft = freshDraft({ date, weight: String(weight).replace('.', ','), linkWeight: false }); G.navigate('photoAdd'); }
-      else G.navigate('body');
+      else finish('body');
       G.toast('Meting bewaard op dit toestel.');
     }
   };
   G.actions.deleteMeasurement = element => {
     const m = G.data.measurements.find(item => item.id === element.dataset.id);
     if (!m) return;
-    G.confirm('Meting verwijderen?', 'Deze meting verdwijnt uit je gewichtsverloop. Je foto’s blijven bewaard.', async () => { if (await G.commit(data => { data.measurements = data.measurements.filter(item => item.id !== m.id); })) { G.navigate('body'); G.toast('Meting verwijderd.'); } });
+    G.confirm('Meting verwijderen?', 'Deze meting verdwijnt uit je gewichtsverloop. Je foto’s blijven bewaard.', async () => { if (await G.commit(data => { data.measurements = data.measurements.filter(item => item.id !== m.id); })) { finish('body'); G.toast('Meting verwijderd.'); } });
   };
   G.actions.photoFilter = element => { G.ui.photoAngle = element.dataset.angle; G.render(); };
   G.actions.openPhoto = element => G.navigate('photoDetail', { photoId: element.dataset.id });
@@ -176,18 +177,18 @@
         if (d.linkWeight && weight != null && !data.measurements.some(m => m.date === d.date && Math.abs(m.weight - weight) < .000001)) data.measurements.unshift({ id: G.uid(), date: d.date, weight, note: 'Toegevoegd bij voortgangsfoto' });
       });
       if (!saved && !G.data.photos.some(p => p.id === id)) { await window.GymPhotos.remove(id); stored = false; return; }
-      stored = false; discardDraft(); G.navigate('photoDetail', { photoId: id }); G.toast('Foto bewaard op dit toestel.');
+      stored = false; discardDraft(); finish('photoDetail', { photoId: id }); G.toast('Foto bewaard op dit toestel.');
     } catch (error) {
       if (stored && !G.data.photos.some(p => p.id === id)) await window.GymPhotos.remove(id).catch(() => {});
       G.toast(error.name === 'QuotaExceededError' ? 'De lokale opslag is vol. Maak ruimte vrij en probeer opnieuw.' : error.message || 'Foto bewaren is mislukt. Probeer opnieuw.');
-    } finally { photoBusy = false; G.render(); }
+    } finally { photoBusy = false; if (G.ui.page === 'photoAdd') G.render(); }
   };
   G.actions.deletePhoto = element => {
     const p = photo(element.dataset.id); if (!p) return;
     G.confirm('Foto verwijderen?', 'Deze foto wordt definitief van dit toestel verwijderd. Een gekoppelde gewichtsmeting blijft bewaard.', async () => {
       const saved = await G.commit(data => { data.photos = data.photos.filter(item => item.id !== p.id); });
       if (!saved && G.data.photos.some(item => item.id === p.id)) return;
-      try { await window.GymPhotos.remove(p.id); G.navigate('photos'); G.toast('Foto verwijderd van dit toestel.'); }
+      try { await window.GymPhotos.remove(p.id); finish('photos'); G.toast('Foto verwijderd van dit toestel.'); }
       catch (_) {
         await G.commit(data => { if (!data.photos.some(item => item.id === p.id)) data.photos.unshift(p); });
         G.toast('De foto kon niet worden verwijderd. Probeer opnieuw.');
@@ -195,18 +196,32 @@
     });
   };
   G.afterRender.push(() => {
-    const generation = ++renderGeneration;
-    liveURLs.forEach(url => window.GymPhotos.revoke(url)); liveURLs = [];
-    document.querySelectorAll('#app img[data-local-photo]').forEach(async img => {
+    for (const [img, entry] of liveImages) {
+      if (!img.isConnected || img.dataset.localPhoto !== entry.id) {
+        if (entry.url) window.GymPhotos.revoke(entry.url);
+        liveImages.delete(img);
+      }
+    }
+    return Promise.all([...document.querySelectorAll('#app img[data-local-photo]')].map(async img => {
+      const existing = liveImages.get(img);
+      if (existing && (existing.loading || (existing.url && img.getAttribute('src') === existing.url))) return;
+      if (existing?.url) window.GymPhotos.revoke(existing.url);
+      const generation = ++renderGeneration, entry = { id: img.dataset.localPhoto, generation, loading: true, url: '' };
+      liveImages.set(img, entry);
       const status = img.parentElement.querySelector('.photo-load-status');
       try {
-        const url = await window.GymPhotos.url(img.dataset.localPhoto);
-        if (generation !== renderGeneration || !img.isConnected) { window.GymPhotos.revoke(url); return; }
-        liveURLs.push(url);
+        const url = await window.GymPhotos.url(entry.id);
+        if (liveImages.get(img)?.generation !== generation || !img.isConnected || img.dataset.localPhoto !== entry.id) { window.GymPhotos.revoke(url); return; }
+        entry.loading = false; entry.url = url; img.hidden = false;
         img.onload = () => { if (status) status.hidden = true; };
         img.onerror = () => { if (status) status.textContent = 'Foto niet beschikbaar op dit toestel.'; img.hidden = true; };
         img.src = url;
-      } catch (_) { if (status && img.isConnected) status.textContent = 'Foto niet beschikbaar op dit toestel.'; img.hidden = true; }
-    });
+      } catch (_) {
+        if (liveImages.get(img)?.generation !== generation) return;
+        liveImages.delete(img);
+        if (status && img.isConnected) status.textContent = 'Foto niet beschikbaar op dit toestel.';
+        img.hidden = true;
+      }
+    }));
   });
 })();

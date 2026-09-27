@@ -2,6 +2,22 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const M = require('../app/product-model.js');
+const vm = require('node:vm');
+const fs = require('node:fs');
+
+function quickFormApp(data, persist = true, modal = true) {
+  const calls = [], app = {
+    data, ui: { productId: 'product-1' }, pages: {}, actions: {}, forms: {}, afterRender: [],
+    e: String, fmt: String, uid: () => 'new-record', today: () => '2026-09-27',
+    toast: message => calls.push(['toast', message]), formError: (form, message) => { form.error = message; },
+    navigate: (page, params) => calls.push(['navigate', page, params]),
+    async commit(change) { if (!persist) return false; const next = JSON.parse(JSON.stringify(app.data)); change(next); app.data = next; return true; }
+  };
+  if (modal) app.finishQuick = (page, params) => calls.push(['finishQuick', page, params]);
+  vm.runInNewContext(fs.readFileSync(require.resolve('../app/products.js'), 'utf8'), { window: { Gym: app, GymProducts: M } });
+  const form = values => ({ elements: Object.fromEntries(Object.entries(values).map(([name, value]) => [name, { value: String(value) }])), querySelectorAll: () => [] });
+  return { app, calls, form };
+}
 
 function fixture(overrides = {}) {
   const data = { products: [], usages: [] };
@@ -11,6 +27,46 @@ function fixture(overrides = {}) {
 function usage(data, overrides = {}, id = 'usage-1') {
   return M.addUsage(data, { productId: 'product-1', enteredAmount: 1, enteredUnit: data.products[0].entryUnit, date: '2026-09-25', time: '17:30', note: '', ...overrides }, id);
 }
+
+test('quick usage commits the entered unit before closing and returning to the origin', async () => {
+  const { app, calls, form } = quickFormApp(fixture());
+  app.ui.usageDraft = { productId: 'product-1', enteredUnit: 'scoop' };
+  await app.forms['usage-save'](form({ enteredAmount: '1,5', date: '2026-09-27', time: '12:30', note: 'Na training' }));
+  assert.equal(app.data.products[0].stock, 85);
+  assert.equal(app.data.usages[0].enteredUnit, 'scoop');
+  assert.equal(app.data.usages[0].note, 'Na training');
+  assert.equal(calls.filter(call => call[0] === 'finishQuick').length, 1);
+  assert.equal(calls.find(call => call[0] === 'finishQuick')[2].lastUsageId, app.data.usages[0].id);
+  assert.ok(!calls.some(call => call[0] === 'navigate'));
+});
+
+test('invalid or unsaved quick usage keeps the input open and never changes inventory', async () => {
+  for (const [persist, amount] of [[true, '100'], [false, '1']]) {
+    const { app, calls, form } = quickFormApp(fixture(), persist);
+    app.ui.usageDraft = { productId: 'product-1', enteredUnit: 'scoop' };
+    const input = form({ enteredAmount: amount, date: '2026-09-27', time: '12:30', note: 'Nog niet bewaard' });
+    await app.forms['usage-save'](input);
+    assert.equal(app.data.products[0].stock, 100);
+    assert.equal(app.data.usages.length, 0);
+    assert.equal(app.ui.usageDraft.enteredAmount, amount);
+    assert.ok(!calls.some(call => ['finishQuick', 'navigate'].includes(call[0])));
+    if (persist) assert.match(input.error, /voorraad|minder/);
+  }
+});
+
+test('product settings save through the quick flow and retain a functional page fallback', async () => {
+  for (const modal of [true, false]) {
+    const { app, calls, form } = quickFormApp(fixture(), true, modal);
+    app.ui.productDraft = JSON.parse(JSON.stringify(app.data.products[0]));
+    await app.forms['product-save'](form({ name: 'Eigen pre-workout', defaultAmount: '0,5' }));
+    assert.equal(app.data.products[0].name, 'Eigen pre-workout');
+    assert.equal(app.data.products[0].defaultAmount, 0.5);
+    assert.equal(app.data.products[0].ratios.scoop, 10);
+    const completed = calls.find(call => call[0] === (modal ? 'finishQuick' : 'navigate'));
+    assert.equal(completed[1], 'product');
+    assert.equal(completed[2].productId, 'product-1');
+  }
+});
 
 test('accepts Dutch decimal notation and rejects malformed, negative and infinite input', () => {
   assert.equal(M.parseAmount(' 0,25 '), 0.25);

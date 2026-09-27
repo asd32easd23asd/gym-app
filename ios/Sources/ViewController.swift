@@ -16,6 +16,7 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
     private let storageQueue = DispatchQueue(label: "GymPlanner.private-storage", qos: .userInitiated)
     private let notifications = GymNotifications()
     private var bundleRoot: URL?
+    private var barcodeScanActive = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,6 +102,10 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
               let id = body["id"], id is String || id is NSNumber,
               let action = body["action"] as? String else { return }
         let payload = body["payload"] as? [String: Any] ?? [:]
+        if action == "scanBarcode" {
+            scanBarcode(requestID: id)
+            return
+        }
         if action == "copyText" {
             guard let text = payload["text"] as? String, !text.isEmpty, text.utf8.count <= 100_000 else {
                 reply(id, result: .failure(GymError.invalid("De tekst is leeg of te groot om te kopiëren."))); return
@@ -161,6 +166,21 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
             self.webView.callAsyncJavaScript("if (window.GymNative && typeof window.GymNative.receive === 'function') { window.GymNative.receive(response); }",
                                              arguments: ["response": response], in: nil, in: .page) { _ in }
         }
+    }
+
+    private func scanBarcode(requestID: Any) {
+        guard !barcodeScanActive, presentedViewController == nil, view.window != nil,
+              UIApplication.shared.applicationState == .active else {
+            reply(requestID, result: .failure(GymError.invalid("Sluit eerst het geopende venster en probeer opnieuw te scannen.")))
+            return
+        }
+        barcodeScanActive = true
+        let scanner = BarcodeScannerViewController { [weak self] result in
+            guard let self = self else { return }
+            self.barcodeScanActive = false
+            self.reply(requestID, result: result)
+        }
+        present(scanner, animated: true)
     }
 
     private func share(_ url: URL, requestID: Any) {

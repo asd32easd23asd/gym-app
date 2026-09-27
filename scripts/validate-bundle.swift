@@ -14,7 +14,7 @@ let webAssets = [
     "app.js", "photo-store.js", "products.js", "body.js", "bootstrap.js",
     "vendor/lucide.min.js", "vendor/LICENSE-lucide", "preferences.js", "preferences.css",
     "onboarding.js", "onboarding.css", "ai-plan-model.js", "ai-plan.js", "ai-plan.css",
-    "social-model.js", "social.js", "social.css", "navigation.js", "navigation.css", "task-flows.css"
+    "social-model.js", "social.js", "social.css", "navigation.js", "navigation.css", "task-flows.css", "quick-product.css", "quick-dialog.css", "clean.css", "friends-ui.css", "barcode.js", "barcode.css", "vendor/zxing-browser.min.js", "vendor/zxing-browser.LICENSE", "vendor/zxing-library.LICENSE"
 ]
 
 func require(_ condition: Bool, _ message: String) throws {

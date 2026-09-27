@@ -97,8 +97,87 @@ function bodyContext() {
   class Form { constructor(form) { this.values = form.values; } get(key) { return this.values[key] ?? ''; } has(key) { return Object.hasOwn(this.values, key); } }
   const context = { Gym: G, GymNative: { available: false }, GymPhotos: { async put(id, blob) { photoBytes.set(id, blob); }, async remove(id) { deletedPhotos.push(id); photoBytes.delete(id); }, revoke() {} }, document: { addEventListener(type, listener) { events[type] = listener; }, createElement(tag) { assert.equal(tag, 'canvas'); return { getContext: () => ({ fillRect() {}, drawImage() {} }), toBlob: callback => callback(new Blob(['compressed'], { type: 'image/jpeg' })) }; }, querySelectorAll: () => [] }, createImageBitmap: async () => ({ width: 4000, height: 3000, close() {} }), FormData: Form, URL, Blob, Date, Number, Math };
   context.window = context; vm.createContext(context); vm.runInContext(bodySource, context);
-  return { G, errors, messages, events, photoBytes, deletedPhotos };
+  return { G, errors, messages, events, photoBytes, deletedPhotos, context };
 }
+
+test('quick weight save returns to its origin only after successful persistence', async () => {
+  const { G, errors } = bodyContext(), returned = [];
+  G.finishQuick = page => { returned.push(page); G.ui.page = 'today'; };
+  await G.forms.saveMeasurement({ values: { weight: '78,4', date: '2026-09-25', height: '', note: '' } });
+  assert.deepEqual(returned, ['body']);
+  assert.equal(G.ui.page, 'today');
+  assert.equal(G.data.measurements[0].weight, 78.4);
+  G.ui.page = 'measurement';
+  await G.forms.saveMeasurement({ values: { weight: '-1', date: '2026-09-25' } });
+  assert.equal(returned.length, 1);
+  assert.equal(G.ui.page, 'measurement');
+  assert.equal(errors.length, 1);
+  G.commit = async () => false;
+  await G.forms.saveMeasurement({ values: { weight: '79', date: '2026-09-25', height: '', note: '' } });
+  assert.equal(returned.length, 1);
+  assert.equal(G.data.measurements.length, 1);
+});
+
+test('quick photo save returns without rendering over the restored origin or its focus', async () => {
+  const harness = bodyContext(), { G, photoBytes } = harness;
+  const form = await selectPhoto(harness), completed = [];
+  let extraRenders = 0;
+  G.render = () => extraRenders++;
+  G.finishQuick = (page, params) => { completed.push([page, params]); G.ui.page = 'today'; };
+  await G.forms.savePhoto(form);
+  assert.equal(G.ui.page, 'today');
+  assert.equal(completed.length, 1);
+  assert.equal(completed[0][1].photoId, G.data.photos[0].id);
+  assert.equal(photoBytes.size, 1);
+  assert.equal(extraRenders, 0);
+});
+
+function galleryImage(id) {
+  const status = { hidden: false, textContent: 'Foto laden…' };
+  return { dataset: { localPhoto: id }, isConnected: true, src: '', hidden: false,
+    getAttribute(name) { return name === 'src' ? this.src : null; },
+    parentElement: { querySelector: () => status }, status };
+}
+
+test('opening and updating a popup keeps connected gallery photos loaded and releases detached ones', async () => {
+  const { G, context } = bodyContext(), img = galleryImage('existing'), revoked = [], loads = [];
+  let images = [img];
+  context.document.querySelectorAll = () => images;
+  context.GymPhotos.url = async id => { loads.push(id); return 'blob:' + id; };
+  context.GymPhotos.revoke = url => revoked.push(url);
+  await G.afterRender[0](); img.onload();
+  assert.equal(img.src, 'blob:existing');
+  assert.equal(img.status.hidden, true);
+  G.ui.page = 'measurement';
+  await G.afterRender[0]();
+  await G.afterRender[0]();
+  assert.deepEqual(loads, ['existing']);
+  assert.deepEqual(revoked, []);
+  img.isConnected = false; images = [];
+  await G.afterRender[0]();
+  assert.deepEqual(revoked, ['blob:existing']);
+});
+
+test('photo loads pending during popup renders are reused and stale detached loads cannot replace new images', async () => {
+  const { G, context } = bodyContext(), first = galleryImage('same-photo'), revoked = [], requests = [];
+  let images = [first];
+  context.document.querySelectorAll = () => images;
+  context.GymPhotos.url = id => new Promise(resolve => requests.push({ id, resolve }));
+  context.GymPhotos.revoke = url => revoked.push(url);
+  const initialRender = G.afterRender[0]();
+  await G.afterRender[0]();
+  assert.equal(requests.length, 1, 'a second render must reuse the pending image request');
+  first.isConnected = false;
+  const replacement = galleryImage('same-photo'); images = [replacement];
+  const replacementRender = G.afterRender[0]();
+  requests[1].resolve('blob:new-photo');
+  await replacementRender;
+  requests[0].resolve('blob:stale-photo');
+  await initialRender;
+  assert.equal(replacement.src, 'blob:new-photo');
+  assert.equal(first.src, '');
+  assert.deepEqual(revoked, ['blob:stale-photo']);
+});
 test('weight records accept Dutch decimals, persist edits, and can be deleted without deleting photos', async () => {
   const { G } = bodyContext();
   await G.forms.saveMeasurement({ values: { weight: '78,4', height: '182', date: '2026-09-25', note: 'Ochtend' } });
