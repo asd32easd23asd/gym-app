@@ -247,6 +247,12 @@ h1 {
 .dose .nm { font-family: Archivo, sans-serif; font-weight: 700; font-size: 14px; }
 .dose .sub { font-size: 11.5px; color: var(--dim); font-family: "IBM Plex Mono", monospace; }
 .strike { text-decoration: line-through; color: var(--mut); }
+.moment {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--dim);
+  padding-top: 4px; border-top: 1px solid var(--line);
+}
+.card > .moment:first-of-type { border-top: 0; padding-top: 0; }
 
 .iu {
   display: flex; align-items: baseline; gap: 6px; background: var(--raise); border-radius: 10px;
@@ -387,7 +393,7 @@ h1 {
   <header>
     <p class="eyebrow">Voorstel · 28 september 2026</p>
     <h1>Gym Planner, opnieuw ontworpen</h1>
-    <p class="lede">Je app werkt al goed: weekplan, peptides afvinken, voorraad per vial. Wat nog mist is <strong>wat je in de gym echt doet</strong> — per set aftikken met je gewicht erbij — en een kleurenschema dat verschil laat zien tussen "klaar", "let op" en "bijna leeg". Hieronder staat een werkende preview. Tik erop, hij doet echt iets.</p>
+    <p class="lede">Je app werkt al goed: weekplan, dagen afvinken, voorraad bijhouden. Twee dingen missen. <strong>Wat je in de gym echt doet</strong> — per set aftikken met je gewicht erbij. En <strong>alles wat je verder inneemt</strong>: creatine, eiwitpoeder, magnesium, omega-3. Nu kan de app alleen peptides. Hieronder staat een werkende preview. Tik erop, hij doet echt iets.</p>
     <div class="banner">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8.5v.01M12 11.5v4"/></svg>
       <p><b>Je app is niet aangepast.</b> Dit is alleen een preview. Er staat ook een backup van de huidige versie in de repo, in <code>backup/</code>. Zeg het maar als je dit wil, dan bouw ik het echt.</p>
@@ -432,8 +438,8 @@ h1 {
               <svg width="21" height="21" viewBox="0 0 24 24"><path d="M6 6.5v11M18 6.5v11M3 9.5v5M21 9.5v5M6 12h12"/></svg>Plan</button>
             <button type="button" data-tab="stats" aria-current="false">
               <svg width="21" height="21" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Stats</button>
-            <button type="button" data-tab="vials" aria-current="false">
-              <svg width="21" height="21" viewBox="0 0 24 24"><path d="M9 3h6M10 3v4.2c0 .6-.2 1-.6 1.5L8 10.5V19a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-8.5l-1.4-1.8c-.4-.5-.6-.9-.6-1.5V3M8 14h8"/></svg>Vials</button>
+            <button type="button" data-tab="supply" aria-current="false">
+              <svg width="21" height="21" viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8zM4 4.5h16v3.5H4zM10 12h4"/></svg>Supply</button>
           </nav>
         </div>
       </div>
@@ -458,16 +464,23 @@ h1 {
 
       <section>
         <h2><span class="n">02</span>Nieuwe dingen die de app echt beter maken</h2>
-        <p>Dit is de kern. Vooral het eerste punt: nu vink je een oefening af, maar niet wat je getild hebt. Daardoor kan de app je niet laten zien of je sterker wordt.</p>
+        <p>Twee grote gaten. De app kent alleen peptides, terwijl je ook creatine en eiwitpoeder neemt. En je vinkt een oefening af zonder je gewicht, dus de app kan niet laten zien of je sterker wordt.</p>
         <ul class="items">
-          <li><span class="mark">1</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
-          <li><span class="mark">2</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
-          <li><span class="mark">3</span><span><span class="t">Spuit-rekenaar: mg naar IU<span class="tag">groot</span></span><div class="d">Je vult in: vial 20 mg, 2 ml water. De app rekent uit: 10 mg/ml, dus 2 mg = <b>20 IU</b> op een U-100 spuit. Nu reken je dat elke keer zelf, en daar gaat het fout.</div></span></li>
-          <li><span class="mark">4</span><span><span class="t">Prikplek-rotatie</span><div class="d">De app houdt bij waar je de vorige keer geprikt hebt en zegt welke plek nu aan de beurt is. Zo prik je niet steeds dezelfde plek.</div></span></li>
-          <li><span class="mark">5</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
-          <li><span class="mark">6</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
-          <li><span class="mark">7</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
-          <li><span class="mark">8</span><span><span class="t">Waarschuwing als een vial bijna leeg is</span><div class="d">Onder 3 doses wordt de kaart amber en staat er hoeveel doses je nog hebt. Nu moet je zelf naar het ringetje kijken.</div></span></li>
+          <li><span class="mark">1</span><span><span class="t">Alles wat je inneemt, niet alleen peptides<span class="tag">groot</span></span><div class="d">Nu kent de app alleen vials met mg. Creatine, eiwitpoeder, magnesium en omega-3 passen daar niet in. In het voorstel heeft elk item een <b>vorm</b>, en die vorm bepaalt de eenheid en de rekensom:<br>
+            <b>Injection</b> — vial, mg, rekent naar IU op de spuit<br>
+            <b>Powder</b> — bus, gram, rekent naar scoops<br>
+            <b>Pills</b> — pot, capsules per keer<br>
+            <b>Liquid</b> — flesje, ml of druppels<br>
+            Verder hebben ze allemaal hetzelfde: hoeveel er nog in zit en hoe vaak per week. Daaruit rekent de app hoeveel dagen je nog hebt. Kijk bij het tabblad Supply.</div></span></li>
+          <li><span class="mark">2</span><span><span class="t">Je dag op momenten, niet één lijst</span><div class="d">Morning, Post-workout, Evening. Creatine 's ochtends, whey na de training, magnesium 's avonds. Eén lange lijst werkt niet als je zes dingen per dag neemt.</div></span></li>
+          <li><span class="mark">3</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
+          <li><span class="mark">4</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
+          <li><span class="mark">5</span><span><span class="t">Spuit-rekenaar: mg naar IU<span class="tag">groot</span></span><div class="d">Je vult in: vial 20 mg, 2 ml water. De app rekent uit: 10 mg/ml, dus 2 mg = <b>20 IU</b> op een U-100 spuit. Nu reken je dat elke keer zelf, en daar gaat het fout.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">Prikplek-rotatie</span><div class="d">De app houdt bij waar je de vorige keer geprikt hebt en zegt welke plek nu aan de beurt is. Zo prik je niet steeds dezelfde plek.</div></span></li>
+          <li><span class="mark">7</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
+          <li><span class="mark">8</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
+          <li><span class="mark">9</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
+          <li><span class="mark">10</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
         </ul>
       </section>
 
@@ -486,7 +499,18 @@ h1 {
       </section>
 
       <section>
-        <h2><span class="n">04</span>Wat er niet verandert</h2>
+        <h2><span class="n">04</span>Mag dit in de App Store?</h2>
+        <p>Je vroeg het, dus eerlijk antwoord: <strong>zo niet.</strong> Maar dat maakt voor jou weinig uit, want je zet hem er ook niet op.</p>
+        <ul class="items">
+          <li><span class="mark">✕</span><span><span class="t">App Store: vrijwel zeker afgewezen</span><div class="d">Apple heeft in de App Review Guidelines een stuk over Physical Harm. Apps die een medicijndosering uitrekenen moeten van een erkende instelling of fabrikant komen, met bron erbij. Retatrutide en BPC-157 zijn geen goedgekeurde medicijnen — die zitten nog in onderzoek. Een app die daar doses en spuit-eenheden voor uitrekent komt er niet door. Bij TestFlight net zo, want daar zit dezelfde review op.</div></span></li>
+          <li><span class="mark">✓</span><span><span class="t">Wat je nu doet, mag gewoon</span><div class="d">Sideloadly met je eigen Apple ID, alleen op je eigen telefoon. Dat is geen release, dat is je eigen app op je eigen apparaat. Daar komt geen Apple-review aan te pas. Daarom moet je hem ook elke 7 dagen opnieuw ondertekenen.</div></span></li>
+          <li><span class="mark">→</span><span><span class="t">Wil je hem ooit wél in de store</span><div class="d">Dan splits je hem: gym + supplementen in de store-versie, peptides eruit. Creatine, eiwitpoeder, magnesium en omega-3 zijn gewone voedingssupplementen, daar is niks mis mee. De vorm <b>Injection</b> laat je dan weg. Omdat alles nu één model is, is dat een schakelaar en geen herbouw.</div></span></li>
+          <li><span class="mark">!</span><span><span class="t">Ik ken de regelnummers niet uit mijn hoofd</span><div class="d">En Apple verandert ze. Wil je het zeker weten, lees dan sectie 1.4 (Physical Harm) van de App Review Guidelines op developer.apple.com voordat je iets indient.</div></span></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="n">05</span>Wat er niet verandert</h2>
         <ul class="items">
           <li><span class="mark">=</span><span><span class="t">Je data blijft staan</span><div class="d">Zelfde opslag, zelfde <code>gympep-state-v1</code>, zelfde cloud-sync. Een nieuwe versie leest je oude data gewoon.</div></span></li>
           <li><span class="mark">=</span><span><span class="t">Zelfde manier van installeren</span><div class="d">Nog steeds één <code>app/index.html</code>, nog steeds de GitHub Action die de ipa bouwt, nog steeds Sideloadly.</div></span></li>
@@ -524,16 +548,42 @@ var exercises = [
   { nm: "Rope pushdown",   sets: 3, reps: 15, kg: 22.5, last: "3 × 15 · 20 kg",  done: 0 }
 ];
 
-var peptides = [
-  { nm: "Retatrutide", vialMg: 20, waterMl: 2, doseMg: 2, leftMg: 11.4, site: "R abdomen",
+/* one model for everything you take: injectables, powders and capsules.
+   they differ only in unit, container and how a serving is measured. */
+var stack = [
+  { id: "reta", nm: "Retatrutide", kind: "inject", moment: "Morning",
+    cont: { n: 20, u: "mg" }, waterMl: 2, dose: { n: 2, u: "mg" }, left: 11.4, perWeek: 1, site: "R abdomen",
     steps: [ { mg: 1, when: "start · 20 Jul", st: "past" }, { mg: 2, when: "from 17 Aug", st: "now" }, { mg: 4, when: "from 12 Oct", st: "next" } ] },
-  { nm: "BPC-157", vialMg: 10, waterMl: 2, doseMg: 0.25, leftMg: 0.6, site: "L abdomen",
+  { id: "crea", nm: "Creatine mono", kind: "powder", moment: "Morning",
+    cont: { n: 500, u: "g" }, dose: { n: 5, u: "g" }, left: 460, perWeek: 7, hint: "1 level tsp" },
+  { id: "omega", nm: "Omega-3", kind: "capsule", moment: "Morning",
+    cont: { n: 180, u: "caps" }, dose: { n: 2, u: "caps" }, left: 148, perWeek: 7, hint: "990 mg EPA + DHA" },
+  { id: "whey", nm: "Whey protein", kind: "powder", moment: "Post-workout",
+    cont: { n: 1000, u: "g" }, dose: { n: 60, u: "g" }, left: 420, perWeek: 4, scoopG: 30, hint: "2 scoops · 48 g protein" },
+  { id: "mag", nm: "Magnesium glycinate", kind: "capsule", moment: "Evening",
+    cont: { n: 120, u: "caps" }, dose: { n: 2, u: "caps" }, left: 62, perWeek: 7, hint: "400 mg elemental" },
+  { id: "bpc", nm: "BPC-157", kind: "inject", moment: "Evening",
+    cont: { n: 10, u: "mg" }, waterMl: 2, dose: { n: 0.25, u: "mg" }, left: 0.6, perWeek: 3, site: "L abdomen",
     steps: [ { mg: 0.25, when: "start · 1 Sep", st: "now" } ] }
 ];
 
-var doses = [
-  { pep: 0, at: "09:00", done: false },
-  { pep: 1, at: "21:00", done: true, loggedAt: "08:52" }
+/* what is scheduled today (Monday, a training day) */
+var intake = [
+  { id: "crea",  at: "09:00",     done: true, loggedAt: "08:47" },
+  { id: "omega", at: "09:00",     done: true, loggedAt: "08:47" },
+  { id: "reta",  at: "09:00",     done: false },
+  { id: "whey",  at: "after gym", done: false },
+  { id: "bpc",   at: "21:00",     done: false },
+  { id: "mag",   at: "22:00",     done: false }
+];
+
+var MOMENTS = ["Morning", "Post-workout", "Evening"];
+
+var adherence = [
+  { nm: "Creatine", done: 7, tot: 7 },
+  { nm: "Whey protein", done: 3, tot: 4 },
+  { nm: "Magnesium", done: 5, tot: 7 },
+  { nm: "Retatrutide", done: 1, tot: 1 }
 ];
 
 var bodyWeight = {
@@ -580,9 +630,28 @@ function nl(n, d) {
   var v = (typeof d === "number") ? n.toFixed(d) : String(n);
   return v.replace(".", ",");
 }
-function conc(p) { return p.vialMg / p.waterMl; }               /* mg per ml */
-function iuFor(p) { return (p.doseMg / conc(p)) * 100; }         /* units on a U-100 syringe */
-function dosesLeft(p) { return Math.floor(p.leftMg / p.doseMg + 1e-9); }
+/* the four forms a stack item can take — one name each, used everywhere */
+var FORM = {
+  inject:  { label: "Injection", container: "vial", unitHint: "mg · IU" },
+  powder:  { label: "Powder",    container: "tub",  unitHint: "g · scoops" },
+  capsule: { label: "Pills",     container: "jar",  unitHint: "caps" },
+  liquid:  { label: "Liquid",    container: "bottle", unitHint: "ml · drops" }
+};
+function form(p) { return FORM[p.kind]; }
+
+function item(id) { for (var i = 0; i < stack.length; i++) if (stack[i].id === id) return stack[i]; return null; }
+function conc(p) { return p.cont.n / p.waterMl; }                 /* mg per ml, injectables only */
+function iuFor(p) { return (p.dose.n / conc(p)) * 100; }          /* units on a U-100 syringe */
+function servings(p) { return Math.floor(p.left / p.dose.n + 1e-9); }
+function daysLeft(p) { return Math.floor(servings(p) * 7 / p.perWeek); }
+function isLow(p) { return daysLeft(p) <= 14; }
+function doseLabel(p) { return nl(p.dose.n) + " " + p.dose.u; }
+/* how a serving is actually measured, per kind */
+function servingLabel(p) {
+  if (p.kind === "inject") return nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + " IU";
+  if (p.kind === "powder") return p.scoopG ? (p.dose.n / p.scoopG) + " scoops" : p.hint;
+  return nl(p.dose.n) + " caps";
+}
 
 function tickRule(w) {
   /* the syringe-gradation motif: a measured rule, used as a divider */
@@ -697,7 +766,7 @@ function wireTip(wrap, labels, values, fmt) {
 function viewToday() {
   var setsDone = 0, setsTot = 0;
   exercises.forEach(function (e) { setsDone += e.done; setsTot += e.sets; });
-  var dDone = doses.filter(function (x) { return x.done; }).length;
+  var dDone = intake.filter(function (x) { return x.done; }).length;
   var pct = setsTot ? setsDone / setsTot : 0;
   var C = 2 * Math.PI * 33;
 
@@ -723,7 +792,7 @@ function viewToday() {
     '</svg><div class="inner"><span class="big">' + setsDone + "/" + setsTot + '</span><span class="cap">sets</span></div></div>' +
     '<div class="sumlist">' +
       '<div class="sumrow"><span class="stripe" style="background:var(--acc)"></span><span class="lbl">Push · 5 exercises</span><span class="val">' + Math.round(pct * 100) + '%</span></div>' +
-      '<div class="sumrow"><span class="stripe" style="background:var(--s3)"></span><span class="lbl">Peptides</span><span class="val">' + dDone + "/" + doses.length + '</span></div>' +
+      '<div class="sumrow"><span class="stripe" style="background:var(--s3)"></span><span class="lbl">Stack · 6 items</span><span class="val">' + dDone + "/" + intake.length + '</span></div>' +
       '<div class="sumrow"><span class="stripe" style="background:var(--s1)"></span><span class="lbl">Weight · 98,6 kg</span><span class="val">−0,3</span></div>' +
     "</div></div></div>";
 
@@ -744,19 +813,30 @@ function viewToday() {
   h += "</div>";
 
   /* peptides */
-  h += '<div class="card"><div class="chead"><h3>Peptides</h3><span class="note">' + dDone + " of " + doses.length + " taken</span></div>";
-  h += doses.map(function (x, i) {
-    var p = peptides[x.pep];
-    var low = dosesLeft(p) <= 3;
-    return '<div class="dose"><button type="button" class="tick' + (x.done ? " done" : "") + '" data-dose="' + i + '" ' +
-      'aria-label="Log ' + esc(p.nm) + '" aria-pressed="' + x.done + '">' + (x.done ? check() : "") + "</button>" +
-      '<div class="body"><div class="nm' + (x.done ? " strike" : "") + '">' + esc(p.nm) + " · " + nl(p.doseMg) + ' mg</div>' +
-      '<div class="sub">' + (x.done ? "taken " + esc(x.loggedAt) : "planned " + esc(x.at)) + " · " + esc(p.site) +
-      (low ? ' · <span style="color:var(--warn)">' + dosesLeft(p) + " left</span>" : "") + "</div></div>" +
-      '<div class="iu"><span class="v">' + nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + '</span><span class="u">iu</span></div></div>';
-  }).join("");
+  h += '<div class="card"><div class="chead"><h3>Stack</h3><span class="note">' + dDone + " of " + intake.length + " taken</span></div>";
+  MOMENTS.forEach(function (mo) {
+    var rows = intake.filter(function (x) { return item(x.id).moment === mo; });
+    if (!rows.length) return;
+    h += '<div class="moment">' + esc(mo) + "</div>";
+    h += rows.map(function (x) {
+      var p = item(x.id);
+      var i = intake.indexOf(x);
+      var low = isLow(p);
+      var sub = (x.done ? "taken " + esc(x.loggedAt) : "planned " + esc(x.at));
+      if (p.kind === "inject") sub += " · " + esc(p.site);
+      else if (p.hint) sub += " · " + esc(p.hint);
+      if (low) sub += ' · <span style="color:var(--warn)">' + daysLeft(p) + " days left</span>";
+      var readout = p.kind === "inject"
+        ? '<div class="iu"><span class="v">' + nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + '</span><span class="u">iu</span></div>'
+        : '<span class="chip">' + esc(servingLabel(p)) + "</span>";
+      return '<div class="dose"><button type="button" class="tick' + (x.done ? " done" : "") + '" data-dose="' + i + '" ' +
+        'aria-label="Log ' + esc(p.nm) + '" aria-pressed="' + x.done + '">' + (x.done ? check() : "") + "</button>" +
+        '<div class="body"><div class="nm' + (x.done ? " strike" : "") + '">' + esc(p.nm) + " · " + doseLabel(p) + "</div>" +
+        '<div class="sub">' + sub + "</div></div>" + readout + "</div>";
+    }).join("");
+  });
   h += tickRule();
-  h += '<div class="chead"><span class="note">Next site · ' + esc(peptides[0].site) + '</span><span class="note">U-100 syringe</span></div>';
+  h += '<div class="chead"><span class="note">Next injection site · ' + esc(item("reta").site) + '</span><span class="note">U-100 syringe</span></div>';
   h += "</div>";
 
   /* notes */
@@ -808,8 +888,21 @@ function viewStats() {
   h += '<div class="statgrid">' +
     '<div class="stat"><span class="v">−5,6<s> kg</s></span><span class="k">10 weeks</span></div>' +
     '<div class="stat"><span class="v">23,1<s> t</s></span><span class="k">last week</span></div>' +
-    '<div class="stat"><span class="v">14</span><span class="k">doses</span></div>' +
+    '<div class="stat"><span class="v">86<s> %</s></span><span class="k">stack taken</span></div>' +
     "</div>";
+
+  /* adherence is a short list of ratios, not a chart */
+  var aDone = 0, aTot = 0;
+  adherence.forEach(function (a) { aDone += a.done; aTot += a.tot; });
+  h += '<div class="card"><div class="chead"><h3>Stack this week</h3><span class="note">' + aDone + " of " + aTot + "</span></div>";
+  h += adherence.map(function (a) {
+    var f = a.tot ? a.done / a.tot : 0;
+    return '<div class="sumrow"><span class="lbl">' + esc(a.nm) + "</span>" +
+      '<span class="track" style="flex:0 0 78px;height:5px;border-radius:3px;background:var(--raise);overflow:hidden">' +
+      '<span style="display:block;height:100%;width:' + (f * 100).toFixed(0) + '%;background:' + (f === 1 ? "var(--ok)" : "var(--acc)") + '"></span></span>' +
+      '<span class="val">' + a.done + "/" + a.tot + "</span></div>";
+  }).join("");
+  h += "</div>";
 
   var lc = lineChart({ values: bodyWeight.values, labels: bodyWeight.labels, color: "var(--s1)", unit: "kg",
     markAt: bodyWeight.markAt, markText: bodyWeight.markText, aria: "Body weight per week, 104,2 down to 98,6 kg" });
@@ -829,39 +922,60 @@ function viewStats() {
   return h;
 }
 
-function viewVials() {
+function viewSupply() {
   var h = "";
-  h += peptides.map(function (p, i) {
-    var left = dosesLeft(p), frac = Math.max(0, Math.min(1, p.leftMg / p.vialMg));
-    var C = 2 * Math.PI * 30, low = left <= 3;
+
+  h += stack.map(function (p) {
+    var left = servings(p), days = daysLeft(p), low = isLow(p);
+    var frac = Math.max(0, Math.min(1, p.left / p.cont.n));
+    var C = 2 * Math.PI * 30;
     var ringCol = low ? "var(--warn)" : "var(--acc)";
-    return '<div class="card"' + (low ? ' style="border-color:color-mix(in srgb, var(--warn) 45%, var(--line))"' : "") + ">" +
+    var readLabel = p.kind === "inject" ? "Draw to" : "One serving";
+    var readUnit = p.kind === "inject" ? "iu · u-100"
+      : p.kind === "powder" ? (p.scoopG ? "scoops · " + nl(p.scoopG) + " g each" : "g") : "caps";
+    var readVal = p.kind === "inject" ? nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1)
+      : p.kind === "powder" ? (p.scoopG ? nl(p.dose.n / p.scoopG) : nl(p.dose.n)) : nl(p.dose.n);
+
+    var s = '<div class="card"' + (low ? ' style="border-color:color-mix(in srgb, var(--warn) 45%, var(--line))"' : "") + ">" +
       '<div class="chead"><h3>' + esc(p.nm) + "</h3>" +
-      (low ? '<span class="chip warn">' + left + " doses left</span>" : '<span class="chip">' + left + " doses left</span>") + "</div>" +
+      '<span style="display:flex;gap:6px;align-items:center;flex-shrink:0">' +
+      '<span class="chip">' + esc(form(p).label) + "</span>" +
+      '<span class="chip' + (low ? " warn" : "") + '">' + days + " days left</span></span></div>" +
       '<div class="vial"><div class="dial" style="width:70px;height:70px"><svg viewBox="0 0 70 70" aria-hidden="true">' +
         '<circle cx="35" cy="35" r="30" fill="none" stroke="var(--raise)" stroke-width="7"/>' +
         '<circle cx="35" cy="35" r="30" fill="none" stroke="' + ringCol + '" stroke-width="7" stroke-linecap="round" ' +
         'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - frac)).toFixed(1) + '" transform="rotate(-90 35 35)"/>' +
-      '</svg><div class="inner"><span class="big" style="font-size:16px;color:' + ringCol + '">' + nl(p.leftMg, 1) + '</span><span class="cap">mg</span></div></div>' +
+      '</svg><div class="inner"><span class="big" style="font-size:15px;color:' + ringCol + '">' + nl(p.left, p.left % 1 === 0 ? 0 : 1) + '</span><span class="cap">' + esc(p.cont.u) + "</span></div></div>" +
       '<div class="vialstats">' +
-        '<div class="kv"><span class="k">Vial</span><span class="v">' + nl(p.vialMg) + " mg</span></div>" +
-        '<div class="kv"><span class="k">Water</span><span class="v">' + nl(p.waterMl, 1) + " ml</span></div>" +
-        '<div class="kv"><span class="k">Strength</span><span class="v">' + nl(conc(p), 1) + " mg/ml</span></div>" +
-        '<div class="kv"><span class="k">Dose</span><span class="v">' + nl(p.doseMg) + " mg</span></div>" +
+        '<div class="kv"><span class="k">' + form(p).container.charAt(0).toUpperCase() + form(p).container.slice(1) + '</span><span class="v">' + nl(p.cont.n) + " " + esc(p.cont.u) + "</span></div>" +
+        (p.kind === "inject"
+          ? '<div class="kv"><span class="k">Water</span><span class="v">' + nl(p.waterMl, 1) + ' ml</span></div>' +
+            '<div class="kv"><span class="k">Strength</span><span class="v">' + nl(conc(p), 1) + " mg/ml</span></div>"
+          : '<div class="kv"><span class="k">Servings left</span><span class="v">' + left + "</span></div>") +
+        '<div class="kv"><span class="k">Dose</span><span class="v">' + doseLabel(p) + "</span></div>" +
+        '<div class="kv"><span class="k">Per week</span><span class="v">' + p.perWeek + "×</span></div>" +
       "</div></div>" +
       tickRule() +
-      '<div class="chead"><span class="note">Draw to</span><div class="iu"><span class="v">' + nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + '</span><span class="u">iu · u-100</span></div></div>' +
-      '<div class="steps">' + p.steps.map(function (s, si) {
-        return '<div class="step ' + s.st + '"><div class="rail"><div class="dot"></div>' +
+      '<div class="chead"><span class="note">' + readLabel + '</span><div class="iu"><span class="v">' + readVal + '</span><span class="u">' + readUnit + "</span></div></div>";
+
+    if (p.steps && p.steps.length > 1) {
+      s += '<div class="steps">' + p.steps.map(function (st, si) {
+        return '<div class="step ' + st.st + '"><div class="rail"><div class="dot"></div>' +
           (si < p.steps.length - 1 ? '<div class="line"></div>' : "") + "</div>" +
-          '<div class="txt"><div class="d1">' + nl(s.mg) + " mg per dose" + (s.st === "now" ? " · now" : "") + "</div>" +
-          '<div class="d2">' + esc(s.when) + "</div></div></div>";
-      }).join("") + "</div>" +
-      '<div class="btnrow"><button type="button" class="btn sm">Log dose</button><button type="button" class="btn line sm">New vial</button></div>' +
-      "</div>";
+          '<div class="txt"><div class="d1">' + nl(st.mg) + " mg per dose" + (st.st === "now" ? " · now" : "") + "</div>" +
+          '<div class="d2">' + esc(st.when) + "</div></div></div>";
+      }).join("") + "</div>";
+    }
+    if (low) s += '<div class="exmeta" style="color:var(--warn)">Running out in ' + days + " days — order a new " + form(p).container + "</div>";
+
+    s += '<div class="btnrow"><button type="button" class="btn sm">Log</button>' +
+      '<button type="button" class="btn line sm">New ' + form(p).container + "</button></div></div>";
+    return s;
   }).join("");
 
-  /* injection site rotation */
+  h += '<button type="button" class="btn ghost">+ Add to stack</button>';
+
+  /* injection site rotation — only for the injectables in the stack */
   h += '<div class="card"><div class="chead"><h3>Injection sites</h3><span class="chip acc">next · R abdomen</span></div>' +
     '<div class="sites"><svg width="86" height="104" viewBox="0 0 86 104" aria-label="Body map with four injection zones" role="img">' +
       '<rect x="27" y="4" width="32" height="26" rx="13" fill="var(--raise)"/>' +
@@ -884,14 +998,14 @@ function viewVials() {
 }
 
 /* ---------------- render ---------------- */
-var TITLES = { today: ["Today", "Monday"], plan: ["Plan", "Weekly"], stats: ["Stats", "Progress"], vials: ["Vials", "Inventory"] };
+var TITLES = { today: ["Today", "Monday"], plan: ["Plan", "Weekly"], stats: ["Stats", "Progress"], supply: ["Supply", "Stack"] };
 
 function render() {
   var t = TITLES[tab];
   titleEl.textContent = t[0];
   subEl.textContent = t[1];
   dayEl.textContent = tab === "today" ? TODAY.d : "";
-  bodyEl.innerHTML = tab === "today" ? viewToday() : tab === "plan" ? viewPlan() : tab === "stats" ? viewStats() : viewVials();
+  bodyEl.innerHTML = tab === "today" ? viewToday() : tab === "plan" ? viewPlan() : tab === "stats" ? viewStats() : viewSupply();
   bodyEl.scrollTop = 0;
 
   if (tab === "stats") {
@@ -938,10 +1052,11 @@ bodyEl.addEventListener("click", function (e) {
   }
   var tick = e.target.closest(".tick");
   if (tick && tick.dataset.dose != null) {
-    var d = doses[+tick.dataset.dose];
+    var d = intake[+tick.dataset.dose];
     d.done = !d.done;
-    if (d.done) { d.loggedAt = "08:52"; peptides[d.pep].leftMg = Math.max(0, Math.round((peptides[d.pep].leftMg - peptides[d.pep].doseMg) * 10) / 10); }
-    else peptides[d.pep].leftMg = Math.round((peptides[d.pep].leftMg + peptides[d.pep].doseMg) * 10) / 10;
+    var it = item(d.id);
+    if (d.done) { d.loggedAt = "08:52"; it.left = Math.max(0, Math.round((it.left - it.dose.n) * 100) / 100); }
+    else it.left = Math.round((it.left + it.dose.n) * 100) / 100;
     render();
     return;
   }
