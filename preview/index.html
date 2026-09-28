@@ -228,6 +228,15 @@ h1 {
   .set { transition: background-color .16s ease, color .16s ease, transform .1s ease; }
   .set:active { transform: scale(.93); }
 }
+.prbtn {
+  font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; cursor: pointer; border: 0; border-radius: 9px;
+  background: var(--raise); color: var(--mut); box-shadow: inset 0 0 0 1px var(--line);
+  min-height: 34px; padding: 7px 11px; display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
+}
+.prbtn.hot { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+.prbtn:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+
 .pr { display: flex; align-items: center; gap: 8px; }
 .pr .track { flex: 1 1 auto; height: 5px; border-radius: 3px; background: var(--raise); overflow: hidden; }
 .pr .fill { height: 100%; border-radius: 3px; background: var(--acc); }
@@ -579,10 +588,11 @@ h1 {
           <li><span class="mark">4</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
           <li><span class="mark">5</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
           
-          <li><span class="mark">6</span><span><span class="t">Lichaamsgewicht in een grafiek, met historie</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Gratis zie je 12 weken terug; met Plus zet je hem op 1 jaar of 10 jaar. Je oude data blijft altijd op je telefoon staan — Plus zet hem alleen terug in de grafiek. Probeer de knopjes boven de grafiek bij Stats.</div></span></li>
-          <li><span class="mark">7</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
-          <li><span class="mark">8</span><span><span class="t">AI-plan werkt met elke AI, en is gratis</span><div class="d">Geen Claude-only meer. De app maakt een prompt met jouw stack en je trainingsdagen erin. Die kopieer je naar ChatGPT, Claude, Gemini, Grok — wat je ook gebruikt. Antwoord terugplakken en klaar. Kost niks, dus blijft gratis. Kijk bij Plan.</div></span></li>
-          <li><span class="mark">9</span><span><span class="t">AI-coach — staat op <b>Soon</b>, nog niet bruikbaar</span><div class="d">De coach leest straks je week en stelt dingen voor die hij ook kan uitvoeren: "Bench press · probeer 82,5 kg vandaag", "Vrijdag herinneren om whey te bestellen — nog 12 dagen, levering duurt 3". Jij tikt op de knop, hij zet de reminder. Nooit uit zichzelf.<br><br>In de preview staat hij bewust <b>uitgeschakeld</b> met een Soon-label en voorbeelden erbij. Er valt niks te tikken. Een knop die niks doet is verwarrender voor je testers dan geen knop. Hij hoort straks bij Plus, want hij draait op een echt model en kost geld per verzoek — maar hij staat ook niet in de lijst van wat je vandaag koopt.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">PR-knop bij elke oefening</span><div class="d">Naast elke oefening staat een PR-knop. Onder de sets zie je wat je vorige keer deed én je record: <i>best 85 kg · 31 Aug</i>. Til je meer dan je record, dan springt de knop op amber en zegt <b>New PR</b>. Tikken opent hetzelfde stepper-scherm als bij het loggen — gewicht bijstellen, reps erbij, opslaan. Is het geen verbetering, dan kan je niet opslaan; je record blijft staan.</div></span></li>
+          <li><span class="mark">7</span><span><span class="t">Lichaamsgewicht in een grafiek, met historie</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Gratis zie je 12 weken terug; met Plus zet je hem op 1 jaar of 10 jaar. Je oude data blijft altijd op je telefoon staan — Plus zet hem alleen terug in de grafiek. Probeer de knopjes boven de grafiek bij Stats.</div></span></li>
+          <li><span class="mark">8</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
+          <li><span class="mark">9</span><span><span class="t">AI-plan werkt met elke AI, en is gratis</span><div class="d">Geen Claude-only meer. De app maakt een prompt met jouw stack en je trainingsdagen erin. Die kopieer je naar ChatGPT, Claude, Gemini, Grok — wat je ook gebruikt. Antwoord terugplakken en klaar. Kost niks, dus blijft gratis. Kijk bij Plan.</div></span></li>
+          <li><span class="mark">10</span><span><span class="t">AI-coach — staat op <b>Soon</b>, nog niet bruikbaar</span><div class="d">De coach leest straks je week en stelt dingen voor die hij ook kan uitvoeren: "Bench press · probeer 82,5 kg vandaag", "Vrijdag herinneren om whey te bestellen — nog 12 dagen, levering duurt 3". Jij tikt op de knop, hij zet de reminder. Nooit uit zichzelf.<br><br>In de preview staat hij bewust <b>uitgeschakeld</b> met een Soon-label en voorbeelden erbij. Er valt niks te tikken. Een knop die niks doet is verwarrender voor je testers dan geen knop. Hij hoort straks bij Plus, want hij draait op een echt model en kost geld per verzoek — maar hij staat ook niet in de lijst van wat je vandaag koopt.</div></span></li>
         </ul>
       </section>
 
@@ -663,11 +673,11 @@ var week = [
 ];
 
 var exercises = [
-  { nm: "Bench press",     sets: 4, reps: 8,  kg: 80,   last: "4 × 8 · 77,5 kg", done: 4 },
-  { nm: "Incline DB press",sets: 3, reps: 10, kg: 26,   last: "3 × 10 · 24 kg",  done: 2 },
-  { nm: "Cable fly",       sets: 3, reps: 12, kg: 15,   last: "3 × 12 · 15 kg",  done: 0 },
-  { nm: "Overhead press",  sets: 4, reps: 6,  kg: 45,   last: "4 × 6 · 45 kg",   done: 0 },
-  { nm: "Rope pushdown",   sets: 3, reps: 15, kg: 22.5, last: "3 × 15 · 20 kg",  done: 0 }
+  { nm: "Bench press",     sets: 4, reps: 8,  kg: 80,   last: "4 × 8 · 77,5 kg", done: 4, pr: { kg: 85, when: "31 Aug" } },
+  { nm: "Incline DB press",sets: 3, reps: 10, kg: 26,   last: "3 × 10 · 24 kg",  done: 2, pr: { kg: 26, when: "14 Sep" } },
+  { nm: "Cable fly",       sets: 3, reps: 12, kg: 15,   last: "3 × 12 · 15 kg",  done: 0, pr: null },
+  { nm: "Overhead press",  sets: 4, reps: 6,  kg: 45,   last: "4 × 6 · 45 kg",   done: 0, pr: { kg: 47.5, when: "7 Sep" } },
+  { nm: "Rope pushdown",   sets: 3, reps: 15, kg: 22.5, last: "3 × 15 · 20 kg",  done: 0, pr: null }
 ];
 
 /* one model for everything you take: injectables, powders and capsules.
@@ -980,10 +990,15 @@ function viewToday() {
       sets += '<button type="button" class="set' + (s < e.done ? " done" : "") + '" data-ex="' + i + '" data-set="' + s + '" ' +
         'aria-label="Set ' + (s + 1) + ' of ' + esc(e.nm) + '" aria-pressed="' + (s < e.done) + '">' + (s + 1) + "</button>";
     }
+    var beat = e.pr && e.kg > e.pr.kg;
     return '<div class="ex"><div class="exhead"><span class="nm">' + esc(e.nm) + '</span>' +
       '<span class="tgt">' + e.sets + " × " + e.reps + " · " + nl(e.kg) + " kg</span></div>" +
       '<div class="sets">' + sets + "</div>" +
-      '<div class="exmeta">last time <b>' + esc(e.last) + "</b></div></div>";
+      '<div class="exmeta"><span style="flex:1 1 auto;min-width:0">last time <b>' + esc(e.last) + "</b>" +
+      (e.pr ? ' · best <b>' + nl(e.pr.kg) + " kg</b> " + esc(e.pr.when) : "") + "</span>" +
+      '<button type="button" class="prbtn' + (beat ? " hot" : "") + '" data-pr="' + i + '">' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>' +
+      (beat ? "New PR" : "PR") + "</button></div></div>";
   }).join("");
   h += "</div>";
 
@@ -1199,6 +1214,7 @@ function viewSupply() {
 function viewSheet() {
   if (!sheet) return "";
   if (sheet.kind === "paywall") return viewPaywall();
+  if (sheet.kind === "pr") return viewPrSheet();
   var p = item(sheet.id);
   var st = stepFor(p);
   var planned = p.dose.n;
@@ -1224,6 +1240,31 @@ function viewSheet() {
       : "Taken from your plan. Change it above if today is different.") + "</div>" +
     '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
     '<button type="button" class="btn" id="sheetSave">Log ' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + " " + esc(p.dose.u) + "</button></div>" +
+    "</div></div>";
+}
+
+/* a record is a number you claim, so it gets the same stepper as a dose */
+function viewPrSheet() {
+  var e = exercises[sheet.ex];
+  var old = e.pr ? e.pr.kg : 0;
+  var better = sheet.amount > old;
+  return '<div class="sheet" id="sheet"><div class="sheetcard">' +
+    '<span class="grab"></span>' +
+    '<h3>Personal record · ' + esc(e.nm) + "</h3>" +
+    '<div class="stepper">' +
+      '<button type="button" id="amtMinus" aria-label="Less">−</button>' +
+      '<span class="val"><span class="n">' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 1) + '</span><span class="u">kg</span></span>' +
+      '<button type="button" id="amtPlus" aria-label="More">+</button></div>' +
+    '<div class="quick">' + [e.kg, roundAmt(e.kg + 2.5), roundAmt(e.kg + 5)].map(function (v) {
+      return '<button type="button" data-amt="' + v + '" aria-pressed="' + (roundAmt(sheet.amount) === v) + '">' + nl(v) + " kg</button>";
+    }).join("") + "</div>" +
+    '<div class="field"><label for="prReps">Reps</label><input id="prReps" type="number" min="1" value="' + sheet.reps + '"></div>' +
+    '<div class="hintline">' + (old
+      ? (better ? "Beats your <b>" + nl(old) + " kg</b> from " + esc(e.pr.when) + "."
+                : "Your record stays <b>" + nl(old) + " kg</b> from " + esc(e.pr.when) + ".")
+      : "First record for this lift.") + "</div>" +
+    '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
+    '<button type="button" class="btn" id="prSave"' + (better || !old ? "" : " disabled style=\"opacity:.45\"") + '>Save record</button></div>' +
     "</div></div>";
 }
 
@@ -1410,6 +1451,13 @@ bodyEl.addEventListener("click", function (e) {
     if (RANGES[k].plus && !isPlus) { sheet = { kind: "paywall" }; render(); return; }
     range = k; render(); return;
   }
+  var prBtn = e.target.closest("[data-pr]");
+  if (prBtn) {
+    var pi = +prBtn.dataset.pr, ex = exercises[pi];
+    sheet = { kind: "pr", ex: pi, amount: Math.max(ex.kg, ex.pr ? ex.pr.kg : 0), reps: ex.reps };
+    render();
+    return;
+  }
   var logBtn = e.target.closest("[data-log]");
   if (logBtn) { openLog(logBtn.dataset.log); return; }
 });
@@ -1443,6 +1491,17 @@ function openLog(id) {
 sheetEl.addEventListener("click", function (e) {
   if (e.target.id === "sheet" || e.target.closest("#sheetCancel")) { sheet = null; render(); return; }
   if (e.target.closest("#sheetPlus")) { isPlus = true; sheet = null; render(); return; }
+  if (sheet && sheet.kind === "pr") {
+    if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + 2.5); render(); return; }
+    if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(2.5, roundAmt(sheet.amount - 2.5)); render(); return; }
+    var pq = e.target.closest("[data-amt]");
+    if (pq) { sheet.amount = parseFloat(pq.dataset.amt); render(); return; }
+    if (e.target.closest("#prSave")) {
+      exercises[sheet.ex].pr = { kg: sheet.amount, when: "today" };
+      sheet = null; render();
+    }
+    return;
+  }
   if (!sheet || sheet.kind !== "log") return;
   var p = item(sheet.id), st = stepFor(p);
   if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + st); render(); return; }
@@ -1459,7 +1518,9 @@ sheetEl.addEventListener("click", function (e) {
 });
 
 sheetEl.addEventListener("change", function (e) {
-  if (sheet && sheet.kind === "log" && e.target.id === "logTime") sheet.at = e.target.value;
+  if (!sheet) return;
+  if (sheet.kind === "log" && e.target.id === "logTime") sheet.at = e.target.value;
+  if (sheet.kind === "pr" && e.target.id === "prReps") sheet.reps = Math.max(1, +e.target.value || 1);
 });
 
 Array.prototype.forEach.call(document.querySelectorAll(".sc-tabs button"), function (b) {
