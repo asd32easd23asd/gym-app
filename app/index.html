@@ -1,1013 +1,1545 @@
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<title>Gym and Peptide Planner</title>
+<title>Gym Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
 <style>
-  :root {
-    --bg: #0a0a0a; --card: #1b1b1b; --inner: #141414; --line: #333;
-    --text: #f2f2f2; --muted: #8a8a8a; --dim: #6a6a6a;
-    --green: #7ddb6f; --green-bg: #24301f; --blue: #6fb1ff; --blue-bg: #1f2733;
-    --orange: #e8945a;
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0; color: var(--text);
-    background: radial-gradient(ellipse 120% 30% at 50% 0%, #142016 0%, var(--bg) 60%) fixed var(--bg);
-    font-family: 'Nunito', system-ui, sans-serif; font-weight: 700;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
-  main { flex: 1; padding: 18px 20px 120px 20px; display: flex; flex-direction: column; gap: 14px; }
-  h1 { font-size: 30px; font-weight: 900; margin: 0; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: calc(22px + env(safe-area-inset-top, 0px)) 20px 0 20px; }
-  .card { background: linear-gradient(180deg, #1e1e1e, #191919); border: 1px solid #252525; border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
-  .row { display: flex; align-items: center; gap: 12px; }
-  .between { display: flex; justify-content: space-between; align-items: center; }
-  .muted { color: var(--muted); font-size: 13px; }
-  .small { font-size: 12px; }
-  .title { font-size: 17px; font-weight: 900; }
-  .item { display: flex; align-items: center; gap: 12px; background: var(--inner); border-radius: 14px; padding: 12px 14px; }
-  .check { width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 2px solid #444; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .check.done { background: var(--green); border-color: var(--green); }
-  .done-text { color: var(--muted); text-decoration: line-through; }
-  .pill { border: none; font-family: inherit; background: linear-gradient(180deg, #8fe382, #6ccb5e); color: #08120a; font-size: 13px; font-weight: 900; border-radius: 999px; padding: 10px 16px; cursor: pointer; box-shadow: 0 6px 18px rgba(125,219,111,0.22); }
-  .pill.ghost { background: #242424; color: var(--text); border: 1px solid #303030; box-shadow: none; }
-  .pill.danger { background: #341d1d; color: #ff9d9d; border: 1px solid #4a2626; box-shadow: none; }
-  .iconbtn { width: 34px; height: 34px; min-width: 34px; border: none; border-radius: 50%; background: #262626; color: var(--green); font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
-  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  .bar > div { height: 100%; background: var(--green); border-radius: 4px; }
-  .badge { font-size: 12px; font-weight: 900; border-radius: 999px; padding: 5px 12px; }
-  .badge.g { background: var(--green-bg); color: var(--green); }
-  .badge.b { background: var(--blue-bg); color: var(--blue); }
-  .badge.o { background: #33261b; color: var(--orange); }
-  nav {
-    position: fixed; bottom: 0; left: 0; right: 0; background: #101010cc; backdrop-filter: blur(14px);
-    display: flex; justify-content: space-around; padding: 12px 10px calc(14px + env(safe-area-inset-bottom)) 10px;
-  }
-  nav button { border: none; background: none; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--muted); cursor: pointer; }
-  nav button.on { color: var(--green); }
-  nav svg { stroke: currentColor; }
-  dialog {
-    border: none; border-radius: 22px; background: var(--card); color: var(--text);
-    padding: 22px; width: min(92vw, 380px); font-family: 'Nunito', system-ui, sans-serif; font-weight: 700;
-  }
-  dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
-  dialog h2 { margin: 0 0 14px 0; font-size: 19px; font-weight: 900; }
-  form.fields { display: flex; flex-direction: column; gap: 10px; }
-  label.f { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--muted); font-weight: 800; }
-  input, select, textarea {
-    background: var(--inner); border: 1px solid #2a2a2a; border-radius: 12px; color: var(--text);
-    font-family: inherit; font-weight: 700; font-size: 16px; padding: 12px 14px; outline: none;
-  }
-  input:focus, select:focus { border-color: var(--green); }
-  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .btnrow { display: flex; gap: 10px; margin-top: 8px; }
-  .btnrow .pill { flex: 1; padding: 13px 0; text-align: center; font-size: 14px; }
-  .btnrow.col { flex-direction: column; }
-  .ring { position: relative; width: 92px; height: 92px; min-width: 92px; }
-  .ring .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .empty { text-align: center; color: var(--dim); font-size: 14px; padding: 8px 0; }
-  .stat { flex: 1; }
-  .stat .n { font-size: 25px; font-weight: 900; }
-  .stat .n span { font-size: 15px; color: var(--muted); }
-  .linkish { background: #242424; border: 1px solid #303030; border-radius: 999px; color: #cfcfcf; font-family: inherit; font-weight: 800; font-size: 12px; cursor: pointer; padding: 7px 13px; }
-  .linkish.plain { background: none; border: none; padding: 4px; color: var(--muted); }
-  .weeknav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .weeknav .label { flex: 1; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 0.3px; }
-  .navarrow { width: 38px; height: 38px; min-width: 38px; border: 1px solid #2c2c2c; border-radius: 50%; background: #1d1d1d; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
-  .dayrow { display: flex; align-items: center; gap: 14px; background: var(--inner); border-radius: 16px; padding: 14px; cursor: pointer; }
-  .dayrow .dw { width: 34px; font-size: 13px; font-weight: 900; color: var(--green); }
-  .daystrip { display: flex; gap: 7px; }
-  .day { flex: 1; border: none; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--card); border-radius: 16px; padding: 10px 0; cursor: pointer; color: var(--text); }
-  .day .dwl { font-size: 11px; font-weight: 800; color: var(--muted); }
-  .day .dn { font-size: 17px; font-weight: 900; }
-  .day.sel { background: var(--green); }
-  .day.sel .dwl, .day.sel .dn { color: #0a0a0a; }
-  .day.today:not(.sel) .dn { color: var(--green); }
-  @media (prefers-reduced-motion: no-preference) { .pill { transition: transform .1s; } .pill:active { transform: scale(.96); } }
+/* Dark is the default look. Light is a full second palette, not an inversion. */
+:root {
+  color-scheme: dark;
+  --bg: #0F1316; --surf: #171D20; --raise: #202830; --line: #2B343A;
+  --txt: #E9EEEF; --mut: #99A5AB; --dim: #808C92;
+  --acc: #45C9BA; --acc-ink: #04211E; --acc-soft: #123430;
+  --ok: #63BE79; --warn: #E3B341; --dgr: #E0736C;
+  --s1: #2FA79B; --s2: #8A7ADB; --s3: #C0705A;
+  --grid: #262E33;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #F1F4F4; --surf: #FFFFFF; --raise: #E9EEED; --line: #D8DFDE;
+  --txt: #0F1618; --mut: #56646A; --dim: #6C7A7F;
+  --acc: #0E7C72; --acc-ink: #FFFFFF; --acc-soft: #E0F0EE;
+  --ok: #2E8049; --warn: #8F5E06; --dgr: #B4453F;
+  --s1: #068C80; --s2: #6046C4; --s3: #A8533B;
+  --grid: #E2E8E7;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--txt);
+  font-family: var(--sans); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+input, select, textarea, button { font-family: inherit; }
+[hidden] { display: none !important; }
+
+#app { display: flex; flex-direction: column; height: 100%; max-width: 560px; margin: 0 auto; position: relative; }
+
+/* ---- chrome ---- */
+.top {
+  flex: 0 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 18px 12px; border-bottom: 1px solid var(--line);
+}
+.top h1 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin: 0; line-height: 1.1; }
+.top .sub { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); display: block; margin-bottom: 3px; }
+.top .right { display: flex; align-items: center; gap: 8px; }
+.top .date { font-family: var(--mono); font-size: 12px; color: var(--mut); }
+
+main { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 18px 24px; display: flex; flex-direction: column; gap: 13px; }
+
+nav {
+  flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line); background: var(--surf);
+  padding: 8px 6px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+nav button {
+  border: 0; background: none; cursor: pointer; color: var(--dim);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 600; padding: 5px 0 3px; min-height: 48px; border-radius: 12px;
+}
+nav button[aria-current="true"] { color: var(--acc); }
+nav svg { stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- blocks ---- */
+.card { background: var(--surf); border: 1px solid var(--line); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+.card.soon { border-style: dashed; }
+.chead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.chead h2 { font-size: 14px; font-weight: 700; margin: 0; }
+.note { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.empty { text-align: center; color: var(--dim); font-size: 13px; padding: 14px 0; }
+.hint { font-size: 12.5px; color: var(--mut); }
+.hint b { color: var(--txt); font-weight: 600; }
+
+.chip {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; padding: 4px 9px; border-radius: 6px;
+  background: var(--raise); color: var(--mut); white-space: nowrap;
+}
+.chip.acc { background: var(--acc-soft); color: var(--acc); }
+.chip.warn { background: rgba(227,179,65,.18); color: var(--warn); }
+.chip.ok { background: rgba(99,190,121,.18); color: var(--ok); }
+
+.btn {
+  font-size: 14px; font-weight: 700; cursor: pointer; border: 0; border-radius: 13px;
+  background: var(--acc); color: var(--acc-ink); min-height: 46px; padding: 12px 18px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn.ghost { background: var(--raise); color: var(--txt); }
+.btn.line { background: none; color: var(--txt); box-shadow: inset 0 0 0 1px var(--line); }
+.btn.danger { background: rgba(224,115,108,.14); color: var(--dgr); }
+.btn.sm { min-height: 38px; font-size: 13px; padding: 8px 14px; border-radius: 10px; }
+.btnrow { display: flex; gap: 9px; }
+.btnrow > * { flex: 1; }
+.btnrow .fixed { flex: 0 0 auto; }
+.icon {
+  width: 38px; height: 38px; min-width: 38px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--raise); color: var(--txt); display: flex; align-items: center; justify-content: center;
+}
+.icon svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* week strip */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.wday {
+  border: 0; cursor: pointer; background: var(--surf); color: var(--txt); border-radius: 13px;
+  padding: 8px 0 7px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-height: 58px; box-shadow: inset 0 0 0 1px var(--line);
+}
+.wday .dw { font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: .08em; color: var(--dim); }
+.wday .dd { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wday .dots { display: flex; gap: 3px; height: 5px; align-items: center; }
+.wday .dots i { width: 5px; height: 5px; border-radius: 50%; display: block; }
+.wday.sel { box-shadow: inset 0 0 0 2px var(--acc); }
+.wday.today { background: var(--acc); box-shadow: none; }
+.wday.today .dw, .wday.today .dd { color: var(--acc-ink); }
+
+/* summary */
+.summary { display: flex; align-items: center; gap: 16px; }
+.dial { position: relative; width: 78px; height: 78px; flex: 0 0 auto; }
+.dial .inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.dial .big, .dial .cap { display: block; }
+.dial .big { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.dial .cap { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.sumlist { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sumrow { display: flex; align-items: center; gap: 9px; font-size: 13px; width: 100%; background: none; border: 0; color: inherit; padding: 0; text-align: left; }
+button.sumrow { cursor: pointer; }
+.sumrow .lbl { color: var(--mut); flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sumrow .val { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.stripe { width: 3px; border-radius: 2px; align-self: stretch; min-height: 16px; }
+
+/* exercises */
+.ex { display: flex; flex-direction: column; gap: 9px; padding: 12px 0; border-top: 1px solid var(--line); }
+.ex:first-of-type { border-top: 0; padding-top: 2px; }
+.exhead { display: flex; align-items: baseline; gap: 10px; }
+.exhead .nm { font-size: 14.5px; font-weight: 700; flex: 1 1 auto; }
+.exhead .tgt { font-family: var(--mono); font-size: 12px; color: var(--mut); font-variant-numeric: tabular-nums; }
+.exmeta { font-size: 12px; color: var(--dim); display: flex; align-items: center; gap: 8px; }
+.exmeta .txt { flex: 1 1 auto; min-width: 0; }
+.exmeta b { color: var(--mut); font-weight: 500; font-family: var(--mono); }
+.sets { display: flex; gap: 7px; flex-wrap: wrap; }
+.set {
+  width: 44px; height: 44px; border-radius: 12px; border: 0; cursor: pointer;
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  background: var(--raise); color: var(--mut);
+  display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 1px var(--line);
+  transition: background-color .15s ease, color .15s ease, transform .1s ease;
+}
+.set.done { background: var(--acc); color: var(--acc-ink); box-shadow: none; }
+.set:active { transform: scale(.93); }
+.prbtn {
+  font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .06em; cursor: pointer;
+  border: 0; border-radius: 9px; background: var(--raise); color: var(--mut);
+  box-shadow: inset 0 0 0 1px var(--line); min-height: 34px; padding: 7px 11px;
+  display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
+}
+.prbtn.hot { background: rgba(227,179,65,.18); color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+.prbtn svg { stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.bar { display: flex; align-items: center; gap: 8px; }
+.bar .track { flex: 1 1 auto; height: 5px; border-radius: 3px; background: var(--raise); overflow: hidden; }
+.bar .fill { display: block; height: 100%; border-radius: 3px; background: var(--acc); transition: width .25s ease; }
+.bar .pct { font-family: var(--mono); font-size: 11px; color: var(--mut); font-variant-numeric: tabular-nums; }
+
+/* stack rows */
+.moment { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); padding-top: 4px; border-top: 1px solid var(--line); }
+.card > .moment:first-of-type { border-top: 0; padding-top: 0; }
+.row { display: flex; align-items: center; gap: 11px; }
+.tick {
+  width: 32px; height: 32px; min-width: 32px; border-radius: 50%; border: 0; cursor: pointer; padding: 0;
+  background: var(--raise); box-shadow: inset 0 0 0 2px var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.tick.done { background: var(--ok); box-shadow: none; }
+.tick svg { stroke: var(--bg); fill: none; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.rbody { flex: 1 1 auto; min-width: 0; background: none; border: 0; color: inherit; text-align: left; padding: 0; }
+button.rbody { cursor: pointer; }
+.rbody .nm, .rbody .sub { display: block; }
+.rbody .nm { font-size: 14px; font-weight: 700; }
+.rbody .sub { font-size: 11.5px; color: var(--dim); font-family: var(--mono); }
+.strike { text-decoration: line-through; color: var(--mut); }
+.xbtn { width: 38px; height: 38px; min-width: 38px; border: 0; border-radius: 10px; background: none; color: var(--dim); cursor: pointer; font-size: 17px; }
+
+/* supply */
+.vial { display: flex; gap: 15px; align-items: center; }
+.vialstats { flex: 1 1 auto; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.kv { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+.kv .k { color: var(--mut); }
+.kv .v { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.rule { height: 9px; display: block; width: 100%; opacity: .85; }
+
+/* titration */
+.steps { display: flex; flex-direction: column; }
+.step { display: flex; gap: 12px; }
+.step .rail { display: flex; flex-direction: column; align-items: center; width: 12px; flex: 0 0 auto; }
+.step .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--raise); box-shadow: inset 0 0 0 2px var(--line); }
+.step.past .dot { background: var(--acc); opacity: .45; box-shadow: none; }
+.step.now .dot { background: var(--acc); box-shadow: 0 0 0 4px var(--acc-soft); }
+.step .line { width: 2px; flex: 1 1 auto; background: var(--line); min-height: 16px; }
+.step .txt { padding-bottom: 13px; flex: 1 1 auto; }
+.step:last-child .txt { padding-bottom: 0; }
+.step .d1, .step .d2 { display: block; }
+.step .d1 { font-family: var(--mono); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.step.next .d1 { color: var(--mut); }
+.step.now .d1 { color: var(--acc); }
+.step .d2 { font-size: 11px; color: var(--dim); }
+
+/* plan */
+.prow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; color: inherit; text-align: left; cursor: pointer; }
+.prow:first-of-type { border-top: 0; }
+.prow .dw { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--acc); width: 26px; flex: 0 0 auto; letter-spacing: .06em; }
+.prow .b { flex: 1 1 auto; min-width: 0; }
+.prow .t1, .prow .t2 { display: block; }
+.prow .t1 { font-size: 14px; font-weight: 700; }
+.prow .t1.restday { color: var(--dim); font-weight: 600; }
+.prow .t2 { font-size: 11.5px; color: var(--dim); font-family: var(--mono); }
+.prow svg { stroke: var(--dim); fill: none; stroke-width: 2.4; stroke-linecap: round; }
+
+/* stats */
+.statgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.stat { background: var(--surf); border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; }
+.stat .v { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.025em; }
+.stat .v s { text-decoration: none; font-size: 11px; color: var(--mut); font-weight: 600; }
+.stat .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--dim); }
+.seg { display: flex; gap: 6px; }
+.seg button {
+  flex: 1; font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; border: 0;
+  border-radius: 10px; background: var(--raise); color: var(--mut); min-height: 36px; padding: 7px 4px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.seg button[aria-pressed="true"] { background: var(--acc-soft); color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* rest timer */
+.rest {
+  position: absolute; left: 12px; right: 12px; bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  background: var(--acc); color: var(--acc-ink); border-radius: 16px; padding: 11px 13px;
+  display: flex; align-items: center; gap: 11px; box-shadow: 0 12px 30px rgba(0,0,0,.34); z-index: 4;
+}
+.rest .t { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; min-width: 62px; }
+.rest .lb { flex: 1 1 auto; font-size: 12px; font-weight: 600; opacity: .8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rest button { font-family: var(--mono); font-size: 12px; font-weight: 600; cursor: pointer; border: 0; border-radius: 9px; background: rgba(0,0,0,.16); color: inherit; min-height: 34px; padding: 6px 11px; }
+
+/* sheet */
+.sheet { position: absolute; inset: 0; z-index: 6; display: flex; align-items: flex-end; background: rgba(0,0,0,.55); }
+.sheetcard {
+  width: 100%; background: var(--surf); border-top: 1px solid var(--line);
+  border-radius: 22px 22px 0 0; padding: 16px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 13px; max-height: 94%; overflow-y: auto;
+}
+.sheetcard h2 { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -.015em; }
+.grab { width: 38px; height: 4px; border-radius: 2px; background: var(--line); align-self: center; }
+.stepper { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.stepper button {
+  width: 52px; height: 52px; min-width: 52px; border: 0; cursor: pointer; border-radius: 17px;
+  background: var(--raise); color: var(--txt); font-size: 24px; font-weight: 700; line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.stepper .val { text-align: center; min-width: 130px; }
+.stepper .val .n {
+  font-size: 34px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums;
+  display: block; line-height: 1.05; width: 100%; background: none; border: 0; color: var(--txt);
+  text-align: center; padding: 2px 0; border-bottom: 2px dashed var(--line);
+}
+.stepper .val .n:focus { outline: none; border-bottom-color: var(--acc); }
+.stepper .val .u { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.quick { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; }
+.quick button {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600; cursor: pointer; border: 0;
+  border-radius: 9px; background: var(--raise); color: var(--mut); min-height: 38px; padding: 8px 13px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.quick button[aria-pressed="true"] { background: var(--acc-soft); color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+.f { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--mut); font-weight: 600; }
+.f input, .f select, .f textarea {
+  background: var(--raise); border: 1px solid var(--line); border-radius: 12px; color: var(--txt);
+  font-size: 16px; font-weight: 500; padding: 12px 14px; outline: none; width: 100%;
+}
+.f input:focus, .f select:focus, .f textarea:focus { border-color: var(--acc); }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.fields { display: flex; flex-direction: column; gap: 10px; }
+.soonlist { opacity: .45; pointer-events: none; display: flex; flex-direction: column; gap: 12px; }
 </style>
+</head>
+<body>
 
 <div id="app">
-  <div class="topbar">
-    <div class="row" style="gap:12px">
-      <button id="backbtn" class="iconbtn" style="display:none;width:38px;height:38px;min-width:38px;color:var(--text)" onclick="goBack()" aria-label="Back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
-      <h1 id="pagetitle">Today</h1>
+  <div class="top">
+    <div>
+      <span class="sub" id="topSub"></span>
+      <h1 id="topTitle">Today</h1>
     </div>
-    <span id="topright" class="muted"></span>
+    <div class="right">
+      <span class="date" id="topDate"></span>
+      <button class="icon" id="settingsBtn" aria-label="Settings" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.2.63.78 1.07 1.44 1.11H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.89z"/></svg>
+      </button>
+    </div>
   </div>
+
   <main id="main"></main>
-  <nav>
-    <button id="nav-home" onclick="go('home')">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>
-      Today</button>
-    <button id="nav-plan" onclick="go('plan')">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>
-      Plan</button>
-    <button id="nav-hist" onclick="go('hist')">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-      History</button>
+  <div id="sheetHost"></div>
+
+  <div class="rest" id="rest" hidden>
+    <span class="t" id="restT">1:30</span>
+    <span class="lb" id="restLb">Rest</span>
+    <button type="button" id="restPlus">+30s</button>
+    <button type="button" id="restSkip">Skip</button>
+  </div>
+
+  <nav aria-label="Tabs">
+    <button type="button" data-tab="today" aria-current="true">
+      <svg width="21" height="21" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Today</button>
+    <button type="button" data-tab="plan" aria-current="false">
+      <svg width="21" height="21" viewBox="0 0 24 24"><path d="M6 6.5v11M18 6.5v11M3 9.5v5M21 9.5v5M6 12h12"/></svg>Plan</button>
+    <button type="button" data-tab="stats" aria-current="false">
+      <svg width="21" height="21" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Stats</button>
+    <button type="button" data-tab="supply" aria-current="false">
+      <svg width="21" height="21" viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8zM4 4.5h16v3.5H4zM10 12h4"/></svg>Supply</button>
   </nav>
 </div>
 
-<dialog id="dlg"></dialog>
-
 <script>
 "use strict";
-// ---------- state ----------
-const LS_KEY = "gympep-state-v1";
-let state = { peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 };
-let db = null, saveTimer = null;
-let tab = "home";
-let editPlanId = null, editWd = null;
-let selDate = null; // selected day on Today tab (null = today)
 
-const DW = ["MO","TU","WE","TH","FR","SA","SU"];
-const DWL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+/* ============================================================
+   state
+   ============================================================ */
+var LS_KEY = "gympep-state-v1";          /* same key: v1 data is read and upgraded in place */
+var BLANK = { v: 2, stack: [], plans: [], activePlanId: null, planLog: [], days: {},
+              history: [], prs: {}, weights: [], schedVer: 0, notifyOn: false, restSec: 90, theme: "dark" };
 
-function todayISO(d) { const x = d || new Date(); return x.getFullYear() + "-" + String(x.getMonth()+1).padStart(2,"0") + "-" + String(x.getDate()).padStart(2,"0"); }
+var state = clone(BLANK);
+var db = null, saveTimer = null;
+var tab = "today", selDate = null, sheet = null;
+var editPlanId = null, editWd = null;
+var dayDirty = false;   /* a day was just built from the plan and needs writing */
+
+var DW = ["MO","TU","WE","TH","FR","SA","SU"];
+var DWL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MOMENTS = ["Morning", "Pre-workout", "Post-workout", "Evening"];
+var FORM = {
+  inject:  { label: "Vial",   container: "vial",   unit: "mg" },
+  powder:  { label: "Powder", container: "tub",    unit: "g" },
+  capsule: { label: "Pills",  container: "jar",    unit: "caps" },
+  liquid:  { label: "Liquid", container: "bottle", unit: "ml" }
+};
+var KEEP_DAYS = 550;                      /* days are pruned past this, so storage cannot grow forever */
+
+/* ============================================================
+   small helpers
+   ============================================================ */
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function uid() { return Math.random().toString(36).slice(2, 10); }
-function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function fmtMg(v) { return (Math.round(v * 1000) / 1000).toString().replace(".", ","); }
-function wdOf(dateISO) { return (new Date(dateISO).getDay() + 6) % 7; }
-function fmtDate(iso) { return new Date(iso).toLocaleDateString("en-US", { day: "numeric", month: "short" }); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function iso(d) {
+  var x = d || new Date();
+  return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0");
+}
+function today() { return iso(); }
+function parseISO(s) { var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function shortDate(s) { var d = parseISO(s); return d.getDate() + " " + MONTHS[d.getMonth()]; }
+function wdOf(s) { return (parseISO(s).getDay() + 6) % 7; }
+function addDays(s, n) { var d = parseISO(s); d.setDate(d.getDate() + n); return iso(d); }
+function num(v, dec) {
+  var n = Number(v) || 0;
+  var s = dec == null ? String(Math.round(n * 1000) / 1000) : n.toFixed(dec);
+  return s;
+}
+function round(v) { return Math.round(Number(v) * 1000) / 1000; }
+function nowHM() { return new Date().toTimeString().slice(0, 5); }
+function keyOf(name) { return String(name || "").trim().toLowerCase(); }
 
-function pep(id) { return state.peptides.find(p => p.id === id); }
-function plan(id) { return (state.plans || []).find(p => p.id === id); }
-function activePlan() { return plan(state.activePlanId); }
-function doseFor(p, dateISO) {
-  let mg = p.doseMg;
-  (p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1).forEach(s => { if (s.from <= dateISO) mg = s.mg; });
-  return mg;
+/* ============================================================
+   stack maths — amounts and supply only, never how to take it
+   ============================================================ */
+function item(id) { for (var i = 0; i < state.stack.length; i++) if (state.stack[i].id === id) return state.stack[i]; return null; }
+function form(p) { return FORM[p.kind] || FORM.powder; }
+function doseOn(p, dateISO) {
+  var n = p.dose.n;
+  (p.steps || []).slice().sort(function (a, b) { return a.from < b.from ? -1 : 1; })
+    .forEach(function (s) { if (s.from <= dateISO) n = s.n; });
+  return n;
 }
 function nextStep(p, dateISO) {
-  const fut = (p.plan || []).filter(s => s.from > dateISO).sort((a, b) => a.from < b.from ? -1 : 1);
-  return fut[0] || null;
+  var f = (p.steps || []).filter(function (s) { return s.from > dateISO; })
+    .sort(function (a, b) { return a.from < b.from ? -1 : 1; });
+  return f[0] || null;
 }
-function schedVer() { return state.schedVer || 0; }
-function bumpSched() { state.schedVer = schedVer() + 1; }
-function planDay(pl, wd) {
-  if (!pl.days) pl.days = {};
-  if (!pl.days[wd]) pl.days[wd] = { workoutName: "", exercises: [], doses: [] };
-  return pl.days[wd];
+function servings(p) { var d = doseOn(p, today()); return d > 0 ? Math.floor(p.left / d + 1e-9) : 0; }
+function daysLeft(p) { var w = p.perWeek || 7; return Math.floor(servings(p) * 7 / w); }
+function isLow(p) { return daysLeft(p) <= 14; }
+function amountLabel(p, dateISO) { return num(doseOn(p, dateISO || today())) + " " + p.dose.u; }
+
+/* ============================================================
+   load, migrate, save
+   ============================================================ */
+function load() {
+  var raw = null;
+  try { raw = localStorage.getItem(LS_KEY); } catch (e) {}
+  if (!raw) return;
+  var parsed = null;
+  try { parsed = JSON.parse(raw); } catch (e) { return; }
+  var wasOld = parsed.v !== 2;
+  state = upgrade(parsed);
+  /* write the upgraded shape straight back, so v1 data is converted once and not on every open */
+  if (wasOld) { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {} }
 }
 
-// day materialization from the active plan
-function day(dateISO) {
-  if (!state.days[dateISO]) state.days[dateISO] = { workoutName: "", exercises: [], doses: [], tplV: -1 };
-  const d = state.days[dateISO];
-  if (d.tplV === undefined) d.tplV = -1;
-  const untouched = !d.userEdited && !d.exercises.some(e => e.done) && !d.doses.some(x => x.done) && !(d.reminders || []).some(r => r.done);
-  if (d.tplV !== schedVer() && untouched && dateISO >= todayISO()) {
-    const ap = activePlan();
-    const pd = ap && ap.days ? ap.days[wdOf(dateISO)] : null;
-    if (pd) {
-      d.workoutName = pd.workoutName || "";
-      d.exercises = (pd.exercises || []).map(e => ({ id: uid(), name: e.name, detail: e.detail, done: false }));
-      d.doses = (pd.doses || []).map(ds => {
-        const p = pep(ds.pepId);
-        return p ? { id: uid(), pepId: ds.pepId, mg: doseFor(p, dateISO), time: ds.time || "", done: false } : null;
-      }).filter(Boolean);
-      d.notes = pd.notes || "";
-      d.reminders = (pd.reminders || []).map(r => ({ id: uid(), text: r.text, time: r.time || "", done: false }));
-    } else { d.workoutName = ""; d.exercises = []; d.doses = []; d.notes = ""; d.reminders = []; }
-    d.tplV = schedVer();
+/* v1 kept peptides, weekday templates and exercises as free text.
+   everything below turns that into the v2 shapes without losing anything. */
+function parseDetail(detail) {
+  var out = { sets: 3, reps: 10, kg: 0, note: "" };
+  var s = String(detail || "");
+  var m = s.match(/(\d+)\s*[x×]\s*(\d+)/i);
+  if (m) { out.sets = +m[1]; out.reps = +m[2]; }
+  var w = s.match(/(\d+(?:[.,]\d+)?)\s*kg/i);
+  if (w) out.kg = parseFloat(w[1].replace(",", "."));
+  if (!m && !w) out.note = s.trim();
+  return out;
+}
+
+function upgrade(old) {
+  if (!old || typeof old !== "object") return clone(BLANK);
+  if (old.v === 2) {
+    var s2 = Object.assign(clone(BLANK), old);
+    s2.stack = s2.stack || []; s2.prs = s2.prs || {}; s2.weights = s2.weights || [];
+    return s2;
   }
-  if (!d.reminders) d.reminders = [];
-  if (d.notes === undefined) d.notes = "";
-  return d;
+
+  var s = clone(BLANK);
+  s.plans = [];
+  s.activePlanId = old.activePlanId || null;
+  s.planLog = old.planLog || [];
+  s.schedVer = old.schedVer || 0;
+  s.notifyOn = !!old.notifyOn;
+
+  /* peptides -> stack items with the Vial form */
+  var idMap = {};
+  (old.peptides || []).forEach(function (p) {
+    var it = {
+      id: uid(), nm: p.name || "Item", kind: "inject", moment: "Morning",
+      cont: { n: Number(p.vialMg) || 10, u: "mg" },
+      dose: { n: Number(p.doseMg) || 1, u: "mg" },
+      left: Number(p.remainingMg) || 0, perWeek: 1, hint: "",
+      steps: (p.plan || []).map(function (st) { return { id: uid(), from: st.from, n: Number(st.mg) || 0 }; })
+    };
+    idMap[p.id] = it.id;
+    s.stack.push(it);
+  });
+
+  /* weekday templates -> a plan; old free-text exercises get parsed into sets/reps/kg */
+  function convDays(srcDays) {
+    var out = {};
+    Object.keys(srcDays || {}).forEach(function (wd) {
+      var d = srcDays[wd] || {};
+      out[wd] = {
+        workoutName: d.workoutName || d.name || "",
+        exercises: (d.exercises || []).map(function (e) {
+          var p = parseDetail(e.detail);
+          return { name: e.name || "", sets: p.sets, reps: p.reps, kg: p.kg, note: p.note };
+        }).filter(function (e) { return e.name; }),
+        take: (d.doses || []).map(function (ds) {
+          return idMap[ds.pepId] ? { id: uid(), itemId: idMap[ds.pepId], moment: "Morning", time: ds.time || "" } : null;
+        }).filter(Boolean),
+        notes: d.notes || "",
+        reminders: (d.reminders || []).map(function (r) { return { text: r.text || "", time: r.time || "" }; })
+      };
+    });
+    return out;
+  }
+
+  (old.plans || []).forEach(function (pl) {
+    s.plans.push({ id: pl.id, name: pl.name || "Plan", status: pl.status || "draft", days: convDays(pl.days) });
+  });
+
+  /* the even older tpl/rules model, if a plan was never created from it */
+  if (!s.plans.length && old.tpl && Object.keys(old.tpl).length) {
+    var pl2 = { id: uid(), name: "My plan", status: "active", days: {} };
+    Object.keys(old.tpl).forEach(function (wd) {
+      pl2.days[wd] = {
+        workoutName: old.tpl[wd].name || "",
+        exercises: (old.tpl[wd].exercises || []).map(function (e) {
+          var p = parseDetail(e.detail);
+          return { name: e.name || "", sets: p.sets, reps: p.reps, kg: p.kg, note: p.note };
+        }).filter(function (e) { return e.name; }),
+        take: [], notes: "", reminders: []
+      };
+    });
+    (old.rules || []).forEach(function (r) {
+      var wds = r.days === "daily" ? [0, 1, 2, 3, 4, 5, 6] : (r.days || []);
+      wds.forEach(function (wd) {
+        if (!pl2.days[wd]) pl2.days[wd] = { workoutName: "", exercises: [], take: [], notes: "", reminders: [] };
+        if (idMap[r.pepId]) pl2.days[wd].take.push({ id: uid(), itemId: idMap[r.pepId], moment: "Morning", time: r.time || "" });
+      });
+    });
+    s.plans.push(pl2);
+    s.activePlanId = pl2.id;
+    s.planLog.push({ planId: pl2.id, from: today() });
+  }
+
+  /* how often per week each item is actually taken, read off the active plan */
+  var act = s.plans.filter(function (p) { return p.id === s.activePlanId; })[0] || s.plans[0];
+  if (act) {
+    s.stack.forEach(function (it) {
+      var n = 0;
+      Object.keys(act.days || {}).forEach(function (wd) {
+        (act.days[wd].take || []).forEach(function (t) { if (t.itemId === it.id) n++; });
+      });
+      it.perWeek = n || 1;
+    });
+  }
+
+  /* logged days */
+  Object.keys(old.days || {}).forEach(function (d) {
+    var od = old.days[d] || {};
+    s.days[d] = {
+      workoutName: od.workoutName || "",
+      exercises: (od.exercises || []).map(function (e) {
+        var p = parseDetail(e.detail);
+        return { id: e.id || uid(), name: e.name || "", sets: p.sets, reps: p.reps, kg: p.kg, note: p.note,
+                 done: new Array(p.sets).fill(!!e.done) };
+      }),
+      take: (od.doses || []).map(function (x) {
+        return { id: x.id || uid(), itemId: idMap[x.pepId] || null, amount: Number(x.mg) || 0, unit: "mg",
+                 moment: "Morning", time: x.time || "", done: !!x.done, at: x.at || "", histId: null };
+      }).filter(function (x) { return x.itemId; }),
+      notes: od.notes || "",
+      reminders: (od.reminders || []).map(function (r) {
+        return { id: r.id || uid(), text: r.text || "", time: r.time || "", done: !!r.done };
+      }),
+      userEdited: !!od.userEdited,
+      tplV: -1
+    };
+  });
+
+  (old.history || []).forEach(function (h) {
+    s.history.push({ id: h.id || uid(), date: h.date, at: h.at || "", name: h.name || "", amount: Number(h.mg) || 0, unit: "mg" });
+  });
+
+  return s;
 }
 
 function save() {
+  prune();
   try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    if (db) db.doc("app/state").set(JSON.parse(JSON.stringify(state))).catch(() => {});
-  }, 600);
+  saveTimer = setTimeout(function () {
+    if (db) { try { db.doc("app/state").set(clone(state)); } catch (e) {} }
+  }, 700);
 }
 
-async function init() {
-  try { const raw = localStorage.getItem(LS_KEY); if (raw) state = Object.assign(state, JSON.parse(raw)); } catch (e) {}
-  migrate(); render();
-  try {
-    if (window.claude && window.claude.use) {
-      db = await claude.use("db");
-      if (db) {
-        const snap = await db.doc("app/state").get();
-        if (snap.exists) { state = Object.assign({ peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }, snap.data()); migrate(); render(); }
-        else if (state.peptides.length || Object.keys(state.days).length) save();
-      }
+/* days older than KEEP_DAYS go; without this the store grows for ever */
+function prune() {
+  var cut = addDays(today(), -KEEP_DAYS);
+  Object.keys(state.days).forEach(function (d) { if (d < cut) delete state.days[d]; });
+  if (state.history.length > 2000) state.history = state.history.slice(0, 2000);
+}
+
+/* ============================================================
+   the day: built from the active plan until you touch it
+   ============================================================ */
+function schedVer() { return state.schedVer || 0; }
+function bumpSched() { state.schedVer = schedVer() + 1; }
+function plan(id) { for (var i = 0; i < state.plans.length; i++) if (state.plans[i].id === id) return state.plans[i]; return null; }
+function activePlan() { return plan(state.activePlanId); }
+function planDay(pl, wd) {
+  if (!pl.days) pl.days = {};
+  if (!pl.days[wd]) pl.days[wd] = { workoutName: "", exercises: [], take: [], notes: "", reminders: [] };
+  var d = pl.days[wd];
+  if (!d.take) d.take = [];
+  if (!d.reminders) d.reminders = [];
+  if (!d.exercises) d.exercises = [];
+  return d;
+}
+
+function day(dateISO) {
+  if (!state.days[dateISO]) {
+    state.days[dateISO] = { workoutName: "", exercises: [], take: [], notes: "", reminders: [], userEdited: false, tplV: -1 };
+  }
+  var d = state.days[dateISO];
+  if (!d.exercises) d.exercises = [];
+  if (!d.take) d.take = [];
+  if (!d.reminders) d.reminders = [];
+  if (d.notes === undefined) d.notes = "";
+
+  var touched = d.userEdited
+    || d.exercises.some(function (e) { return (e.done || []).some(Boolean); })
+    || d.take.some(function (t) { return t.done; })
+    || d.reminders.some(function (r) { return r.done; });
+
+  if (d.tplV !== schedVer() && !touched && dateISO >= today()) {
+    var ap = activePlan();
+    var pd = ap && ap.days ? ap.days[wdOf(dateISO)] : null;
+    if (pd) {
+      d.workoutName = pd.workoutName || "";
+      d.exercises = (pd.exercises || []).map(function (e) {
+        return { id: uid(), name: e.name, sets: e.sets || 3, reps: e.reps || 10, kg: e.kg || 0, note: e.note || "",
+                 done: new Array(e.sets || 3).fill(false) };
+      });
+      d.take = (pd.take || []).map(function (t) {
+        var p = item(t.itemId);
+        return p ? { id: uid(), itemId: t.itemId, amount: doseOn(p, dateISO), unit: p.dose.u,
+                     moment: t.moment || p.moment || "Morning", time: t.time || "", done: false, at: "", histId: null } : null;
+      }).filter(Boolean);
+      d.notes = pd.notes || "";
+      d.reminders = (pd.reminders || []).map(function (r) { return { id: uid(), text: r.text, time: r.time || "", done: false }; });
+    } else {
+      d.workoutName = ""; d.exercises = []; d.take = []; d.notes = ""; d.reminders = [];
     }
-  } catch (e) { db = null; }
-}
-function migrate() {
-  if (!state.plans) state.plans = [];
-  if (!state.planLog) state.planLog = [];
-  // old weekday-template model -> one plan
-  if (state.tpl && Object.keys(state.tpl).length && !state.plans.length) {
-    const pl = { id: uid(), name: "Mijn plan", status: "active", days: {} };
-    Object.keys(state.tpl).forEach(wd => {
-      pl.days[wd] = { workoutName: state.tpl[wd].name, exercises: state.tpl[wd].exercises.slice(), doses: [] };
-    });
-    (state.rules || []).forEach(r => {
-      const wds = r.days === "daily" ? [0,1,2,3,4,5,6] : r.days;
-      wds.forEach(wd => { planDay(pl, wd).doses.push({ id: uid(), pepId: r.pepId, time: r.time || "" }); });
-    });
-    state.plans.push(pl); state.activePlanId = pl.id;
-    state.planLog.push({ planId: pl.id, from: todayISO() });
-    bumpSched();
+    d.tplV = schedVer();
+    dayDirty = true;
   }
-  delete state.tpl; delete state.rules;
+  return d;
 }
 
-// ---------- navigation ----------
-function go(t) { tab = t; if (t !== "plan") { editPlanId = null; editWd = null; } render(); window.scrollTo(0, 0); }
-function goBack() {
-  if (tab === "plan" && editWd !== null) { editWd = null; render(); return; }
-  if (tab === "plan" && editPlanId) { editPlanId = null; render(); return; }
-  if (tab === "set") go("hist");
-}
-
-function render() {
-  if (tab === "pep") tab = "plan";
-  ["home","plan","hist"].forEach(t => document.getElementById("nav-" + t).classList.toggle("on", tab === t || (tab === "set" && t === "hist")));
-  const main = document.getElementById("main");
-  const title = document.getElementById("pagetitle");
-  const tr = document.getElementById("topright");
-  const showBack = (tab === "set") || (tab === "plan" && editPlanId);
-  document.getElementById("backbtn").style.display = showBack ? "flex" : "none";
-  if (tab === "home") {
-    const sd = selDate || todayISO();
-    title.textContent = sd === todayISO() ? "Today" : new Date(sd).toLocaleDateString("en-US", { weekday: "long" });
-    tr.textContent = new Date(sd).toLocaleDateString("en-US", { day: "numeric", month: "long" });
-    main.innerHTML = viewHome();
-  }
-  if (tab === "plan") {
-    if (editPlanId && editWd !== null) { const pl = plan(editPlanId); title.textContent = DWL[editWd]; tr.textContent = pl ? pl.name : ""; main.innerHTML = viewDayEditor(); }
-    else if (editPlanId) { title.textContent = "Edit plan"; tr.textContent = ""; main.innerHTML = viewPlanEditor(); }
-    else { title.textContent = "Plan"; tr.textContent = ""; main.innerHTML = viewPlans() + viewPep(); }
-  }
-  if (tab === "hist") {
-    title.textContent = "History";
-    tr.innerHTML = `<button class="iconbtn" onclick="go('set')" aria-label="Settings">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.2.63.78 1.07 1.44 1.11H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.89z"/></svg></button>`;
-    main.innerHTML = viewHist();
-  }
-  if (tab === "set") { title.textContent = "Settings"; tr.textContent = ""; main.innerHTML = viewSettings(); }
-}
-
-// ---------- vandaag ----------
-function chk() { return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>`; }
-
-function weekDates(anchor) {
-  const d = new Date(anchor); const dow = (d.getDay() + 6) % 7; d.setDate(d.getDate() - dow);
-  return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return todayISO(x); });
-}
-function shiftWeek(n) { const d = new Date(selDate || todayISO()); d.setDate(d.getDate() + n); selDate = todayISO(d); render(); }
-
-function viewHome() {
-  const t = selDate || todayISO(), d = day(t);
-  const exDone = d.exercises.filter(e => e.done).length, exTot = d.exercises.length;
-  const doseDone = d.doses.filter(x => x.done).length, doseTot = d.doses.length;
-  const ap = activePlan();
-  let h = "";
-
-  // week-navigatie + dagstrip
-  const week = weekDates(t), td = todayISO();
-  const wkLabel = fmtDate(week[0]) + " – " + fmtDate(week[6]);
-  h += `<div class="weeknav" style="margin:-2px 0">
-    <button class="navarrow" onclick="shiftWeek(-7)" aria-label="Previous week">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="label">${t !== td ? `<button class="linkish" style="color:#0a0a0a;background:var(--green);border-color:var(--green)" onclick="selDate=null;render()">↩ back to today</button>` : wkLabel}</div>
-    <button class="navarrow" onclick="shiftWeek(7)" aria-label="Next week">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>`;
-  h += `<div class="daystrip">` + week.map((iso, i) =>
-    `<button class="day ${iso === t ? "sel" : ""} ${iso === td ? "today" : ""}" onclick="selDate='${iso}';render()">
-      <span class="dwl">${DW[i]}</span><span class="dn">${parseInt(iso.slice(8), 10)}</span></button>`).join("") + `</div>`;
-
-  if (!ap) h += `<div class="card"><div class="empty">No active plan yet.</div>
-    <button class="pill" onclick="go('plan')">Create a plan</button></div>`;
-
-  // workout checklist
-  h += `<div class="card"><div class="between">
-    <span class="title">Workout${d.workoutName ? " · <span style='color:var(--green)'>" + esc(d.workoutName) + "</span>" : ""}</span>
-    <button class="iconbtn" onclick="dlgExtraExercise()">+</button></div>`;
-  if (exTot) {
-    h += `<div class="bar"><div style="width:${Math.round(exDone/exTot*100)}%"></div></div>
-      <div class="between small"><span style="color:var(--green);font-weight:800">${exDone} of ${exTot} exercises</span></div>`;
-    h += d.exercises.map(e => `<div class="item">
-      <div class="check ${e.done ? "done" : ""}" onclick="toggleEx('${e.id}')">${e.done ? chk() : ""}</div>
-      <div style="flex:1">
-        <div class="${e.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(e.name)}</div>
-        <div class="muted small">${esc(e.detail || "")}</div></div></div>`).join("");
-  } else h += `<div class="empty">${ap ? "Rest day — no workout planned for " + DWL[wdOf(t)] : "No workout today"}</div>`;
-  h += `</div>`;
-
-  // peptide checklist
-  h += `<div class="card"><div class="between"><span class="title">Peptides</span>
-    <span class="muted small">${doseDone}/${doseTot} taken</span></div>`;
-  if (doseTot) {
-    h += d.doses.map(x => {
-      const p = pep(x.pepId);
-      return `<div class="item">
-        <div class="check ${x.done ? "done" : ""}" onclick="${x.done ? `undoDose('${t}','${x.id}')` : `setDose('${t}','${x.id}')`}">${x.done ? chk() : ""}</div>
-        <div style="flex:1">
-          <div class="${x.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(p ? p.name : "?")} · ${fmtMg(x.mg)} mg</div>
-          <div class="muted small">${[x.done ? "taken" + (x.at ? " at " + esc(x.at) : "") : (x.time ? "planned " + esc(x.time) : ""), p ? fmtMg(p.remainingMg) + " mg left in vial" : ""].filter(Boolean).join(" · ")}</div></div>
-        ${x.done ? "" : `<button class="pill" style="padding:8px 14px;font-size:12px" onclick="setDose('${t}','${x.id}')">Log</button>`}</div>`;
-    }).join("");
-  } else h += `<div class="empty">No doses planned today</div>`;
-  h += `</div>`;
-
-  // notes & reminders
-  h += `<div class="card"><div class="between"><span class="title">Notes &amp; reminders</span>
-    <div class="row" style="gap:8px">
-      <button class="linkish" onclick="dlgDayNote()">Note</button>
-      <button class="iconbtn" onclick="dlgReminder()">+</button></div></div>`;
-  if (d.notes) h += `<div style="font-size:14px;font-weight:700;white-space:pre-line;background:var(--inner);border-radius:14px;padding:12px 14px">${esc(d.notes)}</div>`;
-  if (d.reminders.length) {
-    h += d.reminders.map(r => `<div class="item">
-      <div class="check ${r.done ? "done" : ""}" onclick="toggleReminder('${r.id}')">${r.done ? chk() : ""}</div>
-      <div style="flex:1">
-        <div class="${r.done ? "done-text" : ""}" style="font-size:14px;font-weight:800">${esc(r.text)}</div>
-        ${r.time ? `<div class="muted small">at ${esc(r.time)}</div>` : ""}</div>
-      <button class="linkish plain" onclick="delReminder('${r.id}')">✕</button></div>`).join("");
-  }
-  if (!d.notes && !d.reminders.length) h += `<div class="empty">No notes for this day</div>`;
-  h += `</div>`;
-  return h;
-}
-function toggleReminder(id) { const r = day(selDate || todayISO()).reminders.find(x => x.id === id); if (r) { r.done = !r.done; save(); render(); } }
-function delReminder(id) { const d = day(selDate || todayISO()); d.reminders = d.reminders.filter(x => x.id !== id); d.userEdited = true; save(); render(); }
-function dlgDayNote() {
-  const d = day(selDate || todayISO());
-  openDlg(`<h2>Note for this day</h2>
-    <form class="fields" onsubmit="event.preventDefault();saveDayNote(this)">
-    <textarea name="n" style="width:100%;height:110px;font-size:14px;font-family:inherit;font-weight:700" placeholder="e.g. use reta in the evening">${esc(d.notes)}</textarea>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Save</button></div></form>`);
-}
-function saveDayNote(f) { const d = day(selDate || todayISO()); d.notes = f.n.value.trim(); d.userEdited = true; closeDlg(); save(); render(); }
-function dlgReminder() {
-  openDlg(`<h2>Reminder</h2>
-    <form class="fields" onsubmit="event.preventDefault();saveReminder(this)">
-    <label class="f">Reminder<input name="t" required placeholder="Pin 1 hour before gym" autofocus></label>
-    <label class="f">Time (optional — sends a notification)<input name="tm" type="time"></label>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Add</button></div></form>`);
-}
-function saveReminder(f) {
-  const d = day(selDate || todayISO());
-  d.reminders.push({ id: uid(), text: f.t.value.trim(), time: f.tm.value, done: false });
-  d.userEdited = true; closeDlg(); save(); render();
-}
-function toggleEx(id) { const e = day(selDate || todayISO()).exercises.find(x => x.id === id); if (e) { e.done = !e.done; save(); render(); } }
-function dlgExtraExercise() {
-  openDlg(`<h2>Extra exercise for this day</h2>
-    <form class="fields" onsubmit="event.preventDefault();saveExtraExercise(this)">
-    <label class="f">Exercise<input name="n" required placeholder="Bench press" autofocus></label>
-    <label class="f">Sets × reps · weight<input name="d" placeholder="4 × 8 · 80 kg"></label>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Add</button></div></form>`);
-}
-function saveExtraExercise(f) {
-  const d = day(selDate || todayISO());
-  d.exercises.push({ id: uid(), name: f.n.value.trim(), detail: f.d.value.trim(), done: false });
-  d.userEdited = true; closeDlg(); save(); render();
-}
-
-function setDose(dateISO, id) {
-  const x = day(dateISO).doses.find(z => z.id === id); if (!x || x.done) return;
-  const p = pep(x.pepId);
-  x.done = true; x.at = new Date().toTimeString().slice(0, 5);
-  if (p) p.remainingMg = Math.max(0, Math.round((p.remainingMg - x.mg) * 1000) / 1000);
-  state.history.unshift({ id: uid(), date: dateISO, at: x.at, name: p ? p.name : "?", mg: x.mg });
-  state.history = state.history.slice(0, 500);
-  save(); render();
-}
-function undoDose(dateISO, id) {
-  const x = day(dateISO).doses.find(z => z.id === id); if (!x || !x.done) return;
-  const p = pep(x.pepId);
-  x.done = false; if (p) p.remainingMg = Math.round((p.remainingMg + x.mg) * 1000) / 1000;
-  const hi = state.history.findIndex(hh => hh.date === dateISO && hh.mg === x.mg && hh.name === (p ? p.name : "?"));
-  if (hi >= 0) state.history.splice(hi, 1);
-  save(); render();
-}
-
-// ---------- plan tab: overview ----------
-function viewPlans() {
-  let h = "";
-  const ap = activePlan();
-  if (ap) {
-    h += `<div class="card"><div class="between">
-      <div><span class="title">${esc(ap.name)}</span> <span class="badge g" style="margin-left:6px">active</span></div>
-      <button class="linkish" onclick="editPlanId='${ap.id}';render()">Edit</button></div>`;
-    for (let wd = 0; wd < 7; wd++) {
-      const pd = ap.days ? ap.days[wd] : null;
-      const doses = pd ? (pd.doses || []) : [];
-      h += `<div class="dayrow" onclick="editPlanId='${ap.id}';editWd=${wd};render()">
-        <span class="dw">${DW[wd]}</span>
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:800;${pd && pd.workoutName ? "" : "color:var(--muted)"}">${pd && pd.workoutName ? esc(pd.workoutName) : "Rest day"}</div>
-          <div class="muted small">${pd && pd.exercises.length ? pd.exercises.length + " exercises" : ""}${pd && pd.exercises.length && doses.length ? " · " : ""}${doses.length ? doses.map(ds => { const p = pep(ds.pepId); return p ? esc(p.name) : ""; }).filter(Boolean).join(", ") : ""}</div></div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>`;
-    }
-    h += `</div>`;
-  } else {
-    h += `<div class="card"><span class="title">No active plan</span>
-      <div class="muted small">Build a weekly plan: your workout and peptides per day. Once activated it repeats every week — months ahead.</div></div>`;
-  }
-  // drafts + other plans
-  const others = (state.plans || []).filter(p => p.id !== state.activePlanId);
-  if (others.length) {
-    h += `<div class="card"><span class="title">Other plans</span>` + others.map(p =>
-      `<div class="item"><div style="flex:1">
-        <div style="font-size:14px;font-weight:800">${esc(p.name)} <span class="badge o" style="padding:2px 8px;font-size:10px;margin-left:4px">${p.status === "draft" ? "draft" : "archived"}</span></div></div>
-        <button class="linkish" onclick="editPlanId='${p.id}';render()">Edit</button>
-        <button class="pill" style="padding:8px 14px;font-size:12px" onclick="activatePlan('${p.id}')">Activate</button></div>`).join("") + `</div>`;
-  }
-  h += `<button class="pill" style="padding:14px 0;font-size:15px" onclick="createPlan()">+ Create new plan</button>`;
-  return h;
-}
-
-function createPlan() {
-  openDlg(`<h2>New plan</h2>
-    <p class="muted" style="margin:0 0 14px 0">Build it yourself, or let Claude write the whole week for you.</p>
-    <div class="btnrow col">
-      <button class="pill" onclick="closeDlg();createCustomPlan()">Custom plan</button>
-      <button class="pill ghost" onclick="dlgClaudePlan()">Claude plan</button>
-      <button class="pill ghost" onclick="closeDlg()">Cancel</button></div>`);
-}
-function createCustomPlan() {
-  const pl = { id: uid(), name: "Plan " + ((state.plans || []).length + 1), status: "draft", days: {} };
-  state.plans.push(pl); editPlanId = pl.id; save(); render();
-}
-
-// ---------- Claude plan ----------
-function claudePrompt() {
-  const peps = state.peptides.map(p => `- ${p.name}: current dose ${fmtMg(doseFor(p, todayISO()))} mg`).join("\n") || "- (none yet — you may propose peptides too)";
-  return `Write a weekly gym + peptide plan for my planner app.
-
-Reply with ONLY one JSON code block, exactly this format:
-
-{
-  "name": "Plan name",
-  "peptides": [
-    { "name": "Retatrutide", "vialMg": 20, "doseMg": 2,
-      "steps": [ { "from": "2026-10-01", "mg": 4 } ] }
-  ],
-  "days": {
-    "0": { "workoutName": "Legs",
-           "exercises": [ { "name": "Squat", "detail": "4 x 8 - 100 kg" } ],
-           "doses": [ { "peptide": "Retatrutide", "time": "09:00" } ],
-           "notes": "Use reta in the evening",
-           "reminders": [ { "text": "Pin 1 hour before gym", "time": "17:00" } ] },
-    "1": { "workoutName": "Push", "exercises": [], "doses": [] }
-  }
-}
-
-Rules:
-- day keys are "0" to "6" where 0 = Monday and 6 = Sunday; omit rest days.
-- "notes" (free text) and "reminders" (text + optional "time" HH:MM, which triggers a notification) are optional per day.
-- "peptides" is optional: only include peptides that are new or whose dose schedule you are setting; "steps" are future dose increases (date + mg per dose).
-- "doses" reference peptides by name; the dose in mg follows the peptide's schedule automatically, so do not put mg on a dose.
-- "detail" is free text like "4 x 8 - 80 kg".
-
-My current peptides:
-${peps}
-
-My goals: [DESCRIBE YOUR GOALS, DAYS AVAILABLE, EQUIPMENT, EXPERIENCE HERE]`;
-}
-function dlgClaudePlan() {
-  openDlg(`<h2>Claude plan</h2>
-    <p class="muted" style="margin:0 0 12px 0">1. Copy the prompt and send it to Claude with your goals.<br>2. Paste Claude&#39;s JSON answer below and import.</p>
-    <button class="pill ghost" style="margin-bottom:10px" onclick="copyClaudePrompt(this)">Copy prompt</button>
-    <form class="fields" onsubmit="event.preventDefault();importClaudePlan(this)">
-      <textarea name="j" style="width:100%;height:140px;font-size:12px;font-family:monospace" placeholder="Paste Claude's JSON here"></textarea>
-      <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-      <button class="pill">Import plan</button></div></form>`);
-}
-function copyClaudePrompt(btn) {
-  const txt = claudePrompt();
-  const done = () => { btn.textContent = "Copied ✓"; setTimeout(() => { btn.textContent = "Copy prompt"; }, 2000); };
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done)); }
-    else fallbackCopy(txt, done);
-  } catch (e) { fallbackCopy(txt, done); }
-}
-function fallbackCopy(txt, done) {
-  const ta = document.createElement("textarea");
-  ta.value = txt; document.body.appendChild(ta); ta.select();
-  try { document.execCommand("copy"); done(); } catch (e) { alert(txt); }
-  document.body.removeChild(ta);
-}
-function importClaudePlan(f) {
-  let raw = f.j.value.trim();
-  const m = raw.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) raw = m[1].trim();
-  let data;
-  try { data = JSON.parse(raw); } catch (e) { alert("That's not valid JSON. Paste exactly the code block Claude replied with."); return; }
-  if (!data || typeof data !== "object" || !data.days) { alert("The JSON is missing the \"days\" part."); return; }
-  // peptides: create or update by name
-  (Array.isArray(data.peptides) ? data.peptides : []).forEach(np => {
-    if (!np || !np.name) return;
-    let p = state.peptides.find(x => x.name.toLowerCase() === String(np.name).toLowerCase());
-    if (!p) {
-      p = { id: uid(), name: String(np.name), vialMg: parseFloat(np.vialMg) || 10, doseMg: parseFloat(np.doseMg) || 1, remainingMg: parseFloat(np.vialMg) || 10, plan: [] };
-      state.peptides.push(p);
-    }
-    (Array.isArray(np.steps) ? np.steps : []).forEach(s => {
-      if (s && s.from && s.mg) p.plan.push({ id: uid(), from: String(s.from), mg: parseFloat(s.mg) });
-    });
-  });
-  const pl = { id: uid(), name: String(data.name || "Claude plan"), status: "draft", days: {} };
-  for (let wd = 0; wd < 7; wd++) {
-    const src = data.days[String(wd)] || data.days[wd];
-    if (!src) continue;
-    const pd = planDay(pl, wd);
-    pd.workoutName = String(src.workoutName || "");
-    pd.exercises = (Array.isArray(src.exercises) ? src.exercises : []).map(e => ({ name: String(e.name || ""), detail: String(e.detail || "") })).filter(e => e.name);
-    pd.doses = (Array.isArray(src.doses) ? src.doses : []).map(ds => {
-      const p = ds && ds.peptide ? state.peptides.find(x => x.name.toLowerCase() === String(ds.peptide).toLowerCase()) : null;
-      return p ? { id: uid(), pepId: p.id, time: String(ds.time || "") } : null;
-    }).filter(Boolean);
-    pd.notes = String(src.notes || "");
-    pd.reminders = (Array.isArray(src.reminders) ? src.reminders : []).map(r => ({ text: String(r.text || ""), time: String(r.time || "") })).filter(r => r.text);
-  }
-  state.plans.push(pl);
-  bumpSched(); closeDlg(); editPlanId = pl.id; editWd = null; save(); render();
-}
-function activatePlan(id) {
-  const pl = plan(id); if (!pl) return;
-  const old = activePlan(); if (old && old.id !== id) old.status = "archived";
-  pl.status = "active"; state.activePlanId = id;
-  const log = state.planLog || (state.planLog = []);
-  if (!log.length || log[log.length - 1].planId !== id) log.push({ planId: id, from: todayISO() });
-  bumpSched(); editPlanId = null; editWd = null; save(); render();
-}
-function delPlan(id) {
-  state.plans = state.plans.filter(p => p.id !== id);
-  if (state.activePlanId === id) { state.activePlanId = null; bumpSched(); }
-  editPlanId = null; editWd = null; closeDlg(); save(); render();
-}
-
-// ---------- plan editor ----------
-function viewPlanEditor() {
-  const pl = plan(editPlanId); if (!pl) { editPlanId = null; return viewPlans(); }
-  const isActive = pl.id === state.activePlanId;
-  let h = `<div class="card"><div class="between">
-    <div class="row"><span class="title">${esc(pl.name)}</span>
-      <span class="badge ${isActive ? "g" : "o"}" style="padding:3px 10px;font-size:11px">${isActive ? "active" : "draft"}</span></div>
-    <button class="linkish" onclick="dlgPlanName()">Name</button></div>
-    <div class="muted small">Tap a day to set its workout and peptides. ${isActive ? "Changes apply to upcoming days right away." : "This is a draft — activate it when it&#39;s ready."}</div>`;
-  for (let wd = 0; wd < 7; wd++) {
-    const pd = pl.days ? pl.days[wd] : null;
-    const doses = pd ? (pd.doses || []) : [];
-    h += `<div class="dayrow" onclick="editWd=${wd};render()">
-      <span class="dw">${DW[wd]}</span>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:800;${pd && pd.workoutName ? "" : "color:var(--muted)"}">${pd && pd.workoutName ? esc(pd.workoutName) : "Rest day"}</div>
-        <div class="muted small">${pd && pd.exercises.length ? pd.exercises.length + " exercises" : ""}${pd && pd.exercises.length && doses.length ? " · " : ""}${doses.length ? doses.length + " doses" : ""}</div></div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>`;
-  }
-  h += `</div>`;
-
-  // peptide-instellingen (ophoging)
-  h += `<div class="card"><div class="between"><span class="title">Peptide settings</span>
-    <button class="iconbtn" onclick="dlgPeptide()">+</button></div>
-    <div class="muted small">Increasing every few weeks? Put it in the dose plan — the plan automatically uses the right dose per day.</div>`;
-  if (state.peptides.length) {
-    h += state.peptides.map(p => {
-      const ns = nextStep(p, todayISO());
-      return `<div class="item"><div style="flex:1">
-        <div style="font-size:14px;font-weight:800">${esc(p.name)} · now ${fmtMg(doseFor(p, todayISO()))} mg</div>
-        <div class="muted small">${ns ? "from " + fmtDate(ns.from) + " → " + fmtMg(ns.mg) + " mg" : "no increase planned"}</div></div>
-        <button class="pill ghost" style="padding:8px 14px;font-size:12px" onclick="dlgSteps('${p.id}')">Dose plan</button></div>`;
-    }).join("");
-  } else h += `<div class="empty">No peptides yet — add one with +</div>`;
-  h += `</div>`;
-
-  h += `<div class="btnrow" style="margin-top:0">
-    ${isActive ? "" : `<button class="pill" onclick="activatePlan('${pl.id}')">Create plan · repeats weekly</button>`}
-    <button class="pill ghost" style="flex:0 0 auto;padding:13px 18px" onclick="goBack()">${isActive ? "Done" : "Save draft"}</button>
-    <button class="pill danger" style="flex:0 0 auto;padding:13px 18px" onclick="confirmAction('Delete plan?','${esc(pl.name)} will be permanently deleted.',()=>delPlan('${pl.id}'))">✕</button>
-  </div>`;
-  return h;
-}
-function dlgPlanName() {
-  const pl = plan(editPlanId); if (!pl) return;
-  openDlg(`<h2>Plan name</h2><form class="fields" onsubmit="event.preventDefault();savePlanName(this)">
-    <label class="f">Name<input name="n" required value="${esc(pl.name)}" autofocus></label>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Save</button></div></form>`);
-}
-function savePlanName(f) { const pl = plan(editPlanId); if (pl) pl.name = f.n.value.trim(); closeDlg(); save(); render(); }
-
-// ---------- day editor ----------
-function viewDayEditor() {
-  const pl = plan(editPlanId); if (!pl) { editPlanId = null; return viewPlans(); }
-  const pd = planDay(pl, editWd);
-  let h = `<div class="card"><div class="between">
-    <span class="title">Workout${pd.workoutName ? " · <span style='color:var(--green)'>" + esc(pd.workoutName) + "</span>" : ""}</span>
-    <div class="row" style="gap:8px">
-      <button class="linkish" onclick="dlgPdName()">Name</button>
-      <button class="iconbtn" onclick="dlgPdExercise()">+</button></div></div>`;
-  if (pd.exercises.length) {
-    h += pd.exercises.map((e, i) => `<div class="item" onclick="dlgPdExercise(${i})" style="cursor:pointer">
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:800">${esc(e.name)}</div>
-        <div class="muted small">${esc(e.detail || "")}</div></div>
-      <span class="muted small">Edit ›</span></div>`).join("");
-  } else h += `<div class="empty">Rest day — or add exercises with +</div>`;
-  h += `</div>`;
-
-  h += `<div class="card"><div class="between"><span class="title">Peptides on ${DWL[editWd]}</span>
-    <button class="iconbtn" onclick="dlgPdDose()">+</button></div>`;
-  if (pd.doses.length) {
-    h += pd.doses.map((ds, i) => {
-      const p = pep(ds.pepId);
-      return `<div class="item"><div style="flex:1">
-        <div style="font-size:14px;font-weight:800">${esc(p ? p.name : "?")} · follows dose plan (now ${p ? fmtMg(doseFor(p, todayISO())) : "?"} mg)</div>
-        <div class="muted small">${ds.time ? "at " + esc(ds.time) : "no time"}</div></div>
-        <button class="linkish plain" onclick="delPdDose(${i})">✕</button></div>`;
-    }).join("");
-  } else h += `<div class="empty">No doses on this day</div>`;
-  h += `</div>`;
-
-  // notes & reminders in het weekplan (herhalen elke week)
-  h += `<div class="card"><div class="between"><span class="title">Notes &amp; reminders</span>
-    <div class="row" style="gap:8px">
-      <button class="linkish" onclick="dlgPdNote()">Note</button>
-      <button class="iconbtn" onclick="dlgPdReminder()">+</button></div></div>`;
-  if (pd.notes) h += `<div style="font-size:14px;font-weight:700;white-space:pre-line;background:var(--inner);border-radius:14px;padding:12px 14px">${esc(pd.notes)}</div>`;
-  if ((pd.reminders || []).length) {
-    h += pd.reminders.map((r, i) => `<div class="item"><div style="flex:1">
-      <div style="font-size:14px;font-weight:800">${esc(r.text)}</div>
-      ${r.time ? `<div class="muted small">at ${esc(r.time)}</div>` : ""}</div>
-      <button class="linkish plain" onclick="delPdReminder(${i})">✕</button></div>`).join("");
-  }
-  if (!pd.notes && !(pd.reminders || []).length) h += `<div class="empty">Repeats every ${DWL[editWd]} — add a note or reminder</div>`;
-  h += `</div>`;
-  h += `<button class="pill ghost" style="padding:13px 0" onclick="goBack()">‹ Back to week overview</button>`;
-  return h;
-}
-function dlgPdNote() {
-  const pd = planDay(plan(editPlanId), editWd);
-  openDlg(`<h2>Note · ${DWL[editWd]}</h2>
-    <form class="fields" onsubmit="event.preventDefault();savePdNote(this)">
-    <textarea name="n" style="width:100%;height:110px;font-size:14px;font-family:inherit;font-weight:700" placeholder="e.g. use reta in the evening">${esc(pd.notes || "")}</textarea>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Save</button></div></form>`);
-}
-function savePdNote(f) { planDay(plan(editPlanId), editWd).notes = f.n.value.trim(); closeDlg(); pdChanged(); }
-function dlgPdReminder() {
-  openDlg(`<h2>Reminder · every ${DWL[editWd]}</h2>
-    <form class="fields" onsubmit="event.preventDefault();savePdReminder(this)">
-    <label class="f">Reminder<input name="t" required placeholder="Pin 1 hour before gym" autofocus></label>
-    <label class="f">Time (optional — sends a notification)<input name="tm" type="time"></label>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Add</button></div></form>`);
-}
-function savePdReminder(f) {
-  const pd = planDay(plan(editPlanId), editWd);
-  if (!pd.reminders) pd.reminders = [];
-  pd.reminders.push({ text: f.t.value.trim(), time: f.tm.value });
-  closeDlg(); pdChanged();
-}
-function delPdReminder(i) { const pd = planDay(plan(editPlanId), editWd); pd.reminders.splice(i, 1); pdChanged(); }
-function pdChanged() { if (editPlanId === state.activePlanId) bumpSched(); save(); render(); }
-function dlgPdName() {
-  const pd = planDay(plan(editPlanId), editWd);
-  openDlg(`<h2>Workout name · ${DWL[editWd]}</h2><form class="fields" onsubmit="event.preventDefault();savePdName(this)">
-    <label class="f">Name (e.g. Legs)<input name="n" value="${esc(pd.workoutName)}" autofocus placeholder="Legs"></label>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Save</button></div></form>`);
-}
-function savePdName(f) { planDay(plan(editPlanId), editWd).workoutName = f.n.value.trim(); closeDlg(); pdChanged(); }
-function dlgPdExercise(i) {
-  const pd = planDay(plan(editPlanId), editWd);
-  const e = i != null ? pd.exercises[i] : null;
-  openDlg(`<h2>${e ? "Edit exercise" : "Add exercise"}</h2>
-    <form class="fields" onsubmit="event.preventDefault();savePdExercise(this,${i != null ? i : -1})">
-    <label class="f">Exercise<input name="n" required value="${esc(e ? e.name : "")}" placeholder="Squat" autofocus></label>
-    <label class="f">Sets × reps · weight<input name="d" value="${esc(e ? e.detail : "")}" placeholder="4 × 8 · 100 kg"></label>
-    <div class="btnrow">${e ? `<button type="button" class="pill danger" onclick="delPdExercise(${i})">Delete</button>` : `<button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>`}
-    <button class="pill">Save</button></div></form>`);
-}
-function savePdExercise(f, i) {
-  const pd = planDay(plan(editPlanId), editWd);
-  if (i >= 0) { pd.exercises[i].name = f.n.value.trim(); pd.exercises[i].detail = f.d.value.trim(); }
-  else pd.exercises.push({ name: f.n.value.trim(), detail: f.d.value.trim() });
-  closeDlg(); pdChanged();
-}
-function delPdExercise(i) { const pd = planDay(plan(editPlanId), editWd); pd.exercises.splice(i, 1); closeDlg(); pdChanged(); }
-function dlgPdDose() {
-  if (!state.peptides.length) { openDlg(`<h2>No peptides</h2><p class="muted" style="margin:0 0 14px 0">Add a peptide first under Peptide settings.</p><div class="btnrow"><button class="pill" onclick="closeDlg()">OK</button></div>`); return; }
-  const opts = state.peptides.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
-  openDlg(`<h2>Peptide on ${DWL[editWd]}</h2><form class="fields" onsubmit="event.preventDefault();savePdDose(this)">
-    <label class="f">Peptide<select name="p">${opts}</select></label>
-    <label class="f">Time (optional)<input name="t" type="time"></label>
-    <div class="muted small">The dose (mg) automatically follows the peptide's dose plan — even when you increase later.</div>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Add</button></div></form>`);
-}
-function savePdDose(f) {
-  planDay(plan(editPlanId), editWd).doses.push({ id: uid(), pepId: f.p.value, time: f.t.value });
-  closeDlg(); pdChanged();
-}
-function delPdDose(i) { planDay(plan(editPlanId), editWd).doses.splice(i, 1); pdChanged(); }
-
-// ---------- vials (voorraad) ----------
-function viewPep() {
-  const t = todayISO();
-  let h = `<div class="between" style="margin-top:8px"><span class="title" style="font-size:20px">Inventory</span>
-    <button class="iconbtn" onclick="dlgPeptide()">+</button></div>`;
-  if (!state.peptides.length) h += `<div class="card"><div class="empty">No peptides yet — add your first vial with +</div></div>`;
-  state.peptides.forEach(p => {
-    const cur = doseFor(p, t), ns = nextStep(p, t);
-    const frac = p.vialMg > 0 ? Math.max(0, Math.min(1, p.remainingMg / p.vialMg)) : 0;
-    const dosesLeft = cur > 0 ? Math.floor(p.remainingMg / cur + 1e-9) : 0;
-    const C = 251, off = C * (1 - frac);
-    h += `<div class="card">
-      <div class="between"><div><div style="font-size:17px;font-weight:900">${esc(p.name)}</div>
-        <div class="muted small">vial ${fmtMg(p.vialMg)} mg · now ${fmtMg(cur)} mg per dose</div></div>
-        <button class="linkish" onclick="dlgPeptide('${p.id}')">Edit</button></div>
-      ${ns ? `<div class="row"><span class="badge b">from ${fmtDate(ns.from)} → ${fmtMg(ns.mg)} mg</span></div>` : ""}
-      <div class="row" style="gap:16px">
-        <div class="ring"><svg width="92" height="92" viewBox="0 0 92 92">
-          <circle cx="46" cy="46" r="40" fill="none" stroke="#333" stroke-width="9"/>
-          <circle cx="46" cy="46" r="40" fill="none" stroke="var(--green)" stroke-width="9" stroke-linecap="round"
-            stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 46 46)"/></svg>
-          <div class="in"><span style="font-size:19px;font-weight:900;color:var(--green)">${fmtMg(p.remainingMg)}</span>
-          <span class="muted" style="font-size:11px">mg left</span></div></div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px">
-          <div class="between small"><span class="muted">Used</span><span>${fmtMg(Math.max(0, p.vialMg - p.remainingMg))} mg</span></div>
-          <div class="between small"><span class="muted">Doses left (at ${fmtMg(cur)} mg)</span><span>${dosesLeft}</span></div>
-        </div></div>
-      <div class="btnrow" style="margin-top:0">
-        <button class="pill" onclick="quickDose('${p.id}')">Log dose −${fmtMg(cur)} mg</button>
-        <button class="pill ghost" style="flex:0 0 auto;padding:13px 16px" onclick="refillVial('${p.id}')">New vial</button>
-      </div></div>`;
-  });
-  return h;
-}
-function quickDose(pid) {
-  const p = pep(pid); if (!p) return;
-  const t = todayISO(), at = new Date().toTimeString().slice(0, 5), mgd = doseFor(p, t);
-  p.remainingMg = Math.max(0, Math.round((p.remainingMg - mgd) * 1000) / 1000);
-  const d = day(t);
-  d.doses.push({ id: uid(), pepId: pid, mg: mgd, time: "", done: true, at });
-  d.userEdited = true;
-  state.history.unshift({ id: uid(), date: t, at, name: p.name, mg: mgd });
-  state.history = state.history.slice(0, 500);
-  save(); render();
-}
-function refillVial(pid) { const p = pep(pid); if (!p) return; p.remainingMg = p.vialMg; save(); render(); }
-
-// ---------- historie + stats ----------
-function histDate(iso) { const t = todayISO(); if (iso === t) return "today"; const y = new Date(); y.setDate(y.getDate() - 1); if (iso === todayISO(y)) return "yesterday"; return fmtDate(iso); }
-
-function lastWeekStarts(n) {
-  const out = [], mon = new Date(weekDates(todayISO())[0]);
-  for (let i = n - 1; i >= 0; i--) { const d = new Date(mon); d.setDate(mon.getDate() - 7 * i); out.push(todayISO(d)); }
+function selISO() { return selDate || today(); }
+function weekOf(anchor) {
+  var start = addDays(anchor, -wdOf(anchor));
+  var out = [];
+  for (var i = 0; i < 7; i++) out.push(addDays(start, i));
   return out;
 }
-// simpele staafgrafiek (één kleur), SVG
-function barChart(data, color, unit) {
-  const W = 340, H = 130, padB = 22, padT = 16, n = data.length;
-  const max = Math.max(1, ...data.map(d => d.value));
-  const slot = W / n, bw = Math.min(26, slot * 0.55);
-  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
-  s += `<line x1="0" y1="${H - padB}" x2="${W}" y2="${H - padB}" stroke="#2c2c2c" stroke-width="1"/>`;
-  data.forEach((d, i) => {
-    const x = slot * i + (slot - bw) / 2;
-    const bh = Math.max(d.value > 0 ? 4 : 0, (H - padB - padT) * d.value / max);
-    const y = H - padB - bh;
-    if (bh > 0) s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${color}"><title>${esc(d.label)}: ${fmtMg(d.value)} ${unit}</title></rect>`;
-    else s += `<rect x="${x.toFixed(1)}" y="${H - padB - 2}" width="${bw.toFixed(1)}" height="2" rx="1" fill="#2c2c2c"><title>${esc(d.label)}: 0 ${unit}</title></rect>`;
-    if (d.value === max && max > 0 || i === n - 1 && d.value > 0)
-      s += `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="800" fill="#cfcfcf" font-family="inherit">${fmtMg(d.value)}</text>`;
-    s += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 7}" text-anchor="middle" font-size="9" font-weight="700" fill="#8a8a8a" font-family="inherit">${esc(d.label)}</text>`;
-  });
-  return s + `</svg>`;
+
+/* ============================================================
+   svg bits
+   ============================================================ */
+function checkIcon() { return '<svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>'; }
+function chevron() { return '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'; }
+function tickRule() {
+  var s = '<svg class="rule" viewBox="0 0 120 9" preserveAspectRatio="none" aria-hidden="true">';
+  for (var i = 0; i <= 120; i += 4) s += '<line x1="' + i + '" y1="' + (i % 20 === 0 ? 0 : 3.5) + '" x2="' + i + '" y2="9" stroke="var(--line)" stroke-width="1"/>';
+  return s + "</svg>";
+}
+function ring(pct, size, color, big, cap) {
+  var r = size / 2 - 5, c = 2 * Math.PI * r;
+  return '<div class="dial" style="width:' + size + 'px;height:' + size + 'px"><svg viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true">' +
+    '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="var(--raise)" stroke-width="7"/>' +
+    '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="7" stroke-linecap="round" ' +
+    'stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - pct)).toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/></svg>' +
+    '<div class="inner"><span class="big">' + big + '</span><span class="cap">' + cap + "</span></div></div>";
 }
 
-function viewHist() {
-  const t = todayISO();
-  let h = "";
-
-  // grafiek: workouts per week (8 weken)
-  const wk = lastWeekStarts(8);
-  const wkData = wk.map(ws => {
-    const days = weekDates(ws);
-    let v = 0;
-    days.forEach(iso => { const d = state.days[iso]; if (d && d.exercises.some(e => e.done)) v++; });
-    return { label: fmtDate(ws).replace(".", ""), value: v };
+/* ============================================================
+   charts
+   ============================================================ */
+function lineChart(values, labels, color, unit) {
+  var W = 320, H = 150, L = 36, R = 10, T = 16, B = 24, n = values.length;
+  if (!n) return "";
+  var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+  var pad = (hi - lo) * 0.18 || 1;
+  var y0 = Math.floor((lo - pad) * 2) / 2, y1 = Math.ceil((hi + pad) * 2) / 2;
+  if (y1 === y0) y1 = y0 + 1;
+  var px = function (i) { return L + (W - L - R) * (n === 1 ? 0.5 : i / (n - 1)); };
+  var py = function (v) { return T + (H - T - B) * (1 - (v - y0) / (y1 - y0)); };
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(unit) + ' over time">';
+  [y0, (y0 + y1) / 2, y1].forEach(function (t) {
+    s += '<line x1="' + L + '" y1="' + py(t).toFixed(1) + '" x2="' + (W - R) + '" y2="' + py(t).toFixed(1) + '" stroke="var(--grid)" stroke-width="1"/>' +
+      '<text x="' + (L - 7) + '" y="' + (py(t) + 3.5).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--dim)">' + num(t, 1) + "</text>";
   });
-  h += `<div class="card"><div class="between"><span class="title">Workouts per week</span>
-    <span class="muted small">last 8 weeks</span></div>${barChart(wkData, "var(--green)", "workouts")}</div>`;
-
-  // grafiek per peptide: mg per week
-  state.peptides.forEach((p, pi) => {
-    const col = pi % 2 === 0 ? "var(--blue)" : "var(--orange)";
-    const data = wk.map(ws => {
-      const days = weekDates(ws);
-      const v = state.history.filter(x => x.name === p.name && days.includes(x.date)).reduce((s2, x) => s2 + x.mg, 0);
-      return { label: fmtDate(ws).replace(".", ""), value: Math.round(v * 1000) / 1000 };
-    });
-    if (data.some(d => d.value > 0))
-      h += `<div class="card"><div class="between"><span class="title">${esc(p.name)} · mg per week</span>
-        <span class="muted small">last 8 weeks</span></div>${barChart(data, col, "mg")}</div>`;
+  var d = values.map(function (v, i) { return (i ? "L" : "M") + px(i).toFixed(1) + " " + py(v).toFixed(1); }).join(" ");
+  s += '<path d="' + d + " L" + px(n - 1).toFixed(1) + " " + (H - B) + " L" + px(0).toFixed(1) + " " + (H - B) + ' Z" fill="' + color + '" fill-opacity="0.13"/>';
+  s += '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  s += '<circle cx="' + px(n - 1).toFixed(1) + '" cy="' + py(values[n - 1]).toFixed(1) + '" r="4.5" fill="' + color + '" stroke="var(--surf)" stroke-width="2"/>';
+  s += '<text x="' + (px(n - 1) - 6).toFixed(1) + '" y="' + (py(values[n - 1]) - 9).toFixed(1) + '" text-anchor="end" font-size="10" font-weight="600" fill="var(--txt)">' + num(values[n - 1], 1) + " " + esc(unit) + "</text>";
+  var every = Math.max(1, Math.ceil(n / 5));
+  labels.forEach(function (lb, i) {
+    if (i % every !== 0 && i !== n - 1) return;
+    s += '<text x="' + px(i).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="8.5" fill="var(--dim)">' + esc(lb) + "</text>";
   });
+  return s + "</svg>";
+}
 
-  // stats per maand (laatste 3)
-  const months = [];
-  for (let i = 0; i < 3; i++) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); months.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")); }
-  h += `<div class="card"><span class="title">Per month</span>`;
-  months.forEach(m => {
-    const label = new Date(m + "-01").toLocaleDateString("en-US", { month: "long", year: "numeric" });
-    const doses = state.history.filter(x => x.date.slice(0, 7) === m);
-    const perPep = {};
-    doses.forEach(x => { perPep[x.name] = (perPep[x.name] || 0) + x.mg; });
-    let workouts = 0;
-    Object.keys(state.days).forEach(iso => { if (iso.slice(0, 7) === m && state.days[iso].exercises.some(e => e.done)) workouts++; });
-    h += `<div style="border-top:1px solid #262626;padding-top:10px">
-      <div style="font-size:14px;font-weight:900;text-transform:capitalize">${label}</div>
-      <div class="between small" style="margin-top:6px"><span class="muted">Workouts done</span><span>${workouts}</span></div>
-      <div class="between small"><span class="muted">Doses taken</span><span>${doses.length}</span></div>` +
-      Object.keys(perPep).map(n => `<div class="between small"><span class="muted">${esc(n)}</span><span>${fmtMg(perPep[n])} mg</span></div>`).join("") +
-      `</div>`;
+function niceTop(v) {
+  if (v <= 0) return 1;
+  var k = Math.pow(10, Math.floor(Math.log10(v))), m = v / k;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * k;
+}
+function barChart(values, labels, color) {
+  var W = 320, H = 132, L = 30, R = 8, T = 14, B = 22, n = values.length;
+  if (!n) return "";
+  var y1 = niceTop(Math.max.apply(null, values) * 1.1);
+  var slot = (W - L - R) / n, bw = Math.min(24, slot - 6);
+  var py = function (v) { return T + (H - T - B) * (1 - v / y1); };
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">';
+  [0, y1 / 2, y1].forEach(function (t) {
+    s += '<line x1="' + L + '" y1="' + py(t).toFixed(1) + '" x2="' + (W - R) + '" y2="' + py(t).toFixed(1) + '" stroke="var(--grid)" stroke-width="1"/>' +
+      '<text x="' + (L - 6) + '" y="' + (py(t) + 3.5).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--dim)">' + num(t, t % 1 === 0 ? 0 : 1) + "</text>";
   });
-  h += `</div>`;
+  var top = 0;
+  values.forEach(function (v, i) {
+    if (v > values[top]) top = i;
+    var x = L + slot * i + (slot - bw) / 2, y = py(v), h = Math.max(2, (H - B) - y);
+    s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="4" fill="' + color + '"/>';
+  });
+  if (values[top] > 0) {
+    s += '<text x="' + (L + slot * top + slot / 2).toFixed(1) + '" y="' + (py(values[top]) - 5).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="600" fill="var(--txt)">' + num(values[top], values[top] % 1 === 0 ? 0 : 1) + "</text>";
+  }
+  var every = Math.max(1, Math.ceil(n / 5));
+  labels.forEach(function (lb, i) {
+    if (i % every !== 0) return;
+    s += '<text x="' + (L + slot * i + slot / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="8.5" fill="var(--dim)">' + esc(lb) + "</text>";
+  });
+  return s + "</svg>";
+}
 
-  // welk plan wanneer
-  h += `<div class="card"><span class="title">Plan history</span>`;
-  const log = (state.planLog || []).slice().reverse();
-  if (log.length) {
-    h += log.map((l, i) => {
-      const pl = plan(l.planId);
-      const till = i === 0 ? "now" : fmtDate(log[i - 1].from);
-      return `<div class="between" style="font-size:14px"><span>${esc(pl ? pl.name : "deleted plan")}${l.planId === state.activePlanId && i === 0 ? ` <span class="badge g" style="padding:2px 8px;font-size:10px">actief</span>` : ""}</span>
-        <span class="muted">${fmtDate(l.from)} → ${till}</span></div>`;
+/* ============================================================
+   Today
+   ============================================================ */
+function viewToday() {
+  var t = selISO(), d = day(t), td = today();
+  var setsDone = 0, setsTot = 0;
+  d.exercises.forEach(function (e) { setsTot += e.sets; e.done.forEach(function (x) { if (x) setsDone++; }); });
+  var takeDone = d.take.filter(function (x) { return x.done; }).length;
+  var pct = setsTot ? setsDone / setsTot : 0;
+  var h = "";
+
+  /* week strip with what is on each day */
+  var wk = weekOf(t);
+  h += '<div class="week">' + wk.map(function (dd, i) {
+    var sd = state.days[dd], ap = activePlan();
+    var pd = ap && ap.days ? ap.days[i] : null;
+    var hasW = (sd && sd.exercises.length) || (pd && pd.exercises && pd.exercises.length);
+    var hasT = (sd && sd.take.length) || (pd && pd.take && pd.take.length);
+    var dots = "";
+    if (hasW) dots += '<i style="background:var(--acc)"></i>';
+    if (hasT) dots += '<i style="background:var(--s3)"></i>';
+    if (!dots) dots += '<i style="background:var(--line)"></i>';
+    return '<button type="button" class="wday' + (dd === td ? " today" : dd === t ? " sel" : "") + '" data-day="' + dd + '">' +
+      '<span class="dw">' + DW[i] + '</span><span class="dd">' + parseISO(dd).getDate() + '</span><span class="dots">' + dots + "</span></button>";
+  }).join("") + "</div>";
+
+  if (t !== td) h += '<button type="button" class="btn ghost sm" data-goto="today">Back to today</button>';
+
+  /* the answer before the detail */
+  var w = latestWeight();
+  h += '<div class="card"><div class="summary">' +
+    ring(pct, 78, "var(--acc)", setsDone + "/" + setsTot, "sets") +
+    '<div class="sumlist">' +
+      '<div class="sumrow"><span class="stripe" style="background:var(--acc)"></span><span class="lbl">' +
+        (d.workoutName ? esc(d.workoutName) : d.exercises.length ? "Workout" : "Rest day") + "</span>" +
+        '<span class="val">' + Math.round(pct * 100) + "%</span></div>" +
+      '<div class="sumrow"><span class="stripe" style="background:var(--s3)"></span><span class="lbl">Stack</span>' +
+        '<span class="val">' + takeDone + "/" + d.take.length + "</span></div>" +
+      '<button type="button" class="sumrow" data-sheet="weight"><span class="stripe" style="background:var(--s1)"></span>' +
+        '<span class="lbl">Body weight</span><span class="val">' + (w ? num(w.kg, 1) + " kg" : "log") + "</span></button>" +
+    "</div></div></div>";
+
+  /* workout */
+  h += '<div class="card"><div class="chead"><h2>Workout' + (d.workoutName ? " · " + esc(d.workoutName) : "") + "</h2>" +
+    '<span class="note">' + setsDone + " of " + setsTot + " sets</span></div>";
+  if (setsTot) {
+    h += '<div class="bar"><span class="track"><span class="fill" style="width:' + (pct * 100).toFixed(1) + '%"></span></span>' +
+      '<span class="pct">' + Math.round(pct * 100) + "%</span></div>";
+  }
+  if (d.exercises.length) {
+    h += d.exercises.map(function (e, i) {
+      var pr = state.prs[keyOf(e.name)];
+      var beat = pr && e.kg > pr.kg;
+      var sets = "";
+      for (var k = 0; k < e.sets; k++) {
+        sets += '<button type="button" class="set' + (e.done[k] ? " done" : "") + '" data-set="' + i + ":" + k + '" ' +
+          'aria-label="Set ' + (k + 1) + '" aria-pressed="' + !!e.done[k] + '">' + (k + 1) + "</button>";
+      }
+      var last = lastTime(e.name, t);
+      return '<div class="ex"><div class="exhead"><span class="nm">' + esc(e.name) + "</span>" +
+        '<span class="tgt">' + e.sets + " × " + e.reps + (e.kg ? " · " + num(e.kg) + " kg" : "") + "</span></div>" +
+        '<div class="sets">' + sets + "</div>" +
+        '<div class="exmeta"><span class="txt">' +
+          (last ? "last " + esc(last) : e.note ? esc(e.note) : "first time") +
+          (pr ? ' · best <b>' + num(pr.kg) + " kg</b>" : "") + "</span>" +
+        '<button type="button" class="prbtn' + (beat ? " hot" : "") + '" data-pr="' + i + '">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>' +
+        (beat ? "New PR" : "PR") + "</button></div></div>";
     }).join("");
-  } else h += `<div class="empty">No plan activated yet</div>`;
-  h += `</div>`;
+  } else {
+    h += '<div class="empty">' + (activePlan() ? "Rest day — nothing planned for " + DWL[wdOf(t)] : "No plan yet") + "</div>";
+  }
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="addex">+ Exercise</button></div></div>';
 
-  // doseplan-tijdlijnen
-  state.peptides.forEach(p => {
-    const steps = [{ id: "start", from: null, mg: p.doseMg }].concat((p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1));
-    const taken = state.history.filter(x => x.name === p.name);
-    const totMg = taken.reduce((s, x) => s + x.mg, 0);
-    let activeIdx = 0;
-    steps.forEach((s, i) => { if (!s.from || s.from <= t) activeIdx = i; });
-    h += `<div class="card"><div class="between">
-      <span class="title">${esc(p.name)} · dose plan</span>
-      <button class="linkish" onclick="dlgSteps('${p.id}')">Edit</button></div>
-      <div style="display:flex;flex-direction:column;gap:0">` +
-      steps.map((s, i) => {
-        const st = i < activeIdx ? "done" : (i === activeIdx ? "act" : "next");
-        const dot = st === "act"
-          ? `<div style="width:14px;height:14px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px var(--green-bg)"></div>`
-          : st === "done"
-            ? `<div style="width:14px;height:14px;border-radius:50%;background:#3a5c34"></div>`
-            : `<div style="width:14px;height:14px;border-radius:50%;border:2px solid #444"></div>`;
-        return `<div style="display:flex;gap:14px">
-          <div style="display:flex;flex-direction:column;align-items:center;width:14px">
-            ${dot}${i < steps.length - 1 ? `<div style="width:2px;flex:1;background:#2c2c2c;min-height:18px"></div>` : ""}</div>
-          <div style="padding-bottom:${i < steps.length - 1 ? 14 : 0}px">
-            <div style="font-size:14px;font-weight:800;${st === "next" ? "color:var(--muted)" : ""}${st === "act" ? "color:var(--green)" : ""}">${fmtMg(s.mg)} mg per dose${st === "act" ? " · now" : ""}</div>
-            <div class="muted small">${s.from ? "from " + fmtDate(s.from) : "starting dose"}</div>
-          </div></div>`;
-      }).join("") + `</div>
-      <div class="between small" style="border-top:1px solid #262626;padding-top:10px">
-        <span class="muted">Total taken</span><span>${taken.length} doses · ${fmtMg(totMg)} mg</span></div>
-    </div>`;
-  });
+  /* stack, grouped by moment */
+  h += '<div class="card"><div class="chead"><h2>Stack</h2><span class="note">' + takeDone + " of " + d.take.length + " taken</span></div>";
+  if (d.take.length) {
+    MOMENTS.forEach(function (mo) {
+      var rows = d.take.filter(function (x) { return (x.moment || "Morning") === mo; });
+      if (!rows.length) return;
+      h += '<div class="moment">' + esc(mo) + "</div>";
+      h += rows.map(function (x) {
+        var p = item(x.itemId);
+        var idx = d.take.indexOf(x);
+        var sub = x.done ? "taken " + esc(x.at || "") : x.time ? "planned " + esc(x.time) : "not logged";
+        if (p && p.hint) sub += " · " + esc(p.hint);
+        if (p && isLow(p)) sub += ' · <span style="color:var(--warn)">' + daysLeft(p) + " days left</span>";
+        return '<div class="row">' +
+          '<button type="button" class="tick' + (x.done ? " done" : "") + '" data-take="' + idx + '" aria-pressed="' + x.done + '" aria-label="Log">' +
+          (x.done ? checkIcon() : "") + "</button>" +
+          '<button type="button" class="rbody" data-takeedit="' + idx + '">' +
+          '<span class="nm' + (x.done ? " strike" : "") + '">' + esc(p ? p.nm : "?") + " · " + num(x.amount) + " " + esc(x.unit) + "</span>" +
+          '<span class="sub">' + sub + "</span></button>" +
+          '<span class="chip">' + esc(p ? form(p).label : "") + "</span></div>";
+      }).join("");
+    });
+  } else h += '<div class="empty">Nothing planned today</div>';
+  h += "</div>";
 
-  // alle doses
-  h += `<div class="card"><span class="title">All doses</span>`;
-  if (state.history.length) {
-    h += state.history.slice(0, 40).map(x =>
-      `<div class="between" style="font-size:14px"><span>${esc(x.name)} · ${fmtMg(x.mg)} mg</span>
-       <span class="muted">${histDate(x.date)} ${esc(x.at || "")}</span></div>`).join("");
-  } else h += `<div class="empty">No doses taken yet</div>`;
-  h += `</div>`;
+  /* coach: announced, not usable */
+  h += '<div class="card soon"><div class="chead"><h2>Coach</h2><span class="chip warn">Soon</span></div>' +
+    '<div class="hint">An AI that reads your week and proposes things it can set for you — a reminder, a heavier working weight, a heads-up that something is running out. You approve each one.</div>' +
+    '<div class="soonlist">' +
+      '<div class="row"><div class="rbody"><span class="nm">Bench press · try a heavier top set</span><span class="sub">you hit every set twice in a row</span></div></div>' +
+      '<div class="row"><div class="rbody"><span class="nm">Remind you to reorder</span><span class="sub">less than two weeks of servings left</span></div></div>' +
+    "</div>" +
+    '<div class="chead"><span class="note">examples of what it will say</span><span class="note">not working yet</span></div></div>';
+
+  /* notes and reminders */
+  h += '<div class="card"><div class="chead"><h2>Notes &amp; reminders</h2></div>';
+  if (d.notes) h += '<div style="font-size:14px;white-space:pre-line;background:var(--raise);border-radius:14px;padding:12px 14px">' + esc(d.notes) + "</div>";
+  if (d.reminders.length) {
+    h += d.reminders.map(function (r, i) {
+      return '<div class="row"><button type="button" class="tick' + (r.done ? " done" : "") + '" data-rem="' + i + '" aria-pressed="' + r.done + '" aria-label="Done">' +
+        (r.done ? checkIcon() : "") + "</button>" +
+        '<div class="rbody"><span class="nm' + (r.done ? " strike" : "") + '">' + esc(r.text) + "</span>" +
+        (r.time ? '<span class="sub">at ' + esc(r.time) + "</span>" : "") + "</div>" +
+        '<button type="button" class="xbtn" data-remdel="' + i + '" aria-label="Delete">✕</button></div>';
+    }).join("");
+  }
+  if (!d.notes && !d.reminders.length) h += '<div class="empty">Nothing for this day</div>';
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="note">Note</button>' +
+    '<button type="button" class="btn ghost sm" data-sheet="reminder">+ Reminder</button></div></div>';
   return h;
 }
 
-// ---------- settings ----------
-function viewSettings() {
-  const nDays = Object.keys(state.days).length;
-  return `<div class="card"><span class="title">Data</span>
-      <div class="between small"><span class="muted">Peptides</span><span>${state.peptides.length}</span></div>
-      <div class="between small"><span class="muted">Plans</span><span>${(state.plans || []).length}</span></div>
-      <div class="between small"><span class="muted">Days with data</span><span>${nDays}</span></div>
-      <div class="between small"><span class="muted">History items</span><span>${state.history.length}</span></div>
-      <div class="between small"><span class="muted">Storage</span><span>${db ? "cloud + this device" : "this device only"}</span></div>
-    </div>
-    <div class="card"><span class="title">Notifications</span>
-      <div class="muted small">You get a notification when a planned dose time is reached. ${notifSupported() ? "" : "Not available in this environment — works in the real app."}</div>
-      <div class="between small"><span class="muted">Status</span><span>${notifStatus()}</span></div>
-      ${notifSupported() && !state.notifyOn ? `<button class="pill ghost" onclick="enableNotif()">Enable notifications</button>` : ""}
-      ${state.notifyOn ? `<button class="pill ghost" onclick="state.notifyOn=false;save();render()">Disable notifications</button>` : ""}
-    </div>
-    <div class="card"><span class="title">Backup</span>
-      <div class="muted small">Copy this text to keep your data safe, or paste a backup to restore.</div>
-      <button class="pill ghost" onclick="dlgExport()">Export data</button>
-      <button class="pill ghost" onclick="dlgImport()">Import data</button>
-    </div>
-    <div class="card"><span class="title">Clean up</span>
-      <button class="pill ghost" onclick="confirmAction('Clear history?','The dose history will be emptied. Vials and plans stay.',clearHistory)">Clear history</button>
-      <button class="pill danger" onclick="confirmAction('Erase everything?','All peptides, plans and history will be deleted. This cannot be undone.',wipeAll)">Erase everything</button>
-    </div>`;
+function lastTime(name, beforeISO) {
+  var k = keyOf(name), best = null;
+  Object.keys(state.days).sort().forEach(function (dd) {
+    if (dd >= beforeISO) return;
+    (state.days[dd].exercises || []).forEach(function (e) {
+      if (keyOf(e.name) === k && (e.done || []).some(Boolean)) {
+        best = e.sets + " × " + e.reps + (e.kg ? " · " + num(e.kg) + " kg" : "");
+      }
+    });
+  });
+  return best;
 }
-function dlgExport() {
-  openDlg(`<h2>Export data</h2>
-    <textarea readonly style="width:100%;height:150px;font-size:12px;font-family:monospace" onclick="this.select()">${esc(JSON.stringify(state))}</textarea>
-    <div class="btnrow"><button class="pill" onclick="closeDlg()">Close</button></div>`);
+function latestWeight() {
+  if (!state.weights.length) return null;
+  return state.weights.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; })[state.weights.length - 1];
 }
-function dlgImport() {
-  openDlg(`<h2>Import data</h2>
-    <form class="fields" onsubmit="event.preventDefault();doImport(this)">
-    <textarea name="j" style="width:100%;height:150px;font-size:12px;font-family:monospace" placeholder="Paste your backup here"></textarea>
-    <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill">Import</button></div></form>`);
-}
-function doImport(f) {
-  try {
-    const s = JSON.parse(f.j.value);
-    if (!s || typeof s !== "object" || !Array.isArray(s.peptides)) throw 0;
-    state = Object.assign({ peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }, s);
-    migrate(); closeDlg(); save(); render();
-  } catch (e) { alert("That's not a valid backup."); }
-}
-let pendingAction = null;
-function confirmAction(titel, tekst, fn) {
-  pendingAction = fn;
-  openDlg(`<h2>${esc(titel)}</h2><p class="muted" style="margin:0 0 14px 0">${esc(tekst)}</p>
-    <div class="btnrow"><button class="pill ghost" onclick="closeDlg()">Cancel</button>
-    <button class="pill danger" onclick="pendingAction();closeDlg()">Yes, do it</button></div>`);
-}
-function clearHistory() { state.history = []; save(); render(); }
 
-// ---------- notifications ----------
-function nativeNotify() { try { return window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.notify || null; } catch (e) { return null; } }
-function pushNativeSchedule() {
-  const nb = nativeNotify(); if (!nb) return;
-  try {
-    const items = [];
-    for (let i = 0; i < 7; i++) {
-      const dt = new Date(); dt.setDate(dt.getDate() + i);
-      const iso = todayISO(dt), d = day(iso);
-      d.doses.forEach(x => {
-        if (!x.done && x.time) {
-          const p = pep(x.pepId);
-          items.push({ date: iso, time: x.time, title: "Time for your dose", body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg" });
-        }
-      });
-      (d.reminders || []).forEach(r => {
-        if (!r.done && r.time) items.push({ date: iso, time: r.time, title: "Reminder", body: r.text });
-      });
-    }
-    nb.postMessage(JSON.stringify(items));
-  } catch (e) {}
+/* ============================================================
+   Plan
+   ============================================================ */
+function viewPlan() {
+  if (editPlanId && editWd !== null) return viewDayEditor();
+  if (editPlanId) return viewPlanEditor();
+
+  var h = "", ap = activePlan();
+  if (ap) {
+    h += '<div class="card"><div class="chead"><h2>' + esc(ap.name) + '</h2><span class="chip ok">active</span></div>' +
+      '<div class="hint">Repeats every week. Changes apply to days you have not touched yet.</div>';
+    for (var wd = 0; wd < 7; wd++) h += planRow(ap, wd, true);
+    h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-editplan="' + ap.id + '">Edit plan</button></div></div>';
+  } else {
+    h += '<div class="card"><h2>No active plan</h2><div class="hint">Build a week once: your workout and what you take per day. After that it repeats itself.</div></div>';
+  }
+
+  var others = state.plans.filter(function (p) { return p.id !== state.activePlanId; });
+  if (others.length) {
+    h += '<div class="card"><div class="chead"><h2>Other plans</h2></div>' + others.map(function (p) {
+      return '<div class="row"><div class="rbody"><span class="nm">' + esc(p.name) + '</span>' +
+        '<span class="sub">' + esc(p.status || "draft") + "</span></div>" +
+        '<button type="button" class="btn line sm" style="flex:0 0 auto" data-editplan="' + p.id + '">Edit</button>' +
+        '<button type="button" class="btn sm" style="flex:0 0 auto" data-activate="' + p.id + '">Use</button></div>';
+    }).join("") + "</div>";
+  }
+
+  h += '<button type="button" class="btn ghost" data-newplan="1">+ New plan</button>';
+
+  /* a prompt for whatever AI you already use — nothing leaves the app */
+  h += '<div class="card"><div class="chead"><h2>Write my week with AI</h2><span class="chip ok">free</span></div>' +
+    '<div class="hint">Copy the prompt, paste it into any AI you use, paste the answer back. Your stack and training days are already in it.</div>' +
+    '<div class="quick" style="justify-content:flex-start">' + ["ChatGPT", "Claude", "Gemini", "Grok", "DeepSeek"].map(function (n) {
+      return '<span class="chip">' + n + "</span>";
+    }).join("") + "</div>" +
+    '<div class="btnrow"><button type="button" class="btn" data-copyprompt="1">Copy prompt</button>' +
+    '<button type="button" class="btn line" data-sheet="import">Paste answer</button></div></div>';
+  return h;
 }
-function notifSupported() { try { if (nativeNotify()) return true; return typeof Notification !== "undefined" && !!Notification.requestPermission; } catch (e) { return false; } }
+
+function planRow(pl, wd, nav) {
+  var pd = pl.days ? pl.days[wd] : null;
+  var take = pd ? (pd.take || []) : [];
+  var names = take.map(function (t) { var p = item(t.itemId); return p ? p.nm : ""; }).filter(Boolean).join(", ");
+  return '<button type="button" class="prow" data-editday="' + pl.id + ":" + wd + '">' +
+    '<span class="dw">' + DW[wd] + '</span><span class="b">' +
+    '<span class="t1' + (pd && pd.workoutName ? "" : " restday") + '">' + (pd && pd.workoutName ? esc(pd.workoutName) : "Rest day") + "</span>" +
+    '<span class="t2">' + (pd && pd.exercises.length ? pd.exercises.length + " exercises" : "") +
+      (pd && pd.exercises.length && names ? " · " : "") + esc(names) + "</span></span>" + chevron() + "</button>";
+}
+
+function viewPlanEditor() {
+  var pl = plan(editPlanId);
+  if (!pl) { editPlanId = null; return viewPlan(); }
+  var isActive = pl.id === state.activePlanId;
+  var h = '<div class="card"><div class="chead"><h2>' + esc(pl.name) + '</h2>' +
+    '<span class="chip ' + (isActive ? "ok" : "") + '">' + (isActive ? "active" : "draft") + "</span></div>" +
+    '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="planname">Rename</button></div>';
+  for (var wd = 0; wd < 7; wd++) h += planRow(pl, wd, true);
+  h += "</div>";
+  h += '<div class="btnrow">' +
+    (isActive ? "" : '<button type="button" class="btn" data-activate="' + pl.id + '">Use this plan</button>') +
+    '<button type="button" class="btn line" data-back="1">Done</button>' +
+    '<button type="button" class="btn danger fixed" data-delplan="' + pl.id + '">Delete</button></div>';
+  return h;
+}
+
+function viewDayEditor() {
+  var pl = plan(editPlanId);
+  if (!pl) { editPlanId = null; editWd = null; return viewPlan(); }
+  var pd = planDay(pl, editWd);
+  var h = '<div class="card"><div class="chead"><h2>Workout' + (pd.workoutName ? " · " + esc(pd.workoutName) : "") + "</h2>" +
+    '<button type="button" class="btn ghost sm" style="flex:0 0 auto" data-sheet="pdname">Name</button></div>';
+  if (pd.exercises.length) {
+    h += pd.exercises.map(function (e, i) {
+      return '<button type="button" class="prow" data-pdex="' + i + '"><span class="b">' +
+        '<span class="t1">' + esc(e.name) + "</span>" +
+        '<span class="t2">' + e.sets + " × " + e.reps + (e.kg ? " · " + num(e.kg) + " kg" : "") + "</span></span>" + chevron() + "</button>";
+    }).join("");
+  } else h += '<div class="empty">Rest day — or add exercises</div>';
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-pdex="new">+ Exercise</button></div></div>';
+
+  h += '<div class="card"><div class="chead"><h2>Stack on ' + DWL[editWd] + "</h2></div>";
+  if (pd.take.length) {
+    h += pd.take.map(function (t, i) {
+      var p = item(t.itemId);
+      return '<div class="row"><div class="rbody"><span class="nm">' + esc(p ? p.nm : "?") + " · " + (p ? amountLabel(p) : "") + "</span>" +
+        '<span class="sub">' + esc(t.moment || "Morning") + (t.time ? " · " + esc(t.time) : "") + "</span></div>" +
+        '<button type="button" class="xbtn" data-pdtakedel="' + i + '" aria-label="Remove">✕</button></div>';
+    }).join("");
+  } else h += '<div class="empty">Nothing on this day</div>';
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="pdtake">+ Add from stack</button></div></div>';
+
+  h += '<div class="card"><div class="chead"><h2>Notes &amp; reminders</h2></div>';
+  if (pd.notes) h += '<div style="font-size:14px;white-space:pre-line;background:var(--raise);border-radius:14px;padding:12px 14px">' + esc(pd.notes) + "</div>";
+  if (pd.reminders.length) {
+    h += pd.reminders.map(function (r, i) {
+      return '<div class="row"><div class="rbody"><span class="nm">' + esc(r.text) + "</span>" +
+        (r.time ? '<span class="sub">at ' + esc(r.time) + "</span>" : "") + "</div>" +
+        '<button type="button" class="xbtn" data-pdremdel="' + i + '" aria-label="Remove">✕</button></div>';
+    }).join("");
+  }
+  if (!pd.notes && !pd.reminders.length) h += '<div class="empty">Repeats every ' + DWL[editWd] + "</div>";
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="pdnote">Note</button>' +
+    '<button type="button" class="btn ghost sm" data-sheet="pdreminder">+ Reminder</button></div></div>';
+
+  h += '<button type="button" class="btn line" data-back="1">Back to the week</button>';
+  return h;
+}
+
+/* ============================================================
+   Stats
+   ============================================================ */
+var RANGE = "12w";
+function rangeWeeks() { return RANGE === "12w" ? 12 : RANGE === "1y" ? 52 : 520; }
+
+function weekStarts(n) {
+  var out = [], mon = addDays(today(), -wdOf(today()));
+  for (var i = n - 1; i >= 0; i--) out.push(addDays(mon, -7 * i));
+  return out;
+}
+function volumeOf(dISO) {
+  var d = state.days[dISO];
+  if (!d) return 0;
+  var v = 0;
+  (d.exercises || []).forEach(function (e) {
+    var done = (e.done || []).filter(Boolean).length;
+    v += done * (e.reps || 0) * (e.kg || 0);
+  });
+  return v;
+}
+
+function viewStats() {
+  var h = "";
+  var weeks = weekStarts(Math.min(rangeWeeks(), 52));
+  var wLabels = weeks.map(shortDate);
+
+  var vol = weeks.map(function (ws) {
+    var v = 0;
+    for (var i = 0; i < 7; i++) v += volumeOf(addDays(ws, i));
+    return Math.round(v / 100) / 10;                    /* tonnes */
+  });
+  var sessions = weeks.map(function (ws) {
+    var n = 0;
+    for (var i = 0; i < 7; i++) {
+      var d = state.days[addDays(ws, i)];
+      if (d && (d.exercises || []).some(function (e) { return (e.done || []).some(Boolean); })) n++;
+    }
+    return n;
+  });
+
+  var totVol = vol.reduce(function (a, b) { return a + b; }, 0);
+  var w = latestWeight();
+  var firstW = state.weights.length ? state.weights.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; })[0] : null;
+  var dw = w && firstW ? round(w.kg - firstW.kg) : 0;
+
+  h += '<div class="statgrid">' +
+    '<div class="stat"><span class="v">' + (w ? num(w.kg, 1) : "—") + '<s> kg</s></span><span class="k">weight</span></div>' +
+    '<div class="stat"><span class="v">' + (dw ? (dw > 0 ? "+" : "") + num(dw, 1) : "—") + '<s> kg</s></span><span class="k">change</span></div>' +
+    '<div class="stat"><span class="v">' + num(Math.round(totVol * 10) / 10, 1) + '<s> t</s></span><span class="k">lifted</span></div>' +
+    "</div>";
+
+  h += '<div class="card"><div class="chead"><h2>Body weight</h2><span class="note">' +
+    (RANGE === "12w" ? "12 weeks" : RANGE === "1y" ? "1 year" : "everything") + "</span></div>" +
+    '<div class="seg">' + [["12w", "12 weeks"], ["1y", "1 year"], ["all", "All"]].map(function (r) {
+      return '<button type="button" data-range="' + r[0] + '" aria-pressed="' + (RANGE === r[0]) + '">' + r[1] + "</button>";
+    }).join("") + "</div>";
+  var wSeries = weightSeries();
+  h += wSeries.values.length > 1
+    ? '<div class="chart">' + lineChart(wSeries.values, wSeries.labels, "var(--s1)", "kg") + "</div>"
+    : '<div class="empty">Log your weight a few times and the line appears here</div>';
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="weight">Log weight</button></div></div>';
+
+  h += '<div class="card"><div class="chead"><h2>Volume lifted</h2><span class="note">tonnes per week</span></div>' +
+    (totVol > 0 ? '<div class="chart">' + barChart(vol, wLabels, "var(--s2)") + "</div>" : '<div class="empty">Tick off some sets first</div>') + "</div>";
+
+  h += '<div class="card"><div class="chead"><h2>Sessions per week</h2><span class="note">' + weeks.length + " weeks</span></div>" +
+    '<div class="chart">' + barChart(sessions, wLabels, "var(--acc)") + "</div></div>";
+
+  /* records */
+  var prKeys = Object.keys(state.prs);
+  h += '<div class="card"><div class="chead"><h2>Personal records</h2><span class="note">' + prKeys.length + "</span></div>";
+  if (prKeys.length) {
+    h += prKeys.sort().map(function (k) {
+      var r = state.prs[k];
+      return '<div class="kv"><span class="k">' + esc(r.name || k) + '</span><span class="v">' + num(r.kg) + " kg × " + r.reps + " · " + shortDate(r.date) + "</span></div>";
+    }).join("");
+  } else h += '<div class="empty">Hit the PR button on an exercise</div>';
+  h += "</div>";
+
+  /* what you took, per item */
+  state.stack.forEach(function (p) {
+    var data = weeks.map(function (ws) {
+      var v = 0;
+      state.history.forEach(function (x) {
+        if (x.name === p.nm && x.date >= ws && x.date < addDays(ws, 7)) v += x.amount;
+      });
+      return round(v);
+    });
+    if (!data.some(function (v) { return v > 0; })) return;
+    h += '<div class="card"><div class="chead"><h2>' + esc(p.nm) + '</h2><span class="note">' + esc(p.dose.u) + " per week</span></div>" +
+      '<div class="chart">' + barChart(data, wLabels, "var(--s3)") + "</div></div>";
+  });
+
+  /* the log itself */
+  h += '<div class="card"><div class="chead"><h2>Log</h2><span class="note">' + state.history.length + "</span></div>";
+  if (state.history.length) {
+    h += state.history.slice(0, 40).map(function (x) {
+      return '<div class="kv"><span class="k">' + esc(x.name) + " · " + num(x.amount) + " " + esc(x.unit) + "</span>" +
+        '<span class="v">' + shortDate(x.date) + " " + esc(x.at || "") + "</span></div>";
+    }).join("");
+  } else h += '<div class="empty">Nothing logged yet</div>';
+  h += "</div>";
+  return h;
+}
+
+function weightSeries() {
+  var sorted = state.weights.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  var cut = RANGE === "all" ? "0000-00-00" : addDays(today(), -7 * rangeWeeks());
+  var kept = sorted.filter(function (x) { return x.date >= cut; });
+  return { values: kept.map(function (x) { return x.kg; }), labels: kept.map(function (x) { return shortDate(x.date); }) };
+}
+
+/* ============================================================
+   Supply
+   ============================================================ */
+function viewSupply() {
+  var h = "";
+  if (!state.stack.length) {
+    h += '<div class="card"><div class="empty">Nothing in your stack yet.<br>Add whatever you take — protein, creatine, pills, a vial.</div></div>';
+  }
+  h += state.stack.map(function (p) {
+    var left = servings(p), days = daysLeft(p), low = isLow(p);
+    var frac = p.cont.n > 0 ? Math.max(0, Math.min(1, p.left / p.cont.n)) : 0;
+    var col = low ? "var(--warn)" : "var(--acc)";
+    var ns = nextStep(p, today());
+    var s = '<div class="card"' + (low ? ' style="border-color:var(--warn)"' : "") + ">" +
+      '<div class="chead"><h2>' + esc(p.nm) + "</h2>" +
+      '<span style="display:flex;gap:6px;align-items:center;flex-shrink:0">' +
+      '<span class="chip">' + form(p).label + "</span>" +
+      '<span class="chip' + (low ? " warn" : "") + '">' + days + " days</span></span></div>" +
+      '<div class="vial">' + ring(frac, 70, col, num(p.left, p.left % 1 === 0 ? 0 : 1), p.cont.u) +
+      '<div class="vialstats">' +
+        '<div class="kv"><span class="k">' + form(p).container.charAt(0).toUpperCase() + form(p).container.slice(1) + '</span><span class="v">' + num(p.cont.n) + " " + esc(p.cont.u) + "</span></div>" +
+        '<div class="kv"><span class="k">Left</span><span class="v">' + left + " × " + amountLabel(p) + "</span></div>" +
+        '<div class="kv"><span class="k">Each time</span><span class="v">' + amountLabel(p) + "</span></div>" +
+        '<div class="kv"><span class="k">Per week</span><span class="v">' + (p.perWeek || 7) + "×</span></div>" +
+      "</div></div>";
+    if (p.hint) s += tickRule() + '<div class="chead"><span class="note">' + esc(p.hint) + "</span></div>";
+    if ((p.steps || []).length) {
+      var sorted = p.steps.slice().sort(function (a, b) { return a.from < b.from ? -1 : 1; });
+      var steps = (sorted.length && round(sorted[0].n) === round(p.dose.n))
+        ? sorted
+        : [{ id: "start", from: null, n: p.dose.n }].concat(sorted);
+      var act = 0;
+      steps.forEach(function (st, i) { if (!st.from || st.from <= today()) act = i; });
+      s += '<div class="steps">' + steps.map(function (st, i) {
+        var cls = i < act ? "past" : i === act ? "now" : "next";
+        return '<div class="step ' + cls + '"><span class="rail"><span class="dot"></span>' +
+          (i < steps.length - 1 ? '<span class="line"></span>' : "") + "</span>" +
+          '<span class="txt"><span class="d1">' + num(st.n) + " " + esc(p.dose.u) + " each time" + (cls === "now" ? " · now" : "") + "</span>" +
+          '<span class="d2">' + (st.from ? "from " + shortDate(st.from) : "start") + "</span></span></div>";
+      }).join("") + "</div>";
+    }
+    if (ns) s += '<div class="hint">Changes to <b>' + num(ns.n) + " " + esc(p.dose.u) + "</b> on " + shortDate(ns.from) + ".</div>";
+    if (low) s += '<div class="hint" style="color:var(--warn)">Running out in ' + days + " days — order a new " + form(p).container + ".</div>";
+    s += '<div class="btnrow"><button type="button" class="btn sm" data-log="' + p.id + '">Log</button>' +
+      '<button type="button" class="btn line sm" data-refill="' + p.id + '">New ' + form(p).container + "</button>" +
+      '<button type="button" class="btn ghost sm fixed" data-edititem="' + p.id + '">Edit</button></div></div>';
+    return s;
+  }).join("");
+  h += '<button type="button" class="btn ghost" data-sheet="additem">+ Add to stack</button>';
+  return h;
+}
+
+/* ============================================================
+   sheets
+   ============================================================ */
+function stepFor(unit, value) {
+  if (unit === "caps") return 1;
+  if (unit === "g") return 1;
+  if (unit === "ml") return 0.5;
+  return value <= 1 ? 0.05 : 0.25;
+}
+
+function sheetShell(title, body) {
+  return '<div class="sheet" data-close="1"><div class="sheetcard">' +
+    '<span class="grab"></span><h2>' + title + "</h2>" + body + "</div></div>";
+}
+function stepperHtml(value, unit, dec) {
+  return '<div class="stepper"><button type="button" data-step="-1" aria-label="Less">−</button>' +
+    '<span class="val"><input class="n" id="amtInput" type="text" inputmode="decimal" aria-label="Amount" value="' + num(value, dec) + '">' +
+    '<span class="u">' + esc(unit) + "</span></span>" +
+    '<button type="button" data-step="1" aria-label="More">+</button></div>';
+}
+function quickHtml(values, current, unit) {
+  return '<div class="quick">' + values.map(function (v) {
+    return '<button type="button" data-amt="' + v + '" aria-pressed="' + (round(current) === round(v)) + '">' + num(v) + " " + esc(unit) + "</button>";
+  }).join("") + "</div>";
+}
+function sheetButtons(saveLabel, saveId) {
+  return '<div class="btnrow"><button type="button" class="btn line" data-close="1">Cancel</button>' +
+    '<button type="button" class="btn" data-save="' + saveId + '">' + saveLabel + "</button></div>";
+}
+
+function viewSheet() {
+  if (!sheet) return "";
+  var k = sheet.kind;
+
+  if (k === "log") {
+    var p = item(sheet.itemId);
+    if (!p) return "";
+    var planned = doseOn(p, selISO());
+    return sheetShell("Log " + esc(p.nm),
+      stepperHtml(sheet.amount, p.dose.u, sheet.amount % 1 === 0 ? 0 : 2) +
+      quickHtml([planned, round(planned / 2), round(planned * 2)], sheet.amount, p.dose.u) +
+      '<label class="f">Time<input id="logTime" type="time" value="' + esc(sheet.at) + '"></label>' +
+      '<div class="hint" id="logHint" style="text-align:center">' + logHint(p, sheet.amount) + "</div>" +
+      sheetButtons("Log", "log"));
+  }
+
+  if (k === "pr") {
+    var d = day(selISO()), e = d.exercises[sheet.ex];
+    if (!e) return "";
+    var cur = state.prs[keyOf(e.name)];
+    return sheetShell("Record · " + esc(e.name),
+      stepperHtml(sheet.amount, "kg", sheet.amount % 1 === 0 ? 0 : 1) +
+      quickHtml([e.kg || 20, round((e.kg || 20) + 2.5), round((e.kg || 20) + 5)], sheet.amount, "kg") +
+      '<label class="f">Reps<input id="prReps" type="number" min="1" value="' + sheet.reps + '"></label>' +
+      '<div class="hint" id="prHint" style="text-align:center">' + prHint(cur, sheet.amount) + "</div>" +
+      sheetButtons("Save record", "pr"));
+  }
+
+  if (k === "weight") {
+    var lw = latestWeight();
+    return sheetShell("Body weight",
+      stepperHtml(sheet.amount, "kg", 1) +
+      '<label class="f">Date<input id="wDate" type="date" value="' + esc(sheet.date) + '"></label>' +
+      '<div class="hint" style="text-align:center">' + (lw ? "Last: <b>" + num(lw.kg, 1) + " kg</b> on " + shortDate(lw.date) : "First entry.") + "</div>" +
+      sheetButtons("Save", "weight"));
+  }
+
+  if (k === "additem" || k === "edititem") {
+    var it = k === "edititem" ? item(sheet.itemId) : null;
+    var f = it || { nm: "", kind: "powder", cont: { n: "", u: "g" }, dose: { n: "", u: "g" }, left: "", perWeek: 7, moment: "Morning", hint: "" };
+    return sheetShell(it ? "Edit " + esc(it.nm) : "Add to stack",
+      '<div class="fields">' +
+      '<label class="f">Name<input id="iNm" value="' + esc(f.nm) + '" placeholder="Creatine"></label>' +
+      '<label class="f">Form<select id="iKind">' + Object.keys(FORM).map(function (kk) {
+        return '<option value="' + kk + '"' + (f.kind === kk ? " selected" : "") + ">" + FORM[kk].label + " · " + FORM[kk].container + "</option>";
+      }).join("") + "</select></label>" +
+      '<div class="g3">' +
+      '<label class="f">Container<input id="iCont" type="number" step="any" min="0" value="' + esc(f.cont.n) + '"></label>' +
+      '<label class="f">Each time<input id="iDose" type="number" step="any" min="0" value="' + esc(f.dose.n) + '"></label>' +
+      '<label class="f">Per week<input id="iWeek" type="number" min="1" max="21" value="' + esc(f.perWeek || 7) + '"></label>' +
+      "</div>" +
+      (it ? '<label class="f">Left in ' + form(it).container + '<input id="iLeft" type="number" step="any" min="0" value="' + esc(f.left) + '"></label>' : "") +
+      '<label class="f">Default moment<select id="iMoment">' + MOMENTS.map(function (m) {
+        return '<option' + (f.moment === m ? " selected" : "") + ">" + m + "</option>";
+      }).join("") + "</select></label>" +
+      '<label class="f">Note (optional)<input id="iHint" value="' + esc(f.hint || "") + '" placeholder="2 scoops"></label>' +
+      "</div>" +
+      (it ? '<div class="btnrow"><button type="button" class="btn danger" data-delitem="' + it.id + '">Delete</button>' +
+            '<button type="button" class="btn" data-save="item">Save</button></div>'
+          : sheetButtons("Add", "item")));
+  }
+
+  if (k === "steps") {
+    var sp = item(sheet.itemId);
+    if (!sp) return "";
+    var rows = (sp.steps || []).slice().sort(function (a, b) { return a.from < b.from ? -1 : 1; });
+    return sheetShell("Schedule · " + esc(sp.nm),
+      '<div class="hint">Now: <b>' + amountLabel(sp) + "</b> each time. Add a line for every change.</div>" +
+      (rows.length ? rows.map(function (st) {
+        return '<div class="row"><div class="rbody"><span class="nm">' + num(st.n) + " " + esc(sp.dose.u) + "</span>" +
+          '<span class="sub">from ' + shortDate(st.from) + "</span></div>" +
+          '<button type="button" class="xbtn" data-delstep="' + st.id + '" aria-label="Remove">✕</button></div>';
+      }).join("") : '<div class="empty">No changes planned</div>') +
+      '<div class="g2"><label class="f">From<input id="stFrom" type="date" value="' + today() + '"></label>' +
+      '<label class="f">Amount<input id="stN" type="number" step="any" min="0" placeholder="' + num(sp.dose.n) + '"></label></div>' +
+      '<div class="btnrow"><button type="button" class="btn line" data-close="1">Close</button>' +
+      '<button type="button" class="btn" data-save="step">Add</button></div>');
+  }
+
+  if (k === "addex" || k === "pdex") {
+    var ex = sheet.ex != null && sheet.ex !== "new"
+      ? (k === "pdex" ? planDay(plan(editPlanId), editWd).exercises[sheet.ex] : day(selISO()).exercises[sheet.ex])
+      : null;
+    var ef = ex || { name: "", sets: 3, reps: 10, kg: "" };
+    return sheetShell(ex ? "Edit exercise" : "Add exercise",
+      '<div class="fields">' +
+      '<label class="f">Exercise<input id="eNm" value="' + esc(ef.name) + '" placeholder="Bench press"></label>' +
+      '<div class="g3">' +
+      '<label class="f">Sets<input id="eSets" type="number" min="1" max="20" value="' + esc(ef.sets) + '"></label>' +
+      '<label class="f">Reps<input id="eReps" type="number" min="1" max="100" value="' + esc(ef.reps) + '"></label>' +
+      '<label class="f">Kg<input id="eKg" type="number" step="any" min="0" value="' + esc(ef.kg) + '"></label>' +
+      "</div></div>" +
+      (ex ? '<div class="btnrow"><button type="button" class="btn danger" data-delex="' + sheet.ex + '">Delete</button>' +
+            '<button type="button" class="btn" data-save="ex">Save</button></div>'
+          : sheetButtons("Add", "ex")));
+  }
+
+  if (k === "pdtake") {
+    if (!state.stack.length) return sheetShell("Nothing in your stack", '<div class="hint">Add something under Supply first.</div>' +
+      '<div class="btnrow"><button type="button" class="btn" data-close="1">OK</button></div>');
+    return sheetShell("Add from stack",
+      '<div class="fields">' +
+      '<label class="f">Item<select id="tItem">' + state.stack.map(function (p) {
+        return '<option value="' + p.id + '">' + esc(p.nm) + " · " + amountLabel(p) + "</option>";
+      }).join("") + "</select></label>" +
+      '<label class="f">Moment<select id="tMoment">' + MOMENTS.map(function (m) { return "<option>" + m + "</option>"; }).join("") + "</select></label>" +
+      '<label class="f">Time (optional — sends a notification)<input id="tTime" type="time"></label>' +
+      "</div>" + sheetButtons("Add", "pdtake"));
+  }
+
+  if (k === "note" || k === "pdnote") {
+    var cur2 = k === "note" ? day(selISO()).notes : planDay(plan(editPlanId), editWd).notes;
+    return sheetShell("Note",
+      '<label class="f"><textarea id="nText" rows="5" placeholder="Anything worth remembering">' + esc(cur2 || "") + "</textarea></label>" +
+      sheetButtons("Save", k));
+  }
+
+  if (k === "reminder" || k === "pdreminder") {
+    return sheetShell("Reminder",
+      '<div class="fields"><label class="f">Reminder<input id="rText" placeholder="Eat 1 hour before gym"></label>' +
+      '<label class="f">Time (optional — sends a notification)<input id="rTime" type="time"></label></div>' +
+      sheetButtons("Add", k));
+  }
+
+  if (k === "planname" || k === "pdname") {
+    var val = k === "planname" ? (plan(editPlanId) || {}).name : planDay(plan(editPlanId), editWd).workoutName;
+    return sheetShell(k === "planname" ? "Plan name" : "Workout name",
+      '<label class="f"><input id="pName" value="' + esc(val || "") + '" placeholder="' + (k === "planname" ? "Cut &amp; strength" : "Push") + '"></label>' +
+      sheetButtons("Save", k));
+  }
+
+  if (k === "import") {
+    return sheetShell("Paste the AI answer",
+      '<label class="f"><textarea id="impText" rows="7" placeholder="Paste the JSON block here"></textarea></label>' +
+      '<div class="hint" id="impHint">It replies with one JSON block. Paste it whole — the fences are fine.</div>' +
+      sheetButtons("Import", "import"));
+  }
+
+  if (k === "settings") {
+    return sheetShell("Settings",
+      '<div class="kv"><span class="k">Items</span><span class="v">' + state.stack.length + "</span></div>" +
+      '<div class="kv"><span class="k">Days with data</span><span class="v">' + Object.keys(state.days).length + "</span></div>" +
+      '<div class="kv"><span class="k">Log entries</span><span class="v">' + state.history.length + "</span></div>" +
+      '<div class="kv"><span class="k">Storage</span><span class="v">' + (db ? "cloud + phone" : "this phone") + "</span></div>" +
+      tickRule() +
+      '<div class="kv"><span class="k">Notifications</span><span class="v">' + notifStatus() + "</span></div>" +
+      '<div class="btnrow">' +
+        (state.notifyOn ? '<button type="button" class="btn ghost sm" data-notif="off">Turn off</button>'
+                        : '<button type="button" class="btn ghost sm" data-notif="on">Turn on</button>') +
+        '<button type="button" class="btn ghost sm" data-theme="1">' + (state.theme === "light" ? "Dark" : "Light") + " mode</button></div>" +
+      tickRule() +
+      '<div class="btnrow"><button type="button" class="btn ghost sm" data-sheet="export">Export</button>' +
+      '<button type="button" class="btn ghost sm" data-sheet="restore">Restore</button></div>' +
+      '<div class="btnrow"><button type="button" class="btn danger sm" data-wipe="1">Erase everything</button></div>' +
+      '<div class="btnrow"><button type="button" class="btn line" data-close="1">Close</button></div>');
+  }
+
+  if (k === "export") {
+    return sheetShell("Export",
+      '<div class="hint">Copy this and keep it somewhere safe. Restore pastes it back.</div>' +
+      '<label class="f"><textarea id="expText" rows="7" readonly>' + esc(JSON.stringify(state)) + "</textarea></label>" +
+      '<div class="btnrow"><button type="button" class="btn" data-copyexport="1">Copy</button>' +
+      '<button type="button" class="btn line" data-close="1">Close</button></div>');
+  }
+
+  if (k === "restore") {
+    return sheetShell("Restore",
+      '<label class="f"><textarea id="resText" rows="7" placeholder="Paste your backup"></textarea></label>' +
+      '<div class="hint" id="resHint">This replaces everything you have now.</div>' +
+      sheetButtons("Restore", "restore"));
+  }
+
+  if (k === "confirm") {
+    return sheetShell(esc(sheet.title),
+      '<div class="hint">' + esc(sheet.body) + "</div>" +
+      '<div class="btnrow"><button type="button" class="btn line" data-close="1">Cancel</button>' +
+      '<button type="button" class="btn danger" data-confirm="1">Yes, do it</button></div>');
+  }
+  return "";
+}
+
+function logHint(p, v) {
+  var planned = doseOn(p, selISO());
+  return round(v) !== round(planned)
+    ? "Just this once. Your plan stays at <b>" + num(planned) + " " + esc(p.dose.u) + "</b>."
+    : "Taken from your plan. Change it above if today is different.";
+}
+/* lower is allowed on purpose: a record typed wrong has to be fixable */
+function prHint(cur, v) {
+  if (!cur) return "First record for this lift.";
+  if (v > cur.kg) return "Beats <b>" + num(cur.kg) + " kg</b> from " + shortDate(cur.date) + ".";
+  if (round(v) === round(cur.kg)) return "Same as your record from " + shortDate(cur.date) + ".";
+  return "Lower than <b>" + num(cur.kg) + " kg</b>. Saving replaces it — use this to fix a typo.";
+}
+
+function openSheet(o) { sheet = o; render(); }
+function closeSheet() { sheet = null; render(); }
+
+/* stepping patches the sheet instead of re-rendering, so the caret survives typing */
+function syncSheet() {
+  var inp = document.getElementById("amtInput");
+  if (inp && document.activeElement !== inp) {
+    inp.value = num(sheet.amount, sheet.kind === "log" ? (sheet.amount % 1 === 0 ? 0 : 2) : (sheet.amount % 1 === 0 ? 0 : 1));
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-amt]"), function (b) {
+    b.setAttribute("aria-pressed", String(round(sheet.amount) === round(parseFloat(b.dataset.amt))));
+  });
+  var lh = document.getElementById("logHint");
+  if (lh && sheet.kind === "log") lh.innerHTML = logHint(item(sheet.itemId), sheet.amount);
+  var ph = document.getElementById("prHint");
+  if (ph && sheet.kind === "pr") {
+    var e = day(selISO()).exercises[sheet.ex];
+    ph.innerHTML = prHint(state.prs[keyOf(e.name)], sheet.amount);
+  }
+}
+
+/* ============================================================
+   actions
+   ============================================================ */
+function logTake(idx, amount, at) {
+  var d = day(selISO()), x = d.take[idx];
+  if (!x || x.done) return;
+  var p = item(x.itemId);
+  x.amount = amount != null ? round(amount) : x.amount;
+  x.done = true;
+  x.at = at || nowHM();
+  x.histId = uid();
+  if (p) p.left = Math.max(0, round(p.left - x.amount));
+  state.history.unshift({ id: x.histId, date: selISO(), at: x.at, name: p ? p.nm : "?", amount: x.amount, unit: x.unit });
+  d.userEdited = true;
+  save();
+}
+function unlogTake(idx) {
+  var d = day(selISO()), x = d.take[idx];
+  if (!x || !x.done) return;
+  var p = item(x.itemId);
+  if (p) p.left = round(p.left + x.amount);
+  /* the log entry is found by its own id, never by matching values */
+  if (x.histId) {
+    for (var i = 0; i < state.history.length; i++) {
+      if (state.history[i].id === x.histId) { state.history.splice(i, 1); break; }
+    }
+  }
+  x.done = false; x.at = ""; x.histId = null;
+  d.userEdited = true;
+  save();
+}
+
+function aiPrompt() {
+  var lines = state.stack.map(function (p) {
+    return "- " + p.nm + " · " + amountLabel(p) + " · " + (p.perWeek || 7) + "x per week · form " + form(p).label;
+  }).join("\n") || "- (nothing yet, you may suggest some)";
+  return "Write a weekly gym plan for my planner app.\n\n" +
+    "Reply with ONLY one JSON code block, exactly this shape:\n\n" +
+    "{\n" +
+    '  "name": "Plan name",\n' +
+    '  "days": {\n' +
+    '    "0": {\n' +
+    '      "workout": "Push",\n' +
+    '      "exercises": [ { "name": "Bench press", "sets": 4, "reps": 8, "kg": 80 } ],\n' +
+    '      "take": [ { "name": "Creatine", "moment": "Morning", "time": "09:00" } ],\n' +
+    '      "note": "",\n' +
+    '      "reminders": [ { "text": "Eat 1 hour before gym", "time": "17:00" } ]\n' +
+    "    }\n" +
+    "  }\n" +
+    "}\n\n" +
+    "Rules:\n" +
+    '- day keys are "0" to "6", 0 = Monday. Leave rest days out.\n' +
+    '- "moment" is one of: ' + MOMENTS.join(", ") + ".\n" +
+    '- do not put an amount on "take" — the amount comes from my stack below.\n' +
+    "- give every exercise a real starting weight in kg.\n\n" +
+    "My stack:\n" + lines + "\n\n" +
+    "Me: [your age, weight, how many days you can train, what equipment you have, your goal]";
+}
+
+function importPlan(raw) {
+  var text = String(raw || "").trim();
+  var m = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (m) text = m[1].trim();
+  var data;
+  try { data = JSON.parse(text); } catch (e) { return "That is not valid JSON. Paste the whole code block."; }
+  if (!data || typeof data !== "object" || !data.days) return 'The answer has no "days" in it.';
+
+  var pl = { id: uid(), name: String(data.name || "AI plan"), status: "draft", days: {} };
+  for (var wd = 0; wd < 7; wd++) {
+    var src = data.days[String(wd)] || data.days[wd];
+    if (!src) continue;
+    var pd = planDay(pl, wd);
+    pd.workoutName = String(src.workout || src.workoutName || "");
+    pd.exercises = (Array.isArray(src.exercises) ? src.exercises : []).map(function (e) {
+      return { name: String(e.name || ""), sets: Math.max(1, parseInt(e.sets, 10) || 3),
+               reps: Math.max(1, parseInt(e.reps, 10) || 10), kg: parseFloat(e.kg) || 0, note: "" };
+    }).filter(function (e) { return e.name; });
+    pd.take = (Array.isArray(src.take) ? src.take : []).map(function (t) {
+      var nm = keyOf(t && t.name);
+      var p = state.stack.filter(function (x) { return keyOf(x.nm) === nm; })[0];
+      return p ? { id: uid(), itemId: p.id, moment: MOMENTS.indexOf(t.moment) >= 0 ? t.moment : "Morning", time: String(t.time || "") } : null;
+    }).filter(Boolean);
+    pd.notes = String(src.note || src.notes || "");
+    pd.reminders = (Array.isArray(src.reminders) ? src.reminders : []).map(function (r) {
+      return { text: String(r.text || ""), time: String(r.time || "") };
+    }).filter(function (r) { return r.text; });
+  }
+  state.plans.push(pl);
+  editPlanId = pl.id; editWd = null;
+  save();
+  return null;
+}
+
+function activatePlan(id) {
+  var pl = plan(id);
+  if (!pl) return;
+  var old = activePlan();
+  if (old && old.id !== id) old.status = "archived";
+  pl.status = "active";
+  state.activePlanId = id;
+  if (!state.planLog.length || state.planLog[state.planLog.length - 1].planId !== id) {
+    state.planLog.push({ planId: id, from: today() });
+  }
+  bumpSched();
+  editPlanId = null; editWd = null;
+  save();
+}
+
+/* ============================================================
+   notifications — unchanged bridge, wider window, also on hide
+   ============================================================ */
+function nativeBridge() {
+  try { return (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.notify) || null; } catch (e) { return null; }
+}
+function notifSupported() {
+  if (nativeBridge()) return true;
+  try { return typeof Notification !== "undefined" && !!Notification.requestPermission; } catch (e) { return false; }
+}
 function notifStatus() {
-  if (nativeNotify()) return state.notifyOn ? "on (native)" : "off";
   if (!notifSupported()) return "not available";
-  if (state.notifyOn && Notification.permission === "granted") return "on";
-  if (Notification.permission === "denied") return "denied in system settings";
-  return "off";
+  if (nativeBridge()) return state.notifyOn ? "on" : "off";
+  try {
+    if (Notification.permission === "denied") return "blocked in settings";
+    return state.notifyOn && Notification.permission === "granted" ? "on" : "off";
+  } catch (e) { return "off"; }
+}
+function pushSchedule() {
+  var nb = nativeBridge();
+  if (!nb || !state.notifyOn) return;
+  var items = [];
+  for (var i = 0; i < 14; i++) {
+    var dISO = addDays(today(), i), d = day(dISO);
+    d.take.forEach(function (x) {
+      if (!x.done && x.time) {
+        var p = item(x.itemId);
+        items.push({ date: dISO, time: x.time, title: "Time to take it", body: (p ? p.nm : "Item") + " · " + num(x.amount) + " " + x.unit });
+      }
+    });
+    d.reminders.forEach(function (r) { if (!r.done && r.time) items.push({ date: dISO, time: r.time, title: "Reminder", body: r.text }); });
+  }
+  try { nb.postMessage(JSON.stringify(items)); } catch (e) {}
 }
 function enableNotif() {
   if (!notifSupported()) return;
-  if (nativeNotify()) { state.notifyOn = true; save(); render(); pushNativeSchedule(); return; }
+  if (nativeBridge()) { state.notifyOn = true; save(); pushSchedule(); render(); return; }
   try {
-    Notification.requestPermission().then(p => {
-      state.notifyOn = (p === "granted");
-      save(); render();
-    });
+    Notification.requestPermission().then(function (p) { state.notifyOn = p === "granted"; save(); render(); });
   } catch (e) {}
 }
 function checkNotif() {
-  if (!state.notifyOn) return;
-  if (nativeNotify()) { pushNativeSchedule(); return; }
-  if (!notifSupported()) return;
+  if (!state.notifyOn || nativeBridge()) return;
   try {
-    if (Notification.permission !== "granted") return;
-    const t = todayISO(), now = new Date().toTimeString().slice(0, 5);
-    const d = state.days[t]; if (!d) return;
-    let dirty = false;
-    d.doses.forEach(x => {
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    var d = state.days[today()];
+    if (!d) return;
+    var dirty = false, now = nowHM();
+    (d.take || []).forEach(function (x) {
       if (!x.done && x.time && x.time <= now && !x.notified) {
-        const p = pep(x.pepId);
-        new Notification("Time for your dose", { body: (p ? p.name : "Peptide") + " · " + fmtMg(x.mg) + " mg (" + x.time + ")" });
+        var p = item(x.itemId);
+        new Notification("Time to take it", { body: (p ? p.nm : "Item") + " · " + num(x.amount) + " " + x.unit });
         x.notified = true; dirty = true;
       }
     });
-    (d.reminders || []).forEach(r => {
+    (d.reminders || []).forEach(function (r) {
       if (!r.done && r.time && r.time <= now && !r.notified) {
         new Notification("Reminder", { body: r.text });
         r.notified = true; dirty = true;
@@ -1016,69 +1548,468 @@ function checkNotif() {
     if (dirty) save();
   } catch (e) {}
 }
-setInterval(checkNotif, 30000);
-function wipeAll() { state = { peptides: [], days: {}, history: [], plans: [], activePlanId: null, planLog: [], schedVer: 0 }; editPlanId = null; editWd = null; save(); render(); }
 
-// ---------- peptide dialogs ----------
-const dlg = document.getElementById("dlg");
-function openDlg(html) { dlg.innerHTML = html; dlg.showModal(); }
-function closeDlg() { dlg.close(); }
+/* ============================================================
+   render
+   ============================================================ */
+var TITLES = { today: ["Today", ""], plan: ["Plan", "Weekly"], stats: ["Stats", "Progress"], supply: ["Supply", "Stack"] };
 
-function dlgPeptide(id) {
-  const p = id ? pep(id) : null;
-  openDlg(`<h2>${p ? "Edit peptide" : "Add peptide"}</h2>
-    <form class="fields" onsubmit="event.preventDefault();savePeptide(this,'${id || ""}')">
-    <label class="f">Name<input name="n" required value="${esc(p ? p.name : "")}" placeholder="Retatrutide" autofocus></label>
-    <div class="grid2">
-      <label class="f">Vial (mg)<input name="v" type="number" step="0.001" min="0.001" required value="${p ? p.vialMg : ""}" placeholder="20"></label>
-      <label class="f">Starting dose (mg)<input name="d" type="number" step="0.001" min="0.001" required value="${p ? p.doseMg : ""}" placeholder="2"></label></div>
-    ${p ? `<label class="f">Left in vial (mg)<input name="r" type="number" step="0.001" min="0" value="${p.remainingMg}"></label>` : ""}
-    <div class="btnrow">${p ? `<button type="button" class="pill danger" onclick="delPeptide('${id}')">Delete</button>` : `<button type="button" class="pill ghost" onclick="closeDlg()">Cancel</button>`}
-    <button class="pill">Save</button></div></form>`);
-}
-function savePeptide(f, id) {
-  const v = parseFloat(f.v.value), d = parseFloat(f.d.value);
-  if (id) { const p = pep(id); if (p) { p.name = f.n.value.trim(); p.vialMg = v; p.doseMg = d; p.remainingMg = Math.max(0, parseFloat(f.r.value) || 0); } }
-  else state.peptides.push({ id: uid(), name: f.n.value.trim(), vialMg: v, doseMg: d, remainingMg: v, plan: [] });
-  bumpSched(); closeDlg(); save(); render();
-}
-function delPeptide(id) {
-  state.peptides = state.peptides.filter(p => p.id !== id);
-  (state.plans || []).forEach(pl => { Object.values(pl.days || {}).forEach(pd => { pd.doses = (pd.doses || []).filter(ds => ds.pepId !== id); }); });
-  bumpSched(); closeDlg(); save(); render();
+function render() {
+  document.documentElement.setAttribute("data-theme", state.theme === "light" ? "light" : "dark");
+  var main = document.getElementById("main");
+  var t = TITLES[tab];
+  var sub = t[1], title = t[0], date = "";
+
+  if (tab === "today") {
+    var s = selISO();
+    title = s === today() ? "Today" : DWL[wdOf(s)];
+    sub = s === today() ? DWL[wdOf(s)] : "";
+    date = shortDate(s);
+  }
+  if (tab === "plan" && editPlanId) {
+    if (editWd !== null) { title = DWL[editWd]; sub = (plan(editPlanId) || {}).name || ""; }
+    else { title = "Edit plan"; sub = "Weekly"; }
+  }
+
+  document.getElementById("topTitle").textContent = title;
+  document.getElementById("topSub").textContent = sub;
+  document.getElementById("topDate").textContent = date;
+  document.getElementById("settingsBtn").hidden = tab !== "supply";
+
+  main.innerHTML = tab === "today" ? viewToday()
+    : tab === "plan" ? viewPlan()
+    : tab === "stats" ? viewStats()
+    : viewSupply();
+  document.getElementById("sheetHost").innerHTML = viewSheet();
+
+  Array.prototype.forEach.call(document.querySelectorAll("nav button"), function (b) {
+    b.setAttribute("aria-current", String(b.dataset.tab === tab));
+  });
+  if (dayDirty) { dayDirty = false; save(); }
 }
 
-function dlgSteps(pid) {
-  const p = pep(pid); if (!p) return;
-  const t = todayISO();
-  const steps = (p.plan || []).slice().sort((a, b) => a.from < b.from ? -1 : 1);
-  const rows = steps.length ? steps.map(s =>
-    `<div class="item" style="padding:10px 14px"><div style="flex:1">
-      <div style="font-size:14px;font-weight:800">${fmtMg(s.mg)} mg per dose</div>
-      <div class="muted small">from ${fmtDate(s.from)}${s.from <= t ? " · active" : ""}</div></div>
-      <button class="linkish plain" onclick="delStep('${pid}','${s.id}')">✕</button></div>`).join("")
-    : `<div class="empty">No steps yet — starting dose is ${fmtMg(p.doseMg)} mg</div>`;
-  openDlg(`<h2>Dose plan · ${esc(p.name)}</h2>
-    <div class="muted small" style="margin-bottom:10px">Now: ${fmtMg(doseFor(p, t))} mg per dose. Add a step for every increase.</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${rows}</div>
-    <form class="fields" onsubmit="event.preventDefault();addStep(this,'${pid}')">
-      <div class="grid2">
-        <label class="f">From<input name="f" type="date" required value="${t}"></label>
-        <label class="f">Dose (mg)<input name="mg" type="number" step="0.001" min="0.001" required placeholder="4"></label></div>
-      <div class="btnrow"><button type="button" class="pill ghost" onclick="closeDlg()">Close</button>
-      <button class="pill">Add step</button></div></form>`);
+/* ============================================================
+   rest timer
+   ============================================================ */
+var restLeft = 0, restTimer = null;
+function fmtT(s) { return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function startRest(label) {
+  restLeft = state.restSec || 90;
+  var el = document.getElementById("rest");
+  document.getElementById("restLb").textContent = "Rest · " + label;
+  document.getElementById("restT").textContent = fmtT(restLeft);
+  el.hidden = false;
+  clearInterval(restTimer);
+  restTimer = setInterval(function () {
+    restLeft--;
+    if (restLeft <= 0) { stopRest(); return; }
+    document.getElementById("restT").textContent = fmtT(restLeft);
+  }, 1000);
 }
-function addStep(f, pid) {
-  const p = pep(pid); if (!p) return;
-  if (!p.plan) p.plan = [];
-  p.plan.push({ id: uid(), from: f.f.value, mg: parseFloat(f.mg.value) });
-  bumpSched(); save(); dlgSteps(pid); render();
+function stopRest() { clearInterval(restTimer); restTimer = null; document.getElementById("rest").hidden = true; }
+
+/* ============================================================
+   events — delegated, so no user text ever lands inside an attribute
+   ============================================================ */
+document.addEventListener("click", function (ev) {
+  var el;
+
+  /* tabs */
+  el = ev.target.closest("nav button");
+  if (el) { tab = el.dataset.tab; selDate = null; editPlanId = null; editWd = null; sheet = null; render(); document.getElementById("main").scrollTop = 0; return; }
+
+  el = ev.target.closest("#settingsBtn");
+  if (el) { openSheet({ kind: "settings" }); return; }
+
+  /* sheet chrome */
+  if (ev.target.closest("[data-close]") && !ev.target.closest(".sheetcard")) { closeSheet(); return; }
+  el = ev.target.closest("[data-close]");
+  if (el && el.tagName === "BUTTON") { closeSheet(); return; }
+
+  el = ev.target.closest("[data-step]");
+  if (el && sheet) {
+    var unit = sheet.kind === "pr" || sheet.kind === "weight" ? "kg" : (item(sheet.itemId) || { dose: { u: "g" } }).dose.u;
+    var st = sheet.kind === "pr" ? 2.5 : sheet.kind === "weight" ? 0.1 : stepFor(unit, sheet.amount);
+    sheet.amount = Math.max(st, round(sheet.amount + st * (+el.dataset.step)));
+    syncSheet();
+    return;
+  }
+  el = ev.target.closest("[data-amt]");
+  if (el && sheet) { sheet.amount = parseFloat(el.dataset.amt); syncSheet(); return; }
+
+  el = ev.target.closest("[data-save]");
+  if (el) { saveSheet(el.dataset.save); return; }
+
+  el = ev.target.closest("[data-confirm]");
+  if (el && sheet && sheet.fn) { var fn = sheet.fn; sheet = null; fn(); save(); render(); return; }
+
+  el = ev.target.closest("[data-sheet]");
+  if (el) {
+    var kind = el.dataset.sheet;
+    if (kind === "weight") {
+      var lw = latestWeight();
+      openSheet({ kind: "weight", amount: lw ? lw.kg : 80, date: today() });
+    } else if (kind === "addex") {
+      openSheet({ kind: "addex", ex: "new" });
+    } else {
+      openSheet({ kind: kind });
+    }
+    return;
+  }
+
+  /* today */
+  el = ev.target.closest("[data-day]");
+  if (el) { selDate = el.dataset.day; render(); return; }
+  el = ev.target.closest("[data-goto]");
+  if (el) { selDate = null; render(); return; }
+
+  el = ev.target.closest("[data-set]");
+  if (el) {
+    var parts = el.dataset.set.split(":"), d = day(selISO());
+    var e2 = d.exercises[+parts[0]], k = +parts[1];
+    if (e2) {
+      var was = !!e2.done[k];
+      e2.done[k] = !was;
+      d.userEdited = true;
+      save(); render();
+      if (!was) startRest(e2.name); else stopRest();
+    }
+    return;
+  }
+
+  el = ev.target.closest("[data-pr]");
+  if (el) {
+    var dd = day(selISO()), ee = dd.exercises[+el.dataset.pr];
+    if (ee) {
+      var cur = state.prs[keyOf(ee.name)];
+      openSheet({ kind: "pr", ex: +el.dataset.pr, amount: Math.max(ee.kg || 0, cur ? cur.kg : 0) || 20, reps: ee.reps || 8 });
+    }
+    return;
+  }
+
+  el = ev.target.closest("[data-take]");
+  if (el) {
+    var i2 = +el.dataset.take, d2 = day(selISO());
+    if (d2.take[i2].done) unlogTake(i2); else logTake(i2, d2.take[i2].amount, nowHM());
+    render();
+    return;
+  }
+  el = ev.target.closest("[data-takeedit]");
+  if (el) {
+    var i3 = +el.dataset.takeedit, x3 = day(selISO()).take[i3];
+    if (x3 && !x3.done) openSheet({ kind: "log", itemId: x3.itemId, takeIdx: i3, amount: x3.amount, at: nowHM() });
+    return;
+  }
+
+  el = ev.target.closest("[data-rem]");
+  if (el) { var r = day(selISO()).reminders[+el.dataset.rem]; if (r) { r.done = !r.done; save(); render(); } return; }
+  el = ev.target.closest("[data-remdel]");
+  if (el) { var dr = day(selISO()); dr.reminders.splice(+el.dataset.remdel, 1); dr.userEdited = true; save(); render(); return; }
+
+  /* plan */
+  el = ev.target.closest("[data-editplan]");
+  if (el) { editPlanId = el.dataset.editplan; editWd = null; render(); return; }
+  el = ev.target.closest("[data-editday]");
+  if (el) { var p2 = el.dataset.editday.split(":"); editPlanId = p2[0]; editWd = +p2[1]; render(); return; }
+  el = ev.target.closest("[data-back]");
+  if (el) { if (editWd !== null) editWd = null; else editPlanId = null; render(); return; }
+  el = ev.target.closest("[data-activate]");
+  if (el) { activatePlan(el.dataset.activate); render(); return; }
+  el = ev.target.closest("[data-newplan]");
+  if (el) {
+    var np = { id: uid(), name: "Plan " + (state.plans.length + 1), status: "draft", days: {} };
+    state.plans.push(np); editPlanId = np.id; editWd = null; save(); render();
+    return;
+  }
+  el = ev.target.closest("[data-delplan]");
+  if (el) {
+    var pid = el.dataset.delplan, pn = (plan(pid) || {}).name || "";
+    openSheet({ kind: "confirm", title: "Delete plan?", body: pn + " is removed. Your logged days stay.", fn: function () {
+      state.plans = state.plans.filter(function (p) { return p.id !== pid; });
+      if (state.activePlanId === pid) { state.activePlanId = null; bumpSched(); }
+      editPlanId = null; editWd = null;
+    } });
+    return;
+  }
+  el = ev.target.closest("[data-pdex]");
+  if (el) { openSheet({ kind: "pdex", ex: el.dataset.pdex === "new" ? "new" : +el.dataset.pdex }); return; }
+  el = ev.target.closest("[data-pdtakedel]");
+  if (el) { planDay(plan(editPlanId), editWd).take.splice(+el.dataset.pdtakedel, 1); pdChanged(); return; }
+  el = ev.target.closest("[data-pdremdel]");
+  if (el) { planDay(plan(editPlanId), editWd).reminders.splice(+el.dataset.pdremdel, 1); pdChanged(); return; }
+  el = ev.target.closest("[data-delex]");
+  if (el) {
+    var di = +el.dataset.delex;
+    if (sheet.kind === "pdex") { planDay(plan(editPlanId), editWd).exercises.splice(di, 1); sheet = null; pdChanged(); }
+    else { var dz = day(selISO()); dz.exercises.splice(di, 1); dz.userEdited = true; sheet = null; save(); render(); }
+    return;
+  }
+
+  el = ev.target.closest("[data-copyprompt]");
+  if (el) { copyText(aiPrompt(), el, "Copy prompt"); return; }
+  el = ev.target.closest("[data-copyexport]");
+  if (el) { copyText(JSON.stringify(state), el, "Copy"); return; }
+
+  /* supply */
+  el = ev.target.closest("[data-log]");
+  if (el) {
+    var lp = item(el.dataset.log);
+    if (lp) {
+      var d4 = day(selISO());
+      var idx = -1;
+      d4.take.forEach(function (x, i) { if (x.itemId === lp.id && !x.done && idx < 0) idx = i; });
+      if (idx < 0) {
+        d4.take.push({ id: uid(), itemId: lp.id, amount: doseOn(lp, selISO()), unit: lp.dose.u,
+                       moment: lp.moment || "Morning", time: "", done: false, at: "", histId: null });
+        d4.userEdited = true;
+        idx = d4.take.length - 1;
+      }
+      openSheet({ kind: "log", itemId: lp.id, takeIdx: idx, amount: doseOn(lp, selISO()), at: nowHM() });
+    }
+    return;
+  }
+  el = ev.target.closest("[data-refill]");
+  if (el) {
+    var rp = item(el.dataset.refill);
+    if (rp) openSheet({ kind: "confirm", title: "New " + form(rp).container + "?", body: rp.nm + " goes back to " + num(rp.cont.n) + " " + rp.cont.u + ".", fn: function () { rp.left = rp.cont.n; } });
+    return;
+  }
+  el = ev.target.closest("[data-edititem]");
+  if (el) { openSheet({ kind: "edititem", itemId: el.dataset.edititem }); return; }
+  el = ev.target.closest("[data-delitem]");
+  if (el) {
+    var xid = el.dataset.delitem, xn = (item(xid) || {}).nm || "";
+    openSheet({ kind: "confirm", title: "Remove " + xn + "?", body: "It is taken out of your plans too. Your log stays.", fn: function () {
+      state.stack = state.stack.filter(function (p) { return p.id !== xid; });
+      state.plans.forEach(function (pl) {
+        Object.keys(pl.days || {}).forEach(function (wd) {
+          pl.days[wd].take = (pl.days[wd].take || []).filter(function (t) { return t.itemId !== xid; });
+        });
+      });
+      bumpSched();
+    } });
+    return;
+  }
+  el = ev.target.closest("[data-delstep]");
+  if (el) {
+    var sp2 = item(sheet.itemId);
+    if (sp2) { sp2.steps = (sp2.steps || []).filter(function (s) { return s.id !== el.dataset.delstep; }); bumpSched(); save(); render(); }
+    return;
+  }
+
+  /* stats */
+  el = ev.target.closest("[data-range]");
+  if (el) { RANGE = el.dataset.range; render(); return; }
+
+  /* settings */
+  el = ev.target.closest("[data-notif]");
+  if (el) {
+    if (el.dataset.notif === "on") enableNotif();
+    else { state.notifyOn = false; save(); render(); }
+    return;
+  }
+  el = ev.target.closest("[data-theme]");
+  if (el) { state.theme = state.theme === "light" ? "dark" : "light"; save(); render(); return; }
+  el = ev.target.closest("[data-wipe]");
+  if (el) {
+    openSheet({ kind: "confirm", title: "Erase everything?", body: "Stack, plans and log all go. This cannot be undone.", fn: function () {
+      var theme = state.theme;
+      state = clone(BLANK); state.theme = theme;
+      editPlanId = null; editWd = null; tab = "today";
+    } });
+    return;
+  }
+});
+
+document.addEventListener("input", function (ev) {
+  if (!sheet || ev.target.id !== "amtInput") return;
+  var v = parseFloat(String(ev.target.value).replace(",", "."));
+  if (!isNaN(v) && v > 0) { sheet.amount = round(v); syncSheet(); }
+});
+
+function copyText(txt, btn, back) {
+  var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = back; }, 1800); };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  } catch (e) { fallbackCopy(txt, done); }
 }
-function delStep(pid, sid) {
-  const p = pep(pid); if (!p) return;
-  p.plan = (p.plan || []).filter(s => s.id !== sid);
-  bumpSched(); save(); dlgSteps(pid); render();
+function fallbackCopy(txt, done) {
+  var ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+function pdChanged() {
+  if (editPlanId === state.activePlanId) bumpSched();
+  sheet = null; save(); render();
+}
+function val(id) { var el = document.getElementById(id); return el ? el.value : ""; }
+function numVal(id, def) { var v = parseFloat(String(val(id)).replace(",", ".")); return isNaN(v) ? def : v; }
+
+function saveSheet(what) {
+  if (what === "log") {
+    var at = val("logTime") || nowHM();
+    logTake(sheet.takeIdx, sheet.amount, at);
+    closeSheet();
+    return;
+  }
+  if (what === "pr") {
+    var d = day(selISO()), e = d.exercises[sheet.ex];
+    if (e) {
+      state.prs[keyOf(e.name)] = { name: e.name, kg: round(sheet.amount), reps: Math.max(1, parseInt(val("prReps"), 10) || e.reps), date: selISO() };
+      save();
+    }
+    closeSheet();
+    return;
+  }
+  if (what === "weight") {
+    var date = val("wDate") || today();
+    state.weights = state.weights.filter(function (w) { return w.date !== date; });
+    state.weights.push({ date: date, kg: round(sheet.amount) });
+    save(); closeSheet();
+    return;
+  }
+  if (what === "item") {
+    var nm = val("iNm").trim();
+    if (!nm) return;
+    var kind = val("iKind") || "powder";
+    var unit = FORM[kind].unit;
+    var cont = numVal("iCont", 0), dose = numVal("iDose", 0), perWeek = Math.max(1, parseInt(val("iWeek"), 10) || 7);
+    var moment = val("iMoment") || "Morning", hint = val("iHint").trim();
+    if (sheet.kind === "edititem") {
+      var it = item(sheet.itemId);
+      if (it) {
+        it.nm = nm; it.kind = kind;
+        it.cont = { n: cont, u: unit }; it.dose = { n: dose, u: unit };
+        it.left = Math.max(0, numVal("iLeft", it.left));
+        it.perWeek = perWeek; it.moment = moment; it.hint = hint;
+      }
+    } else {
+      state.stack.push({ id: uid(), nm: nm, kind: kind, moment: moment,
+        cont: { n: cont, u: unit }, dose: { n: dose, u: unit }, left: cont, perWeek: perWeek, hint: hint, steps: [] });
+    }
+    bumpSched(); save(); closeSheet();
+    return;
+  }
+  if (what === "step") {
+    var sp = item(sheet.itemId);
+    var n = numVal("stN", 0), from = val("stFrom");
+    if (sp && n > 0 && from) {
+      if (!sp.steps) sp.steps = [];
+      sp.steps.push({ id: uid(), from: from, n: round(n) });
+      bumpSched(); save(); render();
+    }
+    return;
+  }
+  if (what === "ex") {
+    var name = val("eNm").trim();
+    if (!name) return;
+    var sets = Math.max(1, parseInt(val("eSets"), 10) || 3);
+    var reps = Math.max(1, parseInt(val("eReps"), 10) || 10);
+    var kg = numVal("eKg", 0);
+    if (sheet.kind === "pdex") {
+      var pd = planDay(plan(editPlanId), editWd);
+      if (sheet.ex === "new") pd.exercises.push({ name: name, sets: sets, reps: reps, kg: kg, note: "" });
+      else { var pe = pd.exercises[sheet.ex]; pe.name = name; pe.sets = sets; pe.reps = reps; pe.kg = kg; }
+      pdChanged();
+    } else {
+      var dd = day(selISO());
+      if (sheet.ex === "new") dd.exercises.push({ id: uid(), name: name, sets: sets, reps: reps, kg: kg, note: "", done: new Array(sets).fill(false) });
+      else {
+        var de = dd.exercises[sheet.ex];
+        de.name = name; de.reps = reps; de.kg = kg;
+        if (de.sets !== sets) { de.sets = sets; de.done = new Array(sets).fill(false).map(function (_, i) { return !!de.done[i]; }); }
+      }
+      dd.userEdited = true; save(); closeSheet();
+    }
+    return;
+  }
+  if (what === "pdtake") {
+    var pd2 = planDay(plan(editPlanId), editWd);
+    pd2.take.push({ id: uid(), itemId: val("tItem"), moment: val("tMoment") || "Morning", time: val("tTime") });
+    pdChanged();
+    return;
+  }
+  if (what === "note") { var dn = day(selISO()); dn.notes = val("nText").trim(); dn.userEdited = true; save(); closeSheet(); return; }
+  if (what === "pdnote") { planDay(plan(editPlanId), editWd).notes = val("nText").trim(); pdChanged(); return; }
+  if (what === "reminder") {
+    var txt = val("rText").trim();
+    if (!txt) return;
+    var dq = day(selISO());
+    dq.reminders.push({ id: uid(), text: txt, time: val("rTime"), done: false });
+    dq.userEdited = true; save(); closeSheet(); pushSchedule();
+    return;
+  }
+  if (what === "pdreminder") {
+    var rt = val("rText").trim();
+    if (!rt) return;
+    planDay(plan(editPlanId), editWd).reminders.push({ text: rt, time: val("rTime") });
+    pdChanged();
+    return;
+  }
+  if (what === "planname") { var pl3 = plan(editPlanId); if (pl3) pl3.name = val("pName").trim() || pl3.name; save(); closeSheet(); return; }
+  if (what === "pdname") { planDay(plan(editPlanId), editWd).workoutName = val("pName").trim(); pdChanged(); return; }
+  if (what === "import") {
+    var err = importPlan(val("impText"));
+    var hint = document.getElementById("impHint");
+    if (err) { if (hint) { hint.textContent = err; hint.style.color = "var(--dgr)"; } return; }
+    tab = "plan"; closeSheet();
+    return;
+  }
+  if (what === "restore") {
+    var parsed = null;
+    try { parsed = JSON.parse(val("resText")); } catch (e) {}
+    var rh = document.getElementById("resHint");
+    if (!parsed || typeof parsed !== "object") {
+      if (rh) { rh.textContent = "That is not a backup this app wrote."; rh.style.color = "var(--dgr)"; }
+      return;
+    }
+    state = upgrade(parsed);
+    editPlanId = null; editWd = null; tab = "today"; selDate = null;
+    save(); closeSheet();
+    return;
+  }
+}
+
+/* ============================================================
+   start
+   ============================================================ */
+function init() {
+  load();
+  render();
+
+  /* cloud copy when the app runs inside Claude; ignored in the iPhone build */
+  try {
+    if (window.claude && window.claude.use) {
+      Promise.resolve(claude.use("db")).then(function (d) {
+        db = d;
+        if (!db) return;
+        return db.doc("app/state").get().then(function (snap) {
+          if (snap && snap.exists) { state = upgrade(snap.data()); render(); }
+          else if (state.stack.length || Object.keys(state.days).length) save();
+        });
+      }).catch(function () { db = null; });
+    }
+  } catch (e) { db = null; }
+
+  pushSchedule();
+  setInterval(checkNotif, 30000);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") { save(); pushSchedule(); }
+  });
+  window.addEventListener("pagehide", function () { save(); pushSchedule(); });
+
+  document.getElementById("restPlus").addEventListener("click", function () {
+    restLeft += 30; document.getElementById("restT").textContent = fmtT(restLeft);
+  });
+  document.getElementById("restSkip").addEventListener("click", stopRest);
 }
 
 init();
 </script>
+</body>
+</html>
