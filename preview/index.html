@@ -335,11 +335,14 @@ h1 {
   box-shadow: inset 0 0 0 1px var(--line);
 }
 .stepper button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-.stepper .val { text-align: center; min-width: 120px; }
+.stepper .val { text-align: center; min-width: 130px; }
 .stepper .val .n {
-  font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -.03em;
-  font-variant-numeric: tabular-nums; display: block; line-height: 1.05;
+  font: inherit; font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums; display: block; line-height: 1.05; width: 100%;
+  background: none; border: 0; color: var(--txt); text-align: center; padding: 2px 0;
+  border-bottom: 2px dashed var(--line);
 }
+.stepper .val .n:focus { outline: none; border-bottom-color: var(--acc); }
 .stepper .val .u { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
 .quick { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; }
 .quick button {
@@ -588,7 +591,7 @@ h1 {
           <li><span class="mark">4</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
           <li><span class="mark">5</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
           
-          <li><span class="mark">6</span><span><span class="t">PR-knop bij elke oefening</span><div class="d">Naast elke oefening staat een PR-knop. Onder de sets zie je wat je vorige keer deed én je record: <i>best 85 kg · 31 Aug</i>. Til je meer dan je record, dan springt de knop op amber en zegt <b>New PR</b>. Tikken opent hetzelfde stepper-scherm als bij het loggen — gewicht bijstellen, reps erbij, opslaan. Is het geen verbetering, dan kan je niet opslaan; je record blijft staan.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">PR-knop bij elke oefening</span><div class="d">Naast elke oefening staat een PR-knop. Onder de sets zie je wat je vorige keer deed én je record: <i>best 85 kg · 31 Aug</i>. Til je meer dan je record, dan springt de knop op amber en zegt <b>New PR</b>. Tikken opent hetzelfde scherm als bij het loggen. <b>Je kan het getal ook gewoon intypen</b> — tik op het grote cijfer. En je mag een record ook <b>lager</b> zetten: als je een keer 90 intypt terwijl het 80 was, moet je dat kunnen rechtzetten. De app zegt er dan bij dat je je record vervangt.</div></span></li>
           <li><span class="mark">7</span><span><span class="t">Lichaamsgewicht in een grafiek, met historie</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Gratis zie je 12 weken terug; met Plus zet je hem op 1 jaar of 10 jaar. Je oude data blijft altijd op je telefoon staan — Plus zet hem alleen terug in de grafiek. Probeer de knopjes boven de grafiek bij Stats.</div></span></li>
           <li><span class="mark">8</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
           <li><span class="mark">9</span><span><span class="t">AI-plan werkt met elke AI, en is gratis</span><div class="d">Geen Claude-only meer. De app maakt een prompt met jouw stack en je trainingsdagen erin. Die kopieer je naar ChatGPT, Claude, Gemini, Grok — wat je ook gebruikt. Antwoord terugplakken en klaar. Kost niks, dus blijft gratis. Kijk bij Plan.</div></span></li>
@@ -1229,42 +1232,44 @@ function viewSheet() {
     '<h3>Log ' + esc(p.nm) + "</h3>" +
     '<div class="stepper">' +
       '<button type="button" id="amtMinus" aria-label="Less">−</button>' +
-      '<span class="val"><span class="n">' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + '</span><span class="u">' + esc(p.dose.u) + "</span></span>" +
+      '<span class="val"><input class="n" id="amtInput" type="text" inputmode="decimal" aria-label="Amount" value="' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + '"><span class="u">' + esc(p.dose.u) + "</span></span>" +
       '<button type="button" id="amtPlus" aria-label="More">+</button></div>' +
     '<div class="quick">' + quick.map(function (q, i) {
       return '<button type="button" data-amt="' + q.v + '" aria-pressed="' + (roundAmt(sheet.amount) === q.v) + '">' + esc(q.lb) + "</button>";
     }).join("") + "</div>" +
     '<div class="field"><label for="logTime">Time</label><input id="logTime" type="time" value="' + esc(sheet.at) + '"></div>' +
-    '<div class="hintline">' + (changed
+    '<div class="hintline" id="logHint">' + (changed
       ? "Just this once. Your plan stays at <b>" + nl(planned) + " " + esc(p.dose.u) + "</b> per dose."
       : "Taken from your plan. Change it above if today is different.") + "</div>" +
     '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
-    '<button type="button" class="btn" id="sheetSave">Log ' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + " " + esc(p.dose.u) + "</button></div>" +
+    '<button type="button" class="btn" id="sheetSave">Log</button></div>' +
     "</div></div>";
 }
 
 /* a record is a number you claim, so it gets the same stepper as a dose */
+/* lower is allowed on purpose: a record typed wrong has to be fixable */
+function prHint(e, v) {
+  if (!e.pr) return "First record for this lift.";
+  if (v > e.pr.kg) return "Beats your <b>" + nl(e.pr.kg) + " kg</b> from " + esc(e.pr.when) + ".";
+  if (v === e.pr.kg) return "Same as your record from " + esc(e.pr.when) + ".";
+  return "Lower than <b>" + nl(e.pr.kg) + " kg</b>. Saving replaces it — use this to fix a typo.";
+}
 function viewPrSheet() {
   var e = exercises[sheet.ex];
-  var old = e.pr ? e.pr.kg : 0;
-  var better = sheet.amount > old;
   return '<div class="sheet" id="sheet"><div class="sheetcard">' +
     '<span class="grab"></span>' +
     '<h3>Personal record · ' + esc(e.nm) + "</h3>" +
     '<div class="stepper">' +
       '<button type="button" id="amtMinus" aria-label="Less">−</button>' +
-      '<span class="val"><span class="n">' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 1) + '</span><span class="u">kg</span></span>' +
+      '<span class="val"><input class="n" id="amtInput" type="text" inputmode="decimal" aria-label="Weight" value="' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 1) + '"><span class="u">kg</span></span>' +
       '<button type="button" id="amtPlus" aria-label="More">+</button></div>' +
     '<div class="quick">' + [e.kg, roundAmt(e.kg + 2.5), roundAmt(e.kg + 5)].map(function (v) {
       return '<button type="button" data-amt="' + v + '" aria-pressed="' + (roundAmt(sheet.amount) === v) + '">' + nl(v) + " kg</button>";
     }).join("") + "</div>" +
     '<div class="field"><label for="prReps">Reps</label><input id="prReps" type="number" min="1" value="' + sheet.reps + '"></div>' +
-    '<div class="hintline">' + (old
-      ? (better ? "Beats your <b>" + nl(old) + " kg</b> from " + esc(e.pr.when) + "."
-                : "Your record stays <b>" + nl(old) + " kg</b> from " + esc(e.pr.when) + ".")
-      : "First record for this lift.") + "</div>" +
+    '<div class="hintline" id="prHint">' + prHint(e, sheet.amount) + "</div>" +
     '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
-    '<button type="button" class="btn" id="prSave"' + (better || !old ? "" : " disabled style=\"opacity:.45\"") + '>Save record</button></div>' +
+    '<button type="button" class="btn" id="prSave">Save record</button></div>' +
     "</div></div>";
 }
 
@@ -1488,14 +1493,43 @@ function openLog(id) {
   render();
 }
 
+/* stepping and the quick chips patch the sheet instead of re-rendering it,
+   so the cursor stays where it is while you type */
+function syncSheet() {
+  var inp = document.getElementById("amtInput");
+  if (inp && document.activeElement !== inp) {
+    inp.value = sheet.kind === "pr"
+      ? nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 1)
+      : nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2);
+  }
+  Array.prototype.forEach.call(sheetEl.querySelectorAll("[data-amt]"), function (b) {
+    b.setAttribute("aria-pressed", String(roundAmt(sheet.amount) === parseFloat(b.dataset.amt)));
+  });
+  var hint = document.getElementById("prHint");
+  if (hint && sheet.kind === "pr") hint.innerHTML = prHint(exercises[sheet.ex], sheet.amount);
+  var lh = document.getElementById("logHint");
+  if (lh && sheet.kind === "log") {
+    var p = item(sheet.id);
+    lh.innerHTML = roundAmt(sheet.amount) !== p.dose.n
+      ? "Just this once. Your plan stays at <b>" + nl(p.dose.n) + " " + esc(p.dose.u) + "</b> per dose."
+      : "Taken from your plan. Change it above if today is different.";
+  }
+}
+
+sheetEl.addEventListener("input", function (e) {
+  if (!sheet || e.target.id !== "amtInput") return;
+  var v = parseFloat(String(e.target.value).replace(",", "."));
+  if (!isNaN(v) && v > 0) { sheet.amount = roundAmt(v); syncSheet(); }
+});
+
 sheetEl.addEventListener("click", function (e) {
   if (e.target.id === "sheet" || e.target.closest("#sheetCancel")) { sheet = null; render(); return; }
   if (e.target.closest("#sheetPlus")) { isPlus = true; sheet = null; render(); return; }
   if (sheet && sheet.kind === "pr") {
-    if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + 2.5); render(); return; }
-    if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(2.5, roundAmt(sheet.amount - 2.5)); render(); return; }
+    if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + 2.5); syncSheet(); return; }
+    if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(2.5, roundAmt(sheet.amount - 2.5)); syncSheet(); return; }
     var pq = e.target.closest("[data-amt]");
-    if (pq) { sheet.amount = parseFloat(pq.dataset.amt); render(); return; }
+    if (pq) { sheet.amount = parseFloat(pq.dataset.amt); syncSheet(); return; }
     if (e.target.closest("#prSave")) {
       exercises[sheet.ex].pr = { kg: sheet.amount, when: "today" };
       sheet = null; render();
@@ -1504,10 +1538,10 @@ sheetEl.addEventListener("click", function (e) {
   }
   if (!sheet || sheet.kind !== "log") return;
   var p = item(sheet.id), st = stepFor(p);
-  if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + st); render(); return; }
-  if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(st, roundAmt(sheet.amount - st)); render(); return; }
+  if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + st); syncSheet(); return; }
+  if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(st, roundAmt(sheet.amount - st)); syncSheet(); return; }
   var q = e.target.closest("[data-amt]");
-  if (q) { sheet.amount = parseFloat(q.dataset.amt); render(); return; }
+  if (q) { sheet.amount = parseFloat(q.dataset.amt); syncSheet(); return; }
   if (e.target.closest("#sheetSave")) {
     var row = null;
     for (var i = 0; i < intake.length; i++) if (intake[i].id === sheet.id) row = intake[i];
