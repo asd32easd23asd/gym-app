@@ -406,11 +406,37 @@ h1 {
 .legendrow i { width: 10px; height: 10px; border-radius: 3px; display: block; }
 .legendrow i.hollow { background: none; box-shadow: inset 0 0 0 1.5px var(--s3); }
 
+.prompt {
+  margin: 0; background: var(--raise); border-radius: 12px; padding: 12px;
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; line-height: 1.5; color: var(--mut);
+  max-height: 150px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+}
+.paste {
+  font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--txt);
+  background: var(--raise); border: 1px solid var(--line); border-radius: 12px; padding: 11px;
+  min-height: 110px; resize: vertical; width: 100%;
+}
+.paste:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }
+
+.seg2 { display: flex; gap: 6px; }
+.seg2 button {
+  flex: 1; font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 0; border-radius: 10px; background: var(--raise); color: var(--mut);
+  min-height: 36px; padding: 7px 4px; box-shadow: inset 0 0 0 1px var(--line);
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+}
+.seg2 button[aria-pressed="true"] { background: var(--acc-soft); color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+.seg2 button svg { opacity: .8; }
+
 .statgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .stat { background: var(--surf); border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; }
 .stat .v { font-family: Archivo, sans-serif; font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: -.025em; }
 .stat .v s { text-decoration: none; font-size: 11px; color: var(--mut); font-weight: 600; }
 .stat .k { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--dim); }
+
+.card.soon { border-style: dashed; }
+.chip.soonchip { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+.soonlist { opacity: .45; pointer-events: none; user-select: none; display: flex; flex-direction: column; gap: 12px; }
 
 .empty { text-align: center; color: var(--dim); font-size: 13px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
@@ -543,7 +569,7 @@ h1 {
         <p>Twee grote gaten. De app kent alleen peptides, terwijl je ook creatine en eiwitpoeder neemt. En je vinkt een oefening af zonder je gewicht, dus de app kan niet laten zien of je sterker wordt.</p>
         <ul class="items">
           <li><span class="mark">1</span><span><span class="t">Alles wat je inneemt, niet alleen peptides<span class="tag">groot</span></span><div class="d">Nu kent de app alleen vials met mg. Creatine, eiwitpoeder, magnesium en omega-3 passen daar niet in. In het voorstel heeft elk item een <b>vorm</b>, en die vorm bepaalt de eenheid en de verpakking:<br>
-            <b>Injection</b> — vial, mg<br>
+            <b>Vial</b> — vial, mg<br>
             <b>Powder</b> — bus, gram<br>
             <b>Pills</b> — pot, capsules<br>
             <b>Liquid</b> — flesje, ml<br>
@@ -553,10 +579,11 @@ h1 {
           <li><span class="mark">4</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
           <li><span class="mark">5</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
           
-          <li><span class="mark">6</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">Lichaamsgewicht in een grafiek, met historie</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Gratis zie je 12 weken terug; met Plus zet je hem op 1 jaar of 10 jaar. Je oude data blijft altijd op je telefoon staan — Plus zet hem alleen terug in de grafiek. Probeer de knopjes boven de grafiek bij Stats.</div></span></li>
           <li><span class="mark">7</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
           <li><span class="mark">8</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
-          <li><span class="mark">9</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
+          <li><span class="mark">9</span><span><span class="t">AI-plan werkt met elke AI, en is gratis</span><div class="d">Geen Claude-only meer. De app maakt een prompt met jouw stack en je trainingsdagen erin. Die kopieer je naar ChatGPT, Claude, Gemini, Grok — wat je ook gebruikt. Antwoord terugplakken en klaar. Kost niks, dus blijft gratis. Kijk bij Plan.</div></span></li>
+          <li><span class="mark">10</span><span><span class="t">AI-coach — staat op <b>Soon</b>, nog niet bruikbaar</span><div class="d">De coach leest straks je week en stelt dingen voor die hij ook kan uitvoeren: "Bench press · probeer 82,5 kg vandaag", "Vrijdag herinneren om whey te bestellen — nog 12 dagen, levering duurt 3". Jij tikt op de knop, hij zet de reminder. Nooit uit zichzelf.<br><br>In de preview staat hij bewust <b>uitgeschakeld</b> met een Soon-label en voorbeelden erbij. Er valt niks te tikken. Een knop die niks doet is verwarrender voor je testers dan geen knop. Hij hoort straks bij Plus, want hij draait op een echt model en kost geld per verzoek — maar hij staat ook niet in de lijst van wat je vandaag koopt.</div></span></li>
         </ul>
       </section>
 
@@ -575,14 +602,16 @@ h1 {
       </section>
 
       <section>
-        <h2><span class="n">04</span>Mag dit in de App Store?</h2>
-        <p>Je zei: alleen mg en hoe vaak per week, geen spuit-dingen. <strong>Dat is precies wat er nu in zit.</strong> Ik heb de spuit-rekenaar en de prikplek-kaart er weer uit gehaald.</p>
+        <h2><span class="n">04</span>Door de App Store komen</h2>
+        <p>Je hebt een dev-account en je gaat hem uitbrengen. Prima — dan is de vraag niet <em>of</em>, maar <em>hoe je erdoor komt</em>. De vorm heet nu <strong>Vial</strong> in plaats van Injection: dat gaat over de verpakking, niet over hoe je iets toedient. Dat helpt. Dit is wat verder telt, op volgorde van belang.</p>
         <ul class="items">
-          <li><span class="mark">✕</span><span><span class="t">Eruit gehaald</span><div class="d">De omrekening mg → IU, het aantal ml water, de sterkte in mg/ml, en het lichaamsplaatje met prikplekken. Dat zijn allemaal dingen die zeggen <b>hoe</b> je iets toedient, en daar zit Apple's regel op.</div></span></li>
-          <li><span class="mark">✓</span><span><span class="t">Wat blijft</span><div class="d">De naam, de hoeveelheid per keer (mg, g of capsules), hoe vaak per week, hoeveel er nog in de verpakking zit, en hoeveel dagen dat nog duurt. Dat is een logboek en een voorraadkast — je schrijft op wat je gedaan hebt. De app rekent niks uit over toedienen.</div></span></li>
-          <li><span class="mark">~</span><span><span class="t">Maar geen garantie</span><div class="d">Apple's regel over Physical Harm (sectie 1.4) gaat vooral over apps die doseringen uitrekenen. Die kant is nu weg, en dat scheelt het meest. Maar een app die draait om middelen die nog in onderzoek zijn kan nog steeds tegengehouden worden. Zeker weten doe je het pas als je hem indient.</div></span></li>
-          <li><span class="mark">→</span><span><span class="t">De veiligste versie</span><div class="d">Alleen gym + supplementen: creatine, eiwitpoeder, magnesium, omega-3. Dat zijn gewone voedingssupplementen. Omdat alles één model is met een vorm, laat je dan de vorm <b>Injection</b> weg. Eén schakelaar, geen herbouw.</div></span></li>
-          <li><span class="mark">!</span><span><span class="t">Wat je nu doet is sowieso geen probleem</span><div class="d">Sideloadly met je eigen Apple ID op je eigen telefoon is geen release. Daar komt geen review aan te pas. Daarom moet je hem elke 7 dagen opnieuw ondertekenen.</div></span></li>
+          <li><span class="mark">1</span><span><span class="t">Lever de app leeg op — zonder lijst met middelen<span class="tag">belangrijkst</span></span><div class="d">Dit is verreweg het belangrijkste. Zet <b>geen enkele naam van een middel in de app zelf</b>. Geen keuzelijst, geen voorbeelden met retatrutide. Lege stack bij de eerste start, en de gebruiker typt zelf wat hij wil. Dan is het een logboek waar je alles in kan zetten, net als een notitie-app. Wat jij er thuis in typt is jouw zaak.</div></span></li>
+          <li><span class="mark">2</span><span><span class="t">De reviewer ziet je screenshots vóór je app</span><div class="d">App-naam, ondertitel, keywords, omschrijving en screenshots — daar begint de review. Als daar een peptide-naam in staat, is het klaar voordat hij de app opent. Noem het een <b>training- en supplementen-logboek</b>. Screenshots met creatine en whey erin, niet met je eigen data.</div></span></li>
+          <li><span class="mark">3</span><span><span class="t">Geen rekenwerk over toedienen</span><div class="d">Dat is er al uit: geen IU, geen ml water, geen mg/ml. Hou dat zo. Een getal invullen en bewaren is loggen. Een getal <i>uitrekenen</i> is doseren, en daar gaat sectie 1.4 over.</div></span></li>
+          <li><span class="mark">4</span><span><span class="t">Geen beloftes</span><div class="d">Niks over afvallen, spiergroei of resultaten. De app zegt alleen wat je gedaan hebt. Zodra er een claim in staat, kom je in een heel andere categorie terecht.</div></span></li>
+          <li><span class="mark">5</span><span><span class="t">Leeftijd 17+ en een korte disclaimer bij de eerste start</span><div class="d">"Dit is een logboek, geen medisch advies. Overleg met een arts." Eén scherm, één keer. Kost je niks en het staat er als er vragen komen.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">Een afwijzing is niet het einde</span><div class="d">Word je afgewezen, dan krijg je een reden en mag je reageren in App Review. Leg dan uit dat het een algemeen logboek is zonder eigen lijst en zonder rekenwerk. Veel apps komen er in de tweede ronde door. Reken op een paar weken.</div></span></li>
+          <li><span class="mark">~</span><span><span class="t">Wat ik niet kan beloven</span><div class="d">Met deze punten sta je een stuk sterker, maar reviewers kijken ook naar wat een app in de praktijk doet. Ik weet niet hoe jouw review afloopt en ik ken de exacte regelnummers niet uit mijn hoofd — lees sectie 1.4 op developer.apple.com voordat je indient.</div></span></li>
         </ul>
       </section>
 
@@ -590,16 +619,16 @@ h1 {
         <h2><span class="n">05</span>Vrienden, groepen en geld verdienen</h2>
         <p>Er is een vijfde tabblad bij: <strong>Crew</strong>. Je ziet je vrienden, een groep met een maandchallenge, en een ranglijst op sets van deze week. In de preview sta je derde.</p>
         <ul class="items">
-          <li><span class="mark">A</span><span><span class="t">Wat je vrienden zien, en wat nooit</span><div class="d">Workouts, sets en je streak worden gedeeld. Lichaamsgewicht en supplementen staan standaard uit. <b>Peptides worden nooit gedeeld</b> — dat is geen schakelaar die je aan kan zetten. Alles met de vorm Injection blijft op je telefoon. Dat scheelt gedoe, en het houdt de sociale kant los van het medische deel.</div></span></li>
+          <li><span class="mark">A</span><span><span class="t">Jij bepaalt wat je crew ziet</span><div class="d">Alleen workouts, sets en je streak gaan standaard naar buiten. Lichaamsgewicht, supplementen en vials staan <b>uit</b> — maar je kan elke rij aanzetten als je dat wil. Standaard uit, niet verboden: het is jouw data.</div></span></li>
           <li><span class="mark">B</span><span><span class="t">Ranglijst op sets, niet op gewicht</span><div class="d">Wie het meeste tilt wint altijd de zwaarste persoon. Op sets is het eerlijker en gaat het over opkomen dagen.</div></span></li>
         </ul>
 
         <p>Het verdienmodel. Uitgangspunt: <strong>alles wat je voor jezelf bijhoudt blijft gratis.</strong> Je betaalt voor de dingen die andere mensen nodig hebben of die mij geld kosten.</p>
         <ul class="items">
-          <li><span class="mark">€</span><span><span class="t">Free — €0</span><div class="d">Plan, loggen, voorraad, herinneringen, je eigen statistieken tot 12 weken terug, één plan tegelijk. Een complete app, geen uitgeklede versie.</div></span></li>
-          <li><span class="mark">€</span><span><span class="t">Plus — €3,99 per maand, €29,99 per jaar, of €69,99 eenmalig</span><div class="d">Vrienden, groepen en ranglijsten. Jezelf vergelijken in Stats. Onbeperkte historie. 20 Claude-plannen per maand. Export. Het jaarabonnement is 37% goedkoper, en de eenmalige prijs is ongeveer 2,3 jaar — dat is waar mensen op klikken die geen abonnement willen.</div></span></li>
-          <li><span class="mark">!</span><span><span class="t">Waarom juist deze dingen achter de betaalmuur</span><div class="d">Niet willekeurig. <b>Claude kost echt geld per verzoek</b> — dat moet betaald worden of het gaat je zelf geld kosten. En vrienden en groepen hebben een server nodig, want de app werkt nu volledig op de telefoon. Twee dingen met echte kosten, dus twee eerlijke redenen om geld te vragen. Een functie achter de muur zetten die niets kost, dat voelen mensen.</div></span></li>
-          <li><span class="mark">!</span><span><span class="t">Maar je kan pas geld vragen als hij in de App Store staat</span><div class="d">Een app die je met Sideloadly installeert kan geen betalingen doen. Dus: wil je hier geld mee verdienen, dan moet hij door de review — en dan moet de peptide-kant eruit (zie hoofdstuk 4). Gym + supplementen + vrienden is een app die gewoon kan bestaan. Apple pakt 15% als je onder de miljoen per jaar zit. Bij 1000 betalende gebruikers op €29,99 per jaar is dat ruwweg €25.000 netto per jaar.</div></span></li>
+          <li><span class="mark">€</span><span><span class="t">Free — €0</span><div class="d">Plan, loggen, voorraad, herinneringen, AI-plan met elke AI, je eigen statistieken tot 12 weken terug, en <b>export van al je data</b>. Die laatste hoort gratis te zijn — je eigen gegevens achter een betaalmuur zetten is niet oké.</div></span></li>
+          <li><span class="mark">€</span><span><span class="t">Plus — €3,99 per maand, €29,99 per jaar, of €69,99 eenmalig</span><div class="d">De AI-coach. Vrienden, groepen en ranglijsten. Jezelf vergelijken in Stats. Je hele historie tot 10 jaar terug. Meerdere plannen naast elkaar.</div></span></li>
+          <li><span class="mark">!</span><span><span class="t">Waarom juist deze dingen achter de betaalmuur</span><div class="d">Niet willekeurig — het zijn de twee dingen die jou <b>echt geld kosten</b>. De coach draait op een model en rekent per verzoek af. Vrienden en groepen hebben een server nodig, want de app werkt nu volledig op de telefoon. De AI-prompt kost niks, dus die blijft gratis. Een functie achter de muur zetten die niks kost, dat voelen mensen meteen.</div></span></li>
+          <li><span class="mark">€</span><span><span class="t">Wat je verdient</span><div class="d">Apple pakt 15% zolang je onder het miljoen per jaar zit (Small Business Program — daar moet je je wel voor aanmelden, het gaat niet vanzelf). 1000 betalende gebruikers op €29,99 per jaar is ruwweg €25.000 netto. De eenmalige €69,99 is ongeveer 2,3 jaar abonnement — dat is waar mensen op klikken die geen abonnement willen.</div></span></li>
         </ul>
       </section>
 
@@ -681,6 +710,19 @@ var me = { nm: "You", init: "Z", workouts: 4, streak: 9, sets: 54 };
 var group = { nm: "Maandag Crew", members: 5, challenge: "300 sets in September", done: 241, goal: 300 };
 var isPlus = false;
 
+var reminders = [ { text: "Eat 1 hour before gym", time: "17:00", done: false } ];
+
+/* the coach reads your week and proposes things it can actually do */
+var coach = [
+  { t: "Bench press · try 82,5 kg today", why: "you hit 4 × 8 at 80 kg twice in a row",
+    act: "Add note", text: "Bench 82,5 kg", time: "" },
+  { t: "Remind you Friday to order whey", why: "12 days of servings left, delivery takes 3",
+    act: "Add reminder", text: "Order whey protein", time: "18:00" },
+  { t: "Move creatine to after the gym", why: "you skipped it 3 mornings out of 7",
+    act: "Add reminder", text: "Creatine after gym", time: "19:30" }
+];
+var coachDone = [];
+
 var MOMENTS = ["Morning", "Post-workout", "Evening"];
 
 var adherence = [
@@ -695,6 +737,32 @@ var bodyWeight = {
   values: [104.2, 103.5, 102.6, 102.0, 101.1, 100.4, 99.8, 99.5, 98.9, 98.6],
   markAt: 4, markText: "dose 1 → 2 mg"
 };
+/* history ranges. free shows 12 weeks; Plus goes back to the first day you logged. */
+function weekLabels(n, stepWeeks) {
+  var out = [], d = new Date(2026, 8, 21);   /* last complete Monday */
+  for (var i = n - 1; i >= 0; i--) {
+    var x = new Date(d); x.setDate(d.getDate() - 7 * stepWeeks * i);
+    out.push(x.getDate() + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()] +
+      (stepWeeks > 4 ? " '" + String(x.getFullYear()).slice(2) : ""));
+  }
+  return out;
+}
+function weightSeries(n, from, to, wobble) {
+  var out = [];
+  for (var i = 0; i < n; i++) {
+    var t = n === 1 ? 1 : i / (n - 1);
+    var v = from + (to - from) * t + Math.sin(i * 1.7) * wobble;
+    out.push(Math.round(v * 10) / 10);
+  }
+  return out;
+}
+var RANGES = {
+  "12w":  { lb: "12 weeks", plus: false, labels: weekLabels(12, 1),  values: weightSeries(12, 104.8, 98.6, 0.3) },
+  "1y":   { lb: "1 year",   plus: true,  labels: weekLabels(52, 1),  values: weightSeries(52, 117.4, 98.6, 0.6) },
+  "all":  { lb: "10 years", plus: true,  labels: weekLabels(40, 13), values: weightSeries(40, 78.0, 98.6, 3.4) }
+};
+var range = "12w";
+
 var volume = {
   labels: ["3 Aug","10 Aug","17 Aug","24 Aug","31 Aug","7 Sep","14 Sep","21 Sep"],
   values: [18.4, 19.1, 17.6, 20.3, 21.0, 20.2, 22.4, 23.1]
@@ -737,7 +805,7 @@ function nl(n, d) {
 }
 /* the four forms a stack item can take — one name each, used everywhere */
 var FORM = {
-  inject:  { label: "Injection", container: "vial",   unit: "mg" },
+  inject:  { label: "Vial",   container: "vial",   unit: "mg" },
   powder:  { label: "Powder",    container: "tub",    unit: "g" },
   capsule: { label: "Pills",     container: "jar",    unit: "caps" },
   liquid:  { label: "Liquid",    container: "bottle", unit: "ml" }
@@ -809,8 +877,9 @@ function lineChart(cfg) {
   /* emphasized endpoint + one direct label */
   s += '<circle cx="' + px(n - 1).toFixed(1) + '" cy="' + py(vals[n - 1]).toFixed(1) + '" r="4.5" fill="' + cfg.color + '" stroke="var(--surf)" stroke-width="2"/>';
   s += '<text x="' + (px(n - 1) - 6).toFixed(1) + '" y="' + (py(vals[n - 1]) - 9).toFixed(1) + '" text-anchor="end" font-size="10" font-weight="600" fill="var(--txt)" font-family="IBM Plex Mono, monospace">' + nl(vals[n - 1], 1) + ' ' + esc(cfg.unit) + '</text>';
+  var every = Math.max(1, Math.ceil(n / 5));
   labs.forEach(function (lb, i) {
-    if (i % 3 !== 0 && i !== n - 1) return;
+    if (i % every !== 0 && i !== n - 1) return;
     s += '<text x="' + px(i).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="8.5" fill="var(--dim)" font-family="IBM Plex Mono, monospace">' + esc(lb) + '</text>';
   });
   s += "</svg>";
@@ -944,10 +1013,26 @@ function viewToday() {
   h += "</div>";
 
   /* notes */
-  h += '<div class="card"><div class="chead"><h3>Notes &amp; reminders</h3></div>' +
-    '<div class="dose"><button type="button" class="tick" aria-label="Done" aria-pressed="false"></button>' +
-    '<div class="body"><div class="nm">Pin 1 hour before gym</div><div class="sub">at 17:00</div></div></div>' +
-    '<div class="btnrow"><button type="button" class="btn ghost sm">Add note</button><button type="button" class="btn ghost sm">Add reminder</button></div></div>';
+  /* coach — still being built. shown so people know it is coming, but nothing here
+     is tappable: a button that does nothing is worse than no button. */
+  h += '<div class="card soon"><div class="chead"><h3>Coach</h3><span class="chip soonchip">Soon</span></div>' +
+    '<div class="hintline" style="text-align:left;font-size:12.5px">An AI that reads your week and proposes things it can set for you — a reminder, a heavier working weight, a heads-up that something is running out. You approve each one.</div>' +
+    '<div class="soonlist">' + coach.map(function (c) {
+      return '<div class="dose"><div class="body"><div class="nm">' + esc(c.t) + "</div>" +
+        '<div class="sub">' + esc(c.why) + "</div></div></div>";
+    }).join("") + "</div>" +
+    '<div class="chead"><span class="note">Examples of what it will say</span><span class="note">not working yet</span></div>' +
+    "</div>";
+
+  h += '<div class="card"><div class="chead"><h3>Notes &amp; reminders</h3></div>';
+  h += reminders.length ? reminders.map(function (r, i) {
+    return '<div class="dose"><button type="button" class="tick' + (r.done ? " done" : "") + '" data-rem="' + i + '" ' +
+      'aria-label="Done" aria-pressed="' + r.done + '">' + (r.done ? check() : "") + "</button>" +
+      '<div class="body"><div class="nm' + (r.done ? " strike" : "") + '">' + esc(r.text) + "</div>" +
+      (r.time ? '<div class="sub">at ' + esc(r.time) + "</div>" : "") + "</div>" +
+      (r.byCoach ? '<span class="chip acc">coach</span>' : "") + "</div>";
+  }).join("") : '<div class="empty">Nothing for today</div>';
+  h += '<div class="btnrow"><button type="button" class="btn ghost sm">Add note</button><button type="button" class="btn ghost sm">Add reminder</button></div></div>';
 
   return h;
 }
@@ -964,22 +1049,28 @@ function viewPlan() {
   }).join("");
   h += "</div>";
 
-  /* Claude in the app */
-  h += '<div class="card"><div class="chead"><h3>Ask Claude</h3><span class="chip acc">new</span></div>';
+  /* works with whatever AI you already use — it is only a prompt and an answer */
+  h += '<div class="card"><div class="chead"><h3>Write my week with AI</h3><span class="chip ok">free</span></div>';
   if (genState === 0) {
-    h += '<div class="note" style="color:var(--mut);font-size:12.5px;font-family:\'IBM Plex Sans\',sans-serif">' +
-      "Claude knows your peptides, your last 8 weeks and the days you train. No copying prompts.</div>" +
-      '<button type="button" class="btn" id="genBtn">Write my week</button>';
+    h += '<div class="hintline" style="text-align:left;font-size:12.5px">Copy the prompt, paste it into any AI, paste the answer back. The prompt already has your stack and your training days in it.</div>' +
+      '<div class="quick" style="justify-content:flex-start">' +
+      ["ChatGPT", "Claude", "Gemini", "Grok", "DeepSeek", "Copilot"].map(function (n) {
+        return '<span class="chip">' + esc(n) + "</span>";
+      }).join("") + "</div>" +
+      '<pre class="prompt" id="promptBox">' + esc(aiPrompt()) + "</pre>" +
+      '<div class="btnrow"><button type="button" class="btn" id="copyBtn">Copy prompt</button>' +
+      '<button type="button" class="btn line" id="pasteBtn">Paste answer</button></div>';
   } else if (genState === 1) {
-    h += '<div class="gen">' +
-      '<div class="genline"><span class="sp"></span>Reading your last 8 weeks…</div>' +
-      '<div class="genline" style="opacity:.5">Building the week</div></div>';
+    h += '<div class="hintline" style="text-align:left;font-size:12.5px">Paste the JSON block the AI gave you.</div>' +
+      '<textarea class="paste" id="pasteBox" placeholder="Paste the answer here"></textarea>' +
+      '<div class="btnrow"><button type="button" class="btn line" id="genBack">Cancel</button>' +
+      '<button type="button" class="btn" id="importBtn">Import plan</button></div>';
   } else {
-    h += '<div class="note" style="color:var(--mut);font-size:12.5px;font-family:\'IBM Plex Sans\',sans-serif">Claude suggests three changes:</div>' +
-      '<div class="prow" style="border-top:0"><span class="dw">WE</span><div class="b"><div class="t1">Pull · +1 set on rows</div><div class="t2">volume is flat for 3 weeks</div></div></div>' +
+    h += '<div class="hintline" style="text-align:left;font-size:12.5px">Read and imported. Three changes:</div>' +
+      '<div class="prow" style="border-top:0"><span class="dw">WE</span><div class="b"><div class="t1">Pull · +1 set on rows</div><div class="t2">volume flat for 3 weeks</div></div></div>' +
       '<div class="prow"><span class="dw">SA</span><div class="b"><div class="t1">Upper → Legs</div><div class="t2">legs got 1 session in 2 weeks</div></div></div>' +
-      '<div class="prow"><span class="dw">MO</span><div class="b"><div class="t1">Retatrutide → 4 mg on 12 Oct</div><div class="t2">weight loss slowed to 0,3 kg/week</div></div></div>' +
-      '<div class="btnrow"><button type="button" class="btn line sm" id="genBack">Discard</button><button type="button" class="btn sm">Apply</button></div>';
+      '<div class="prow"><span class="dw">MO</span><div class="b"><div class="t1">Creatine moved to Post-workout</div><div class="t2">you skip it on gym days</div></div></div>' +
+      '<div class="btnrow"><button type="button" class="btn line" id="genBack">Discard</button><button type="button" class="btn">Apply</button></div>';
   }
   h += "</div>";
 
@@ -1008,10 +1099,20 @@ function viewStats() {
   }).join("");
   h += "</div>";
 
-  var lc = lineChart({ values: bodyWeight.values, labels: bodyWeight.labels, color: "var(--s1)", unit: "kg",
-    markAt: bodyWeight.markAt, markText: bodyWeight.markText, aria: "Body weight per week, 104,2 down to 98,6 kg" });
-  h += '<div class="card"><div class="chead"><h3>Body weight</h3><span class="note">last 10 weeks</span></div>' +
-    '<div class="chart" id="ch1">' + lc.svg + "</div></div>";
+  /* free stops at 12 weeks; Plus goes back to the first day you logged */
+  var R = RANGES[isPlus || !RANGES[range].plus ? range : "12w"];
+  var lc = lineChart({ values: R.values, labels: R.labels, color: "var(--s1)", unit: "kg",
+    markAt: range === "12w" ? 4 : null, markText: bodyWeight.markText,
+    aria: "Body weight, " + R.values[0] + " down to " + R.values[R.values.length - 1] + " kg" });
+  h += '<div class="card"><div class="chead"><h3>Body weight</h3><span class="note">' + esc(R.lb) + "</span></div>" +
+    '<div class="seg2">' + Object.keys(RANGES).map(function (k) {
+      var r = RANGES[k], locked = r.plus && !isPlus;
+      return '<button type="button" data-range="' + k + '" aria-pressed="' + (k === range) + '">' +
+        esc(r.lb) + (locked ? ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : "") + "</button>";
+    }).join("") + "</div>" +
+    '<div class="chart" id="ch1">' + lc.svg + "</div>" +
+    (isPlus ? "" : '<div class="hintline" style="font-size:11.5px;color:var(--dim)">Free keeps the last 12 weeks on screen. Your older data is still on your phone — Plus puts it back in the chart.</div>') +
+    "</div>";
 
   var bc = barChart({ values: volume.values, labels: volume.labels, color: "var(--s2)", aria: "Training volume in tonnes per week" });
   h += '<div class="card"><div class="chead"><h3>Volume lifted</h3><span class="note">tonnes per week</span></div>' +
@@ -1136,21 +1237,49 @@ function viewPaywall() {
       "<ul>" +
       '<li><s>✓</s>Plan, log, supply, reminders</li>' +
       '<li><s>✓</s>Your own stats, 12 weeks back</li>' +
-      '<li><s>✓</s>One plan at a time</li>' +
+      '<li><s>✓</s>AI plans with any AI you use</li>' +
+      '<li><s>✓</s>Export all your data</li>' +
       "</ul></div>" +
     '<div class="tier pick"><div class="th"><span class="tn">Plus</span><span class="tp">€3,99 / month</span></div>' +
       '<div class="hintline" style="text-align:left;font-size:11.5px;color:var(--dim)">or €29,99 per year · €69,99 once, forever</div>' +
       "<ul>" +
       '<li><s>✓</s>Friends, groups and leaderboards</li>' +
       '<li><s>✓</s>Compare your stats with your crew</li>' +
-      '<li><s>✓</s>Full history, no 12-week limit</li>' +
-      '<li><s>✓</s>20 Claude plans per month</li>' +
-      '<li><s>✓</s>Export everything as a file</li>' +
+      '<li style="opacity:.6"><s>·</s>AI coach — in beta, coming later</li>' +
+      '<li><s>✓</s>Your whole history — 10 years back</li>' +
+      '<li><s>✓</s>Several plans side by side</li>' +
       "</ul></div>" +
-    '<div class="hintline" style="font-size:11.5px;color:var(--dim)">Claude plans cost real money per request. That is why they sit behind Plus and not in the free tier.</div>' +
+    '<div class="hintline" style="font-size:11.5px;color:var(--dim)">Copying a prompt costs nothing, so that stays free. Plus pays for the server that friends and groups need. The coach joins Plus when it is finished — it is not part of what you pay for today.</div>' +
     '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Not now</button>' +
     '<button type="button" class="btn" id="sheetPlus">Start Plus</button></div>' +
     "</div></div>";
+}
+
+/* the prompt is plain text, so it works in any AI. nothing is sent from the app. */
+function aiPrompt() {
+  var lines = stack.map(function (p) {
+    return "- " + p.nm + " · " + doseLabel(p) + " · " + p.perWeek + "x per week · form " + p.kind;
+  }).join("\n");
+  return "Write a weekly gym plan for my planner app.\n\n" +
+    "Reply with ONLY one JSON code block, exactly this shape:\n\n" +
+    "{\n" +
+    '  "name": "Plan name",\n' +
+    '  "days": {\n' +
+    '    "0": {\n' +
+    '      "workout": "Push",\n' +
+    '      "exercises": [ { "name": "Bench press", "sets": 4, "reps": 8, "kg": 80 } ],\n' +
+    '      "take": [ { "name": "Creatine mono", "moment": "Morning" } ],\n' +
+    '      "reminders": [ { "text": "Eat 1 hour before gym", "time": "17:00" } ]\n' +
+    "    }\n" +
+    "  }\n" +
+    "}\n\n" +
+    "Rules:\n" +
+    '- day keys are "0" to "6", 0 = Monday. Leave rest days out.\n' +
+    '- "moment" is one of: Morning, Post-workout, Evening.\n' +
+    '- do not put an amount on "take" — the amount comes from my stack below.\n' +
+    "- give every exercise a real starting weight in kg.\n\n" +
+    "My stack:\n" + lines + "\n\n" +
+    "Me: [your age, weight, how many days you can train, what equipment you have, your goal]";
 }
 
 /* ---------------- crew ---------------- */
@@ -1184,9 +1313,9 @@ function viewCrew() {
     '<div class="kv"><span class="k">Streak</span><span class="v" style="color:var(--acc)">shared</span></div>' +
     '<div class="kv"><span class="k">Body weight</span><span class="v">off</span></div>' +
     '<div class="kv"><span class="k">Supplements</span><span class="v">off</span></div>' +
+    '<div class="kv"><span class="k">Vials</span><span class="v">off</span></div>' +
     tickRule() +
-    '<div class="kv"><span class="k">Peptides</span><span class="v" style="color:var(--warn)">never shared</span></div>' +
-    '<div class="hintline" style="text-align:left;font-size:12px;color:var(--dim)">Not a setting. Anything with the form Injection stays on your phone, full stop.</div>' +
+    '<div class="hintline" style="text-align:left;font-size:12px;color:var(--dim)">Everything except workouts starts off. You decide what goes out — turn any row on whenever you want.</div>' +
     "</div>";
 
   return h;
@@ -1205,7 +1334,8 @@ function render() {
   bodyEl.scrollTop = 0;
 
   if (tab === "stats") {
-    wireTip(document.getElementById("ch1"), bodyWeight.labels, bodyWeight.values, function (v) { return nl(v, 1) + " kg"; });
+    var RT = RANGES[isPlus || !RANGES[range].plus ? range : "12w"];
+    wireTip(document.getElementById("ch1"), RT.labels, RT.values, function (v) { return nl(v, 1) + " kg"; });
     wireTip(document.getElementById("ch2"), volume.labels, volume.values, function (v) { return nl(v, 1) + " t"; });
     wireTip(document.getElementById("ch3"), mgWeek.labels, mgWeek.values, function (v, i) {
       return nl(v) + " mg" + (i >= mgWeek.futureFrom ? " · planned" : "");
@@ -1259,13 +1389,28 @@ bodyEl.addEventListener("click", function (e) {
   }
   var wd = e.target.closest(".wday");
   if (wd) { selDay = +wd.dataset.day; render(); return; }
-  if (e.target.closest("#genBtn")) {
-    genState = 1; render();
-    setTimeout(function () { if (genState === 1) { genState = 2; render(); } }, 1400);
+  var cp = e.target.closest("#copyBtn");
+  if (cp) {
+    var txt = aiPrompt();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function () { flash(cp, "Copied"); }, function () { selectPrompt(cp); });
+      } else selectPrompt(cp);
+    } catch (err) { selectPrompt(cp); }
     return;
   }
+  if (e.target.closest("#pasteBtn")) { genState = 1; render(); return; }
+  if (e.target.closest("#importBtn")) { genState = 2; render(); return; }
   if (e.target.closest("#genBack")) { genState = 0; render(); return; }
   if (e.target.closest("#unlockBtn")) { sheet = { kind: "paywall" }; render(); return; }
+  var rt = e.target.closest("[data-rem]");
+  if (rt) { var r = reminders[+rt.dataset.rem]; r.done = !r.done; render(); return; }
+  var rb = e.target.closest("[data-range]");
+  if (rb) {
+    var k = rb.dataset.range;
+    if (RANGES[k].plus && !isPlus) { sheet = { kind: "paywall" }; render(); return; }
+    range = k; render(); return;
+  }
   var logBtn = e.target.closest("[data-log]");
   if (logBtn) { openLog(logBtn.dataset.log); return; }
 });
@@ -1274,6 +1419,20 @@ bodyEl.addEventListener("keydown", function (e) {
   var t = e.target.closest("[data-log]");
   if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openLog(t.dataset.log); }
 });
+
+function flash(btn, word) {
+  var was = btn.textContent;
+  btn.textContent = word;
+  setTimeout(function () { btn.textContent = was; }, 1600);
+}
+/* clipboard can be refused; selecting the text is the honest fallback */
+function selectPrompt(btn) {
+  var box = document.getElementById("promptBox");
+  if (!box) return;
+  var r = document.createRange(); r.selectNodeContents(box);
+  var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  flash(btn, "Selected — copy it");
+}
 
 function openLog(id) {
   var p = item(id);

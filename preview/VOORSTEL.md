@@ -31,7 +31,7 @@ vial-ringetje met hoeveel mg er nog in zit. Dat is doordacht.
 | Knoppen | ✕ en tekstknopjes ± 20 px | alles minimaal 44 × 44 px (richtlijn van Apple) |
 | Contrast | `--dim: #6a6a6a` haalt geen 4,5:1 | grijzen opnieuw gekozen |
 | Thema | alleen donker | donker én licht |
-| Wat je inneemt | alleen peptides (vial + mg) | vier vormen: Injection, Powder, Pills, Liquid |
+| Wat je inneemt | alleen peptides (vial + mg) | vier vormen: Vial, Powder, Pills, Liquid |
 | Weekstrip | alleen het dagnummer | bolletjes: training gepland, dosis gepland, gedaan |
 
 ---
@@ -48,7 +48,7 @@ de rekensom.
 
 | Vorm | Verpakking | Hoeveelheid in |
 |---|---|---|
-| **Injection** | vial | mg |
+| **Vial** | vial | mg |
 | **Powder** | bus | g |
 | **Pills** | pot | capsules |
 | **Liquid** | flesje | ml |
@@ -76,9 +76,16 @@ zes dingen per dag neemt.
 3. **Lichaamsgewicht in een grafiek**, met een streepje waar je dosis omhoog ging.
    Bij retatrutide is dat precies wat je wil zien, en het staat nu nergens in de app.
 4. **Totaal getild per week** (gewicht × reps × sets).
-5. **Claude in de app.** Nu: prompt kopiëren, naar Claude, JSON terugplakken. De app
-   praat al met Claude voor de opslag, dus dit kan één knop zijn.
-6. **Waarschuwing als iets bijna op is** — onder 14 dagen wordt de kaart amber, met
+5. **AI-plan met elke AI, gratis.** De app maakt een prompt met jouw stack en
+   trainingsdagen erin. Die plak je in ChatGPT, Claude, Gemini, Grok — wat je gebruikt.
+   Antwoord terugplakken en klaar. Kost niks, dus gratis.
+6. **AI-coach — `Soon`, nog niet bruikbaar.** Leest straks je week en stelt dingen voor
+   die hij ook kan uitvoeren: een reminder zetten, een gewicht ophogen, waarschuwen dat
+   je whey op raakt. Jij tikt op de knop, hij doet het. Nooit uit zichzelf.
+   In de preview staat hij **uitgeschakeld** met een Soon-label en voorbeelden erbij —
+   er valt niks te tikken. Een knop die niks doet is verwarrender voor testers dan geen
+   knop. Hij staat daarom ook niet in de Plus-lijst van wat je vandaag koopt.
+7. **Waarschuwing als iets bijna op is** — onder 14 dagen wordt de kaart amber, met
    "bestel een nieuwe bus". Werkt voor vials, bussen en potten.
 
 ---
@@ -110,30 +117,35 @@ Deze zitten er nu echt in, los van het design.
 
 ---
 
-## 4. Mag dit in de App Store?
+## 4. Door de App Store komen
 
-Je wilde alleen mg en hoe vaak per week, geen spuit-dingen. Dat is nu zo.
+Je hebt een dev-account en je gaat hem uitbrengen. Dan is de vraag niet *of*, maar
+*hoe je erdoor komt*. De vorm heet nu **Vial** in plaats van Injection — dat gaat over
+de verpakking, niet over hoe je iets toedient. Dat helpt.
 
-**Eruit gehaald:** de omrekening mg → IU, het aantal ml water, de sterkte in mg/ml, en
-het lichaamsplaatje met prikplekken. Dat zijn allemaal dingen die zeggen *hoe* je iets
-toedient, en daar zit Apple's regel op (App Review Guidelines, sectie 1.4, Physical
-Harm — apps die doseringen uitrekenen moeten van een erkende instelling komen).
+Op volgorde van belang:
 
-**Wat blijft:** naam, hoeveelheid per keer, hoe vaak per week, hoeveel er nog in de
-verpakking zit, en hoeveel dagen dat nog duurt. Dat is een logboek en een voorraadkast.
-Je schrijft op wat je gedaan hebt; de app rekent niks uit over toedienen.
+1. **Lever de app leeg op, zonder lijst met middelen.** Verreweg het belangrijkste.
+   Geen enkele naam van een middel in de app zelf, geen keuzelijst, geen voorbeelden
+   met retatrutide. Lege stack bij de eerste start; de gebruiker typt zelf wat hij wil.
+   Dan is het een logboek waar alles in kan, net als een notitie-app.
+2. **De reviewer ziet je screenshots vóór je app.** Naam, ondertitel, keywords,
+   omschrijving en screenshots — daar begint de review. Staat daar een peptide-naam in,
+   dan is het klaar voordat hij de app opent. Noem het een training- en
+   supplementen-logboek. Screenshots met creatine en whey, niet met je eigen data.
+3. **Geen rekenwerk over toedienen.** Is er al uit. Een getal invullen en bewaren is
+   loggen; een getal *uitrekenen* is doseren, en daar gaat sectie 1.4 over.
+4. **Geen beloftes.** Niks over afvallen of spiergroei. De app zegt alleen wat je
+   gedaan hebt.
+5. **17+ en een korte disclaimer bij de eerste start.** "Dit is een logboek, geen
+   medisch advies. Overleg met een arts." Eén scherm, één keer.
+6. **Een afwijzing is niet het einde.** Je krijgt een reden en mag reageren in App
+   Review. Leg dan uit dat het een algemeen logboek is zonder eigen lijst en zonder
+   rekenwerk. Veel apps komen er in de tweede ronde door.
 
-**Geen garantie.** De doseringskant is nu weg en dat scheelt het meest. Maar een app
-die draait om middelen die nog in onderzoek zijn kan nog steeds tegengehouden worden.
-Zeker weet je het pas als je hem indient. Ik ken de exacte regelnummers niet uit mijn
-hoofd en Apple verandert ze — lees sectie 1.4 op developer.apple.com.
-
-**De veiligste versie** is gym + supplementen, zonder de vorm `Injection`. Creatine,
-eiwitpoeder, magnesium en omega-3 zijn gewone voedingssupplementen. Omdat alles één
-model is, is dat een schakelaar en geen herbouw.
-
-**Wat je nu doet is sowieso geen probleem.** Sideloadly met je eigen Apple ID op je
-eigen telefoon is geen release, daar komt geen review aan te pas.
+Wat ik niet kan beloven: met deze punten sta je sterker, maar reviewers kijken ook naar
+wat een app in de praktijk doet. Ik ken de exacte regelnummers niet uit mijn hoofd en
+Apple verandert ze — lees sectie 1.4 op developer.apple.com voordat je indient.
 
 ---
 
@@ -148,8 +160,8 @@ van deze week.
   Op sets gaat het over opkomen dagen.
 - **Wat gedeeld wordt:** workouts, sets, streak. Lichaamsgewicht en supplementen staan
   standaard uit.
-- **Peptides worden nooit gedeeld.** Geen schakelaar. Alles met de vorm `Injection`
-  blijft op de telefoon. Dat houdt de sociale kant los van het medische deel.
+- **Vials staan standaard uit,** net als lichaamsgewicht en supplementen. Alleen workouts
+  staat standaard uit. Jij bepaalt wat er naar buiten gaat.
 
 ### Verdienmodel
 
@@ -160,28 +172,29 @@ andere mensen nodig heeft of wat geld kost om te draaien.
 |---|---|---|
 | Prijs | €0 | €3,99/mnd · €29,99/jaar · €69,99 eenmalig |
 | Plan, loggen, voorraad, herinneringen | ✓ | ✓ |
-| Eigen statistieken | 12 weken | onbeperkt |
+| AI-plan met elke AI | ✓ | ✓ |
+| Export van al je data | ✓ | ✓ |
+| Eigen statistieken | 12 weken | tot 10 jaar terug |
 | Plannen tegelijk | 1 | meerdere |
+| AI-coach | — | later (nu `Soon`) |
 | Vrienden, groepen, ranglijsten | — | ✓ |
 | Vergelijken in Stats | — | ✓ |
-| Claude-plannen | — | 20 per maand |
-| Export | — | ✓ |
+
+Export staat bewust in Free. Je eigen gegevens achter een betaalmuur zetten is niet oké.
 
 **Waarom juist deze dingen.** Niet willekeurig gekozen:
 
-- Claude kost echt geld per verzoek. Dat moet betaald worden, anders kost het jou geld.
-- Vrienden en groepen hebben een server nodig. De app werkt nu volledig op de telefoon.
+- **Vrienden en groepen** hebben een server nodig. De app werkt nu volledig op de telefoon.
+- **De AI-coach** gaat straks op een echt model draaien en rekent per verzoek af. Zodra
+  hij werkt hoort hij bij Plus — maar zolang hij `Soon` is verkoop je hem niet mee.
 
-Twee functies met echte kosten, dus twee eerlijke redenen om geld te vragen. Een
-functie achter de muur zetten die niks kost, dat voelen mensen.
+De AI-prompt kost niks, dus die blijft gratis. Een functie achter de muur zetten die
+jou niks kost, dat voelen mensen meteen.
 
-**Maar:** een app die je met Sideloadly installeert kan geen betalingen doen. Wil je
-hier geld mee verdienen, dan moet hij door de App Store review — en dan moet de
-peptide-kant eruit (hoofdstuk 4). Gym + supplementen + vrienden is een app die gewoon
-kan bestaan.
-
-Apple pakt 15% als je onder het miljoen per jaar zit. 1000 betalende gebruikers op
-€29,99 per jaar is ruwweg €25.000 netto.
+Apple pakt 15% zolang je onder het miljoen per jaar zit — daarvoor moet je je wel
+aanmelden voor het Small Business Program, dat gaat niet vanzelf. 1000 betalende
+gebruikers op €29,99 per jaar is ruwweg €25.000 netto. De eenmalige €69,99 is ongeveer
+2,3 jaar abonnement; dat is waar mensen op klikken die geen abonnement willen.
 
 ---
 
@@ -202,9 +215,9 @@ dit wil, bouw ik het in `app/index.html`, in stappen:
 
 1. Bugs uit hoofdstuk 3 (klein, geen risico)
 2. Peptides omzetten naar het bredere stack-model met vormen (je data blijft staan —
-   elke bestaande peptide wordt gewoon vorm `Injection`)
+   elke bestaande peptide wordt gewoon vorm `Vial`)
 3. Nieuwe kleuren + letters + grotere knoppen (design, data blijft gelijk)
 4. Set-tracking + rusttimer (grootste stuk)
 5. Gewichtsgrafiek en weekvolume
 6. Claude-knop in de app
-7. Crew + Plus (alleen als je er geld mee wil doen — dit heeft een server nodig)
+7. Crew + AI-coach + Plus (dit heeft een server nodig, dus als laatste)
