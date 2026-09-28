@@ -131,14 +131,14 @@ h1 {
 .sc-body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 22px; display: flex; flex-direction: column; gap: 13px; }
 
 .sc-tabs {
-  flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr);
+  flex: 0 0 auto; display: grid; grid-template-columns: repeat(5, 1fr);
   border-top: 1px solid var(--line); background: var(--surf);
   padding: 8px 6px calc(10px + env(safe-area-inset-bottom, 0px));
 }
 .sc-tabs button {
   border: 0; background: none; font: inherit; cursor: pointer; color: var(--dim);
   display: flex; flex-direction: column; align-items: center; gap: 4px;
-  font-size: 10.5px; font-weight: 600; letter-spacing: .02em; padding: 5px 0 3px; min-height: 46px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: .02em; padding: 5px 0 3px; min-height: 46px;
   border-radius: 12px;
 }
 .sc-tabs button[aria-current="true"] { color: var(--acc); }
@@ -309,6 +309,87 @@ h1 {
 @media (prefers-reduced-motion: no-preference) { .genline .sp { animation: spin .8s linear infinite; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* bottom sheet */
+.sheet { position: absolute; inset: 0; z-index: 5; display: flex; align-items: flex-end; background: rgba(0,0,0,.55); }
+.sheetcard {
+  width: 100%; background: var(--surf); border-top: 1px solid var(--line);
+  border-radius: 22px 22px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 14px; max-height: 92%; overflow-y: auto;
+}
+.sheetcard h3 { font-family: Archivo, sans-serif; font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -.015em; }
+.grab { width: 38px; height: 4px; border-radius: 2px; background: var(--line); align-self: center; }
+.stepper { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.stepper button {
+  width: 52px; height: 52px; min-width: 52px; border: 0; cursor: pointer; font: inherit;
+  border-radius: 17px; background: var(--raise); color: var(--txt);
+  font-family: Archivo, sans-serif; font-size: 24px; font-weight: 700; line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.stepper button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.stepper .val { text-align: center; min-width: 120px; }
+.stepper .val .n {
+  font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums; display: block; line-height: 1.05;
+}
+.stepper .val .u { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.quick { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; }
+.quick button {
+  font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; font-weight: 600; cursor: pointer;
+  border: 0; border-radius: 9px; background: var(--raise); color: var(--mut);
+  min-height: 38px; padding: 8px 13px; box-shadow: inset 0 0 0 1px var(--line);
+}
+.quick button[aria-pressed="true"] { background: var(--acc-soft); color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+.hintline { font-size: 12.5px; color: var(--mut); text-align: center; }
+.hintline b { color: var(--txt); font-weight: 600; }
+.field { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--raise); border-radius: 12px; padding: 10px 14px; }
+.field label { font-size: 13px; color: var(--mut); }
+.field input {
+  font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--txt);
+  background: none; border: 0; text-align: right; min-height: 26px; width: 110px;
+}
+.field input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 6px; }
+
+/* crew */
+.mate { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-top: 1px solid var(--line); }
+.mate:first-of-type { border-top: 0; }
+.av {
+  width: 36px; height: 36px; min-width: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-family: Archivo, sans-serif; font-weight: 800; font-size: 13px; color: var(--acc-ink); background: var(--acc);
+}
+.mate .b { flex: 1 1 auto; min-width: 0; }
+.mate .n1 { font-family: Archivo, sans-serif; font-weight: 700; font-size: 14px; }
+.mate .n2 { font-size: 11.5px; color: var(--dim); font-family: "IBM Plex Mono", monospace; }
+.rank { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--dim); width: 18px; flex: 0 0 auto; }
+.board { display: flex; flex-direction: column; gap: 8px; }
+.brow { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.brow .bn { flex: 0 0 74px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--mut); }
+.brow .bt { flex: 1 1 auto; height: 18px; border-radius: 5px; background: var(--raise); overflow: hidden; display: block; }
+.brow .bf { display: block; height: 100%; border-radius: 5px; background: var(--s2); }
+.brow.me .bf { background: var(--acc); }
+.brow .bv { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-variant-numeric: tabular-nums; width: 26px; text-align: right; }
+
+/* premium */
+.lockwrap { position: relative; }
+.lockblur { filter: blur(5px); opacity: .5; pointer-events: none; user-select: none; }
+.lockover {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  text-align: center; padding: 12px;
+}
+.lockover .lt { font-family: Archivo, sans-serif; font-weight: 700; font-size: 14px; }
+.plus {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 5px; background: var(--warn);
+  color: #14100a; white-space: nowrap;
+}
+.tier { border: 1px solid var(--line); border-radius: 15px; padding: 13px; display: flex; flex-direction: column; gap: 9px; }
+.tier.pick { border-color: var(--acc); background: var(--acc-soft); }
+.tier .th { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tier .tn { font-family: Archivo, sans-serif; font-weight: 800; font-size: 15px; }
+.tier .tp { font-family: "IBM Plex Mono", monospace; font-size: 13px; font-variant-numeric: tabular-nums; }
+.tier ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.tier li { font-size: 12.5px; color: var(--mut); display: grid; grid-template-columns: 15px 1fr; gap: 7px; }
+.tier li s { text-decoration: none; color: var(--acc); font-weight: 700; }
+
 /* charts */
 .chart { position: relative; }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -415,6 +496,8 @@ h1 {
 
           <div class="sc-body" id="scBody"></div>
 
+          <div id="sheetHost"></div>
+
           <div class="rest" id="rest" hidden>
             <span class="t" id="restT">1:30</span>
             <span class="lb">Rest · Bench press</span>
@@ -429,6 +512,8 @@ h1 {
               <svg width="21" height="21" viewBox="0 0 24 24"><path d="M6 6.5v11M18 6.5v11M3 9.5v5M21 9.5v5M6 12h12"/></svg>Plan</button>
             <button type="button" data-tab="stats" aria-current="false">
               <svg width="21" height="21" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Stats</button>
+            <button type="button" data-tab="crew" aria-current="false">
+              <svg width="21" height="21" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.5A4.5 4.5 0 0 1 7.5 14h3A4.5 4.5 0 0 1 15 18.5V20M16 5.3a3.2 3.2 0 0 1 0 5.4M18 14a4.5 4.5 0 0 1 3 4.2V20"/></svg>Crew</button>
             <button type="button" data-tab="supply" aria-current="false">
               <svg width="21" height="21" viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8zM4 4.5h16v3.5H4zM10 12h4"/></svg>Supply</button>
           </nav>
@@ -464,13 +549,14 @@ h1 {
             <b>Liquid</b> — flesje, ml<br>
             Verder hebben ze allemaal hetzelfde: hoeveel per keer, hoe vaak per week, en hoeveel er nog in zit. Daaruit rekent de app hoeveel dagen je nog hebt. Meer niet — zie hoofdstuk 4. Kijk bij het tabblad Supply.</div></span></li>
           <li><span class="mark">2</span><span><span class="t">Je dag op momenten, niet één lijst</span><div class="d">Morning, Post-workout, Evening. Creatine 's ochtends, whey na de training, magnesium 's avonds. Eén lange lijst werkt niet als je zes dingen per dag neemt.</div></span></li>
-          <li><span class="mark">3</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
-          <li><span class="mark">4</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
+          <li><span class="mark">3</span><span><span class="t">Log-scherm: voorgevuld, maar je kan het aanpassen<span class="tag">groot</span></span><div class="d">Je vroeg het: krijg je een scherm of staat het al ingevuld? <b>Allebei.</b> Het bedrag uit je plan staat er al, dus één tik is klaar. Wil je vandaag minder of meer, dan zet je het met − en + bij, of je tikt op Half of Double. Eronder staat: <i>"Just this once. Your plan stays at 2 mg per dose."</i> Wat je hier verandert geldt alleen voor die ene keer — je weekplan blijft staan. Tik op Log bij Supply om het te zien.</div></span></li>
+          <li><span class="mark">4</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
+          <li><span class="mark">5</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
           
-          <li><span class="mark">5</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
-          <li><span class="mark">6</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
-          <li><span class="mark">7</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
-          <li><span class="mark">8</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
+          <li><span class="mark">7</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
+          <li><span class="mark">8</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
+          <li><span class="mark">9</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
         </ul>
       </section>
 
@@ -501,7 +587,24 @@ h1 {
       </section>
 
       <section>
-        <h2><span class="n">05</span>Wat er niet verandert</h2>
+        <h2><span class="n">05</span>Vrienden, groepen en geld verdienen</h2>
+        <p>Er is een vijfde tabblad bij: <strong>Crew</strong>. Je ziet je vrienden, een groep met een maandchallenge, en een ranglijst op sets van deze week. In de preview sta je derde.</p>
+        <ul class="items">
+          <li><span class="mark">A</span><span><span class="t">Wat je vrienden zien, en wat nooit</span><div class="d">Workouts, sets en je streak worden gedeeld. Lichaamsgewicht en supplementen staan standaard uit. <b>Peptides worden nooit gedeeld</b> — dat is geen schakelaar die je aan kan zetten. Alles met de vorm Injection blijft op je telefoon. Dat scheelt gedoe, en het houdt de sociale kant los van het medische deel.</div></span></li>
+          <li><span class="mark">B</span><span><span class="t">Ranglijst op sets, niet op gewicht</span><div class="d">Wie het meeste tilt wint altijd de zwaarste persoon. Op sets is het eerlijker en gaat het over opkomen dagen.</div></span></li>
+        </ul>
+
+        <p>Het verdienmodel. Uitgangspunt: <strong>alles wat je voor jezelf bijhoudt blijft gratis.</strong> Je betaalt voor de dingen die andere mensen nodig hebben of die mij geld kosten.</p>
+        <ul class="items">
+          <li><span class="mark">€</span><span><span class="t">Free — €0</span><div class="d">Plan, loggen, voorraad, herinneringen, je eigen statistieken tot 12 weken terug, één plan tegelijk. Een complete app, geen uitgeklede versie.</div></span></li>
+          <li><span class="mark">€</span><span><span class="t">Plus — €3,99 per maand, €29,99 per jaar, of €69,99 eenmalig</span><div class="d">Vrienden, groepen en ranglijsten. Jezelf vergelijken in Stats. Onbeperkte historie. 20 Claude-plannen per maand. Export. Het jaarabonnement is 37% goedkoper, en de eenmalige prijs is ongeveer 2,3 jaar — dat is waar mensen op klikken die geen abonnement willen.</div></span></li>
+          <li><span class="mark">!</span><span><span class="t">Waarom juist deze dingen achter de betaalmuur</span><div class="d">Niet willekeurig. <b>Claude kost echt geld per verzoek</b> — dat moet betaald worden of het gaat je zelf geld kosten. En vrienden en groepen hebben een server nodig, want de app werkt nu volledig op de telefoon. Twee dingen met echte kosten, dus twee eerlijke redenen om geld te vragen. Een functie achter de muur zetten die niets kost, dat voelen mensen.</div></span></li>
+          <li><span class="mark">!</span><span><span class="t">Maar je kan pas geld vragen als hij in de App Store staat</span><div class="d">Een app die je met Sideloadly installeert kan geen betalingen doen. Dus: wil je hier geld mee verdienen, dan moet hij door de review — en dan moet de peptide-kant eruit (zie hoofdstuk 4). Gym + supplementen + vrienden is een app die gewoon kan bestaan. Apple pakt 15% als je onder de miljoen per jaar zit. Bij 1000 betalende gebruikers op €29,99 per jaar is dat ruwweg €25.000 netto per jaar.</div></span></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="n">06</span>Wat er niet verandert</h2>
         <ul class="items">
           <li><span class="mark">=</span><span><span class="t">Je data blijft staan</span><div class="d">Zelfde opslag, zelfde <code>gympep-state-v1</code>, zelfde cloud-sync. Een nieuwe versie leest je oude data gewoon.</div></span></li>
           <li><span class="mark">=</span><span><span class="t">Zelfde manier van installeren</span><div class="d">Nog steeds één <code>app/index.html</code>, nog steeds de GitHub Action die de ipa bouwt, nog steeds Sideloadly.</div></span></li>
@@ -568,6 +671,16 @@ var intake = [
   { id: "mag",   at: "22:00",     done: false }
 ];
 
+var crew = [
+  { nm: "Mo",     init: "M", workouts: 4, streak: 12, sets: 62 },
+  { nm: "Ayoub",  init: "A", workouts: 4, streak: 5,  sets: 58 },
+  { nm: "Jay",    init: "J", workouts: 3, streak: 21, sets: 47 },
+  { nm: "Sem",    init: "S", workouts: 2, streak: 2,  sets: 31 }
+];
+var me = { nm: "You", init: "Z", workouts: 4, streak: 9, sets: 54 };
+var group = { nm: "Maandag Crew", members: 5, challenge: "300 sets in September", done: 241, goal: 300 };
+var isPlus = false;
+
 var MOMENTS = ["Morning", "Post-workout", "Evening"];
 
 var adherence = [
@@ -611,6 +724,7 @@ var dayEl = document.getElementById("scDay");
 var tab = "today";
 var selDay = 0;
 var genState = 0; /* 0 idle, 1 generating, 2 proposal */
+var sheet = null;   /* null, {kind:"log", id, amount, at}, {kind:"paywall"} */
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -638,6 +752,13 @@ function servings(p) { return Math.floor(p.left / p.dose.n + 1e-9); }
 function daysLeft(p) { return Math.floor(servings(p) * 7 / p.perWeek); }
 function isLow(p) { return daysLeft(p) <= 14; }
 function doseLabel(p) { return nl(p.dose.n) + " " + p.dose.u; }
+/* how big one tap on + or − is, per unit */
+function stepFor(p) {
+  if (p.dose.u === "caps") return 1;
+  if (p.dose.u === "g") return 1;
+  return p.dose.n <= 1 ? 0.05 : 0.25;   /* mg */
+}
+function roundAmt(v) { return Math.round(v * 100) / 100; }
 
 function tickRule(w) {
   /* the syringe-gradation motif: a measured rule, used as a divider */
@@ -814,7 +935,7 @@ function viewToday() {
       var readout = '<span class="chip">' + esc(form(p).label) + "</span>";
       return '<div class="dose"><button type="button" class="tick' + (x.done ? " done" : "") + '" data-dose="' + i + '" ' +
         'aria-label="Log ' + esc(p.nm) + '" aria-pressed="' + x.done + '">' + (x.done ? check() : "") + "</button>" +
-        '<div class="body"><div class="nm' + (x.done ? " strike" : "") + '">' + esc(p.nm) + " · " + doseLabel(p) + "</div>" +
+        '<div class="body" data-log="' + p.id + '" role="button" tabindex="0"><div class="nm' + (x.done ? " strike" : "") + '">' + esc(p.nm) + " · " + doseLabel(p) + "</div>" +
         '<div class="sub">' + sub + "</div></div>" + readout + "</div>";
     }).join("");
   });
@@ -896,6 +1017,24 @@ function viewStats() {
   h += '<div class="card"><div class="chead"><h3>Volume lifted</h3><span class="note">tonnes per week</span></div>' +
     '<div class="chart" id="ch2">' + bc.svg + "</div></div>";
 
+  /* the social half of Stats — free to see it exists, Plus to read it */
+  var cBoard = crew.concat([me]).slice().sort(function (a, b) { return b.sets - a.sets; });
+  var cTop = cBoard[0].sets;
+  var cInner = '<div class="board">' + cBoard.map(function (m) {
+    var mine = m.nm === "You";
+    return '<div class="brow' + (mine ? " me" : "") + '"><span class="bn">' + esc(m.nm) + "</span>" +
+      '<span class="bt"><span class="bf" style="width:' + (m.sets / cTop * 100).toFixed(1) + '%"></span></span>' +
+      '<span class="bv">' + m.sets + "</span></div>";
+  }).join("") + "</div>";
+  h += '<div class="card"><div class="chead"><h3>You vs your crew</h3>' +
+    (isPlus ? '<span class="note">sets this week</span>' : '<span class="plus">Plus</span>') + "</div>" +
+    (isPlus ? cInner
+      : '<div class="lockwrap"><div class="lockblur">' + cInner + "</div>" +
+        '<div class="lockover"><span class="lt">See where you stand</span>' +
+        '<span class="note" style="font-size:12px;color:var(--mut)">Sets, streaks and volume next to your crew</span>' +
+        '<button type="button" class="btn sm" id="unlockBtn">See Plus</button></div></div>') +
+    "</div>";
+
   var mc = barChart({ values: mgWeek.values, labels: mgWeek.labels, color: "var(--s3)", futureFrom: mgWeek.futureFrom,
     aria: "Retatrutide mg per week, a titration staircase" });
   h += '<div class="card"><div class="chead"><h3>Retatrutide · mg per week</h3><span class="note">titration</span></div>' +
@@ -942,7 +1081,7 @@ function viewSupply() {
     }
     if (low) s += '<div class="exmeta" style="color:var(--warn)">Running out in ' + days + " days — order a new " + form(p).container + "</div>";
 
-    s += '<div class="btnrow"><button type="button" class="btn sm">Log</button>' +
+    s += '<div class="btnrow"><button type="button" class="btn sm" data-log="' + p.id + '">Log</button>' +
       '<button type="button" class="btn line sm">New ' + form(p).container + "</button></div></div>";
     return s;
   }).join("");
@@ -954,15 +1093,115 @@ function viewSupply() {
   return h;
 }
 
+/* ---------------- log sheet ---------------- */
+/* the amount is pre-filled from the plan, and you can change it for this one time.
+   changing it here never touches the plan — that is the whole point of the screen. */
+function viewSheet() {
+  if (!sheet) return "";
+  if (sheet.kind === "paywall") return viewPaywall();
+  var p = item(sheet.id);
+  var st = stepFor(p);
+  var planned = p.dose.n;
+  var changed = roundAmt(sheet.amount) !== planned;
+  var quick = [
+    { lb: "Planned " + nl(planned) + " " + p.dose.u, v: planned },
+    { lb: "Half " + nl(roundAmt(planned / 2)) + " " + p.dose.u, v: roundAmt(planned / 2) },
+    { lb: "Double " + nl(roundAmt(planned * 2)) + " " + p.dose.u, v: roundAmt(planned * 2) }
+  ];
+  return '<div class="sheet" id="sheet"><div class="sheetcard">' +
+    '<span class="grab"></span>' +
+    '<h3>Log ' + esc(p.nm) + "</h3>" +
+    '<div class="stepper">' +
+      '<button type="button" id="amtMinus" aria-label="Less">−</button>' +
+      '<span class="val"><span class="n">' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + '</span><span class="u">' + esc(p.dose.u) + "</span></span>" +
+      '<button type="button" id="amtPlus" aria-label="More">+</button></div>' +
+    '<div class="quick">' + quick.map(function (q, i) {
+      return '<button type="button" data-amt="' + q.v + '" aria-pressed="' + (roundAmt(sheet.amount) === q.v) + '">' + esc(q.lb) + "</button>";
+    }).join("") + "</div>" +
+    '<div class="field"><label for="logTime">Time</label><input id="logTime" type="time" value="' + esc(sheet.at) + '"></div>' +
+    '<div class="hintline">' + (changed
+      ? "Just this once. Your plan stays at <b>" + nl(planned) + " " + esc(p.dose.u) + "</b> per dose."
+      : "Taken from your plan. Change it above if today is different.") + "</div>" +
+    '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
+    '<button type="button" class="btn" id="sheetSave">Log ' + nl(sheet.amount, sheet.amount % 1 === 0 ? 0 : 2) + " " + esc(p.dose.u) + "</button></div>" +
+    "</div></div>";
+}
+
+function viewPaywall() {
+  return '<div class="sheet" id="sheet"><div class="sheetcard">' +
+    '<span class="grab"></span>' +
+    '<h3>Gym Planner Plus</h3>' +
+    '<div class="hintline" style="text-align:left">Everything you track for yourself stays free, forever. Plus is for the parts that need other people or cost money to run.</div>' +
+    '<div class="tier"><div class="th"><span class="tn">Free</span><span class="tp">€0</span></div>' +
+      "<ul>" +
+      '<li><s>✓</s>Plan, log, supply, reminders</li>' +
+      '<li><s>✓</s>Your own stats, 12 weeks back</li>' +
+      '<li><s>✓</s>One plan at a time</li>' +
+      "</ul></div>" +
+    '<div class="tier pick"><div class="th"><span class="tn">Plus</span><span class="tp">€3,99 / month</span></div>' +
+      '<div class="hintline" style="text-align:left;font-size:11.5px;color:var(--dim)">or €29,99 per year · €69,99 once, forever</div>' +
+      "<ul>" +
+      '<li><s>✓</s>Friends, groups and leaderboards</li>' +
+      '<li><s>✓</s>Compare your stats with your crew</li>' +
+      '<li><s>✓</s>Full history, no 12-week limit</li>' +
+      '<li><s>✓</s>20 Claude plans per month</li>' +
+      '<li><s>✓</s>Export everything as a file</li>' +
+      "</ul></div>" +
+    '<div class="hintline" style="font-size:11.5px;color:var(--dim)">Claude plans cost real money per request. That is why they sit behind Plus and not in the free tier.</div>' +
+    '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Not now</button>' +
+    '<button type="button" class="btn" id="sheetPlus">Start Plus</button></div>' +
+    "</div></div>";
+}
+
+/* ---------------- crew ---------------- */
+function viewCrew() {
+  var board = crew.concat([me]).slice().sort(function (a, b) { return b.sets - a.sets; });
+  var top = board[0].sets;
+  var h = "";
+
+  h += '<div class="card"><div class="chead"><h3>' + esc(group.nm) + '</h3><span class="chip">' + group.members + " members</span></div>" +
+    '<div class="hintline" style="text-align:left;font-size:12.5px">Challenge · ' + esc(group.challenge) + "</div>" +
+    '<div class="pr"><div class="track"><div class="fill" style="width:' + (group.done / group.goal * 100).toFixed(1) + '%"></div></div>' +
+    '<span class="pct">' + group.done + "/" + group.goal + "</span></div>" +
+    '<div class="board">' + board.map(function (m) {
+      var mine = m.nm === "You";
+      return '<div class="brow' + (mine ? " me" : "") + '"><span class="bn">' + esc(m.nm) + "</span>" +
+        '<span class="bt"><span class="bf" style="width:' + (m.sets / top * 100).toFixed(1) + '%"></span></span>' +
+        '<span class="bv">' + m.sets + "</span></div>";
+    }).join("") + "</div>" +
+    '<div class="chead"><span class="note">sets this week</span><span class="note">resets Monday</span></div></div>';
+
+  h += '<div class="card"><div class="chead"><h3>Your crew</h3><button type="button" class="btn ghost sm" style="flex:0 0 auto">+ Invite</button></div>';
+  h += crew.map(function (m) {
+    return '<div class="mate"><span class="av">' + esc(m.init) + "</span>" +
+      '<div class="b"><div class="n1">' + esc(m.nm) + '</div><div class="n2">' + m.workouts + " workouts · " + m.streak + " day streak</div></div>" +
+      '<span class="chip">' + m.sets + " sets</span></div>";
+  }).join("") + "</div>";
+
+  /* what leaves your phone — peptides never do */
+  h += '<div class="card"><div class="chead"><h3>What your crew sees</h3></div>' +
+    '<div class="kv"><span class="k">Workouts and sets</span><span class="v" style="color:var(--acc)">shared</span></div>' +
+    '<div class="kv"><span class="k">Streak</span><span class="v" style="color:var(--acc)">shared</span></div>' +
+    '<div class="kv"><span class="k">Body weight</span><span class="v">off</span></div>' +
+    '<div class="kv"><span class="k">Supplements</span><span class="v">off</span></div>' +
+    tickRule() +
+    '<div class="kv"><span class="k">Peptides</span><span class="v" style="color:var(--warn)">never shared</span></div>' +
+    '<div class="hintline" style="text-align:left;font-size:12px;color:var(--dim)">Not a setting. Anything with the form Injection stays on your phone, full stop.</div>' +
+    "</div>";
+
+  return h;
+}
+
 /* ---------------- render ---------------- */
-var TITLES = { today: ["Today", "Monday"], plan: ["Plan", "Weekly"], stats: ["Stats", "Progress"], supply: ["Supply", "Stack"] };
+var TITLES = { today: ["Today", "Monday"], plan: ["Plan", "Weekly"], stats: ["Stats", "Progress"], crew: ["Crew", "Together"], supply: ["Supply", "Stack"] };
 
 function render() {
   var t = TITLES[tab];
   titleEl.textContent = t[0];
   subEl.textContent = t[1];
   dayEl.textContent = tab === "today" ? TODAY.d : "";
-  bodyEl.innerHTML = tab === "today" ? viewToday() : tab === "plan" ? viewPlan() : tab === "stats" ? viewStats() : viewSupply();
+  bodyEl.innerHTML = tab === "today" ? viewToday() : tab === "plan" ? viewPlan() : tab === "stats" ? viewStats() : tab === "crew" ? viewCrew() : viewSupply();
+  sheetEl.innerHTML = viewSheet();
   bodyEl.scrollTop = 0;
 
   if (tab === "stats") {
@@ -978,6 +1217,7 @@ function render() {
 }
 
 /* ---------------- rest timer ---------------- */
+var sheetEl = document.getElementById("sheetHost");
 var restEl = document.getElementById("rest");
 var restTEl = document.getElementById("restT");
 var restLeft = 0, restTimer = null;
@@ -1025,6 +1265,43 @@ bodyEl.addEventListener("click", function (e) {
     return;
   }
   if (e.target.closest("#genBack")) { genState = 0; render(); return; }
+  if (e.target.closest("#unlockBtn")) { sheet = { kind: "paywall" }; render(); return; }
+  var logBtn = e.target.closest("[data-log]");
+  if (logBtn) { openLog(logBtn.dataset.log); return; }
+});
+
+bodyEl.addEventListener("keydown", function (e) {
+  var t = e.target.closest("[data-log]");
+  if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openLog(t.dataset.log); }
+});
+
+function openLog(id) {
+  var p = item(id);
+  if (!p) return;
+  sheet = { kind: "log", id: id, amount: p.dose.n, at: new Date().toTimeString().slice(0, 5) };
+  render();
+}
+
+sheetEl.addEventListener("click", function (e) {
+  if (e.target.id === "sheet" || e.target.closest("#sheetCancel")) { sheet = null; render(); return; }
+  if (e.target.closest("#sheetPlus")) { isPlus = true; sheet = null; render(); return; }
+  if (!sheet || sheet.kind !== "log") return;
+  var p = item(sheet.id), st = stepFor(p);
+  if (e.target.closest("#amtPlus")) { sheet.amount = roundAmt(sheet.amount + st); render(); return; }
+  if (e.target.closest("#amtMinus")) { sheet.amount = Math.max(st, roundAmt(sheet.amount - st)); render(); return; }
+  var q = e.target.closest("[data-amt]");
+  if (q) { sheet.amount = parseFloat(q.dataset.amt); render(); return; }
+  if (e.target.closest("#sheetSave")) {
+    var row = null;
+    for (var i = 0; i < intake.length; i++) if (intake[i].id === sheet.id) row = intake[i];
+    if (row && !row.done) { row.done = true; row.loggedAt = sheet.at; }
+    p.left = Math.max(0, roundAmt(p.left - sheet.amount));
+    sheet = null; render();
+  }
+});
+
+sheetEl.addEventListener("change", function (e) {
+  if (sheet && sheet.kind === "log" && e.target.id === "logTime") sheet.at = e.target.value;
 });
 
 Array.prototype.forEach.call(document.querySelectorAll(".sc-tabs button"), function (b) {

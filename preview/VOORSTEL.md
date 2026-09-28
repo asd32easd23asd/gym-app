@@ -65,6 +65,10 @@ zes dingen per dag neemt.
 
 ### 2b. De rest
 
+0. **Log-scherm: voorgevuld, maar aanpasbaar.** Het bedrag uit je plan staat al
+   ingevuld, dus één tik is klaar. Wil je vandaag minder of meer: − en + , of de
+   knoppen Half en Double. Wat je daar verandert geldt **alleen voor die ene keer**;
+   je weekplan blijft staan.
 1. **Per set aftikken, met gewicht.** Nu vink je een hele oefening af. Daardoor weet
    de app niet wat je getild hebt en kan hij niet laten zien of je sterker wordt.
    Voorstel: vier vakjes voor vier sets, en eronder wat je vorige keer deed.
@@ -133,7 +137,55 @@ eigen telefoon is geen release, daar komt geen review aan te pas.
 
 ---
 
-## 5. Wat hetzelfde blijft
+## 5. Vrienden, groepen en een verdienmodel
+
+### Crew
+
+Vijfde tabblad. Vrienden, een groep met een maandchallenge, en een ranglijst op sets
+van deze week.
+
+- **Ranglijst op sets, niet op kilo's.** Op gewicht wint altijd de zwaarste persoon.
+  Op sets gaat het over opkomen dagen.
+- **Wat gedeeld wordt:** workouts, sets, streak. Lichaamsgewicht en supplementen staan
+  standaard uit.
+- **Peptides worden nooit gedeeld.** Geen schakelaar. Alles met de vorm `Injection`
+  blijft op de telefoon. Dat houdt de sociale kant los van het medische deel.
+
+### Verdienmodel
+
+Uitgangspunt: alles wat je voor jezelf bijhoudt blijft gratis. Je betaalt voor wat
+andere mensen nodig heeft of wat geld kost om te draaien.
+
+| | Free | Plus |
+|---|---|---|
+| Prijs | €0 | €3,99/mnd · €29,99/jaar · €69,99 eenmalig |
+| Plan, loggen, voorraad, herinneringen | ✓ | ✓ |
+| Eigen statistieken | 12 weken | onbeperkt |
+| Plannen tegelijk | 1 | meerdere |
+| Vrienden, groepen, ranglijsten | — | ✓ |
+| Vergelijken in Stats | — | ✓ |
+| Claude-plannen | — | 20 per maand |
+| Export | — | ✓ |
+
+**Waarom juist deze dingen.** Niet willekeurig gekozen:
+
+- Claude kost echt geld per verzoek. Dat moet betaald worden, anders kost het jou geld.
+- Vrienden en groepen hebben een server nodig. De app werkt nu volledig op de telefoon.
+
+Twee functies met echte kosten, dus twee eerlijke redenen om geld te vragen. Een
+functie achter de muur zetten die niks kost, dat voelen mensen.
+
+**Maar:** een app die je met Sideloadly installeert kan geen betalingen doen. Wil je
+hier geld mee verdienen, dan moet hij door de App Store review — en dan moet de
+peptide-kant eruit (hoofdstuk 4). Gym + supplementen + vrienden is een app die gewoon
+kan bestaan.
+
+Apple pakt 15% als je onder het miljoen per jaar zit. 1000 betalende gebruikers op
+€29,99 per jaar is ruwweg €25.000 netto.
+
+---
+
+## 6. Wat hetzelfde blijft
 
 - Je data. Zelfde `gympep-state-v1`, zelfde cloud-sync. Een nieuwe versie leest je
   oude data gewoon in.
@@ -155,3 +207,4 @@ dit wil, bouw ik het in `app/index.html`, in stappen:
 4. Set-tracking + rusttimer (grootste stuk)
 5. Gewichtsgrafiek en weekvolume
 6. Claude-knop in de app
+7. Crew + Plus (alleen als je er geld mee wil doen — dit heeft een server nodig)
