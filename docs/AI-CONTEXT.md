@@ -274,3 +274,114 @@ state, and exercising the flows. Useful checks:
 - logging an item decreases `left` and adds one history row with a matching `histId`;
 - the page never scrolls horizontally at 390 px wide;
 - no `pageerror` fires on any tab.
+
+---
+
+## 12. What changed in the rewrite (September 2026)
+
+The app was rebuilt from a 1084-line v1 into the current ~2000-line v2. Everything
+below is already done and in `app/index.html` unless it says otherwise.
+
+### Rewritten
+
+- **Peptides became a stack.** v1 only understood vials measured in mg. Every item now
+  has a `kind` that decides its unit and container — Vial / Powder / Pills / Liquid —
+  so creatine, whey, magnesium and omega-3 fit in the same model. From `left`,
+  `dose` and `perWeek` the app derives **days remaining** and warns under 14 days.
+- **Sets are tracked one at a time.** v1 ticked a whole exercise, which meant the app
+  could not tell whether you were getting stronger. Each exercise now stores
+  `done: [bool]` per set, plus `sets`, `reps` and `kg`, and shows what you did last
+  time. That also makes weekly volume computable.
+- **Rest timer.** Ticking a set starts it; `restSec` defaults to 90.
+- **Personal records** per exercise, stored under the lowercased name. Typed or
+  stepped, and deliberately allowed to go *down* — a record entered wrong has to be
+  fixable, so the save is never blocked.
+- **The day is grouped by moment** — Morning, Pre-workout, Post-workout, Evening.
+- **Logging pre-fills the planned amount** and lets you change it for that one entry
+  without touching the plan; the sheet says so in words.
+- **Body weight** with a chart, plus volume lifted and sessions per week.
+- **History ranges** in Stats: 12 weeks / 1 year / everything.
+- **Light mode**, as a second full token set rather than an inversion.
+- **Export and restore** in Settings, as plain text.
+- **AI prompt** that works with any assistant. It builds text; nothing leaves the app.
+  `importPlan()` parses the JSON answer back into a draft plan.
+
+### Fixed
+
+The eight defects in §6, each with the reason not to reintroduce it.
+
+### Zoom
+
+Refused in three places, because the viewport meta alone is not reliable on iOS:
+`touch-action: manipulation` in CSS, `gesturestart`/`gesturechange`/`gestureend` and
+double-tap handlers in `lockZoom()`, and on the native side the scroll view's zoom
+scale pinned to 1, its pinch recogniser disabled and `viewForZooming` returning nil.
+
+### Designed but not built
+
+Social (groups, challenges) and the AI coach — see §9. Both need a server. In the
+shipped app the coach appears only as a dashed *Soon* card with nothing tappable, on
+purpose: a button that does nothing confuses testers more than no button.
+
+---
+
+## 13. Shipping to TestFlight
+
+The owner has a paid Apple Developer account and wants this on TestFlight. **The
+current CI cannot do that.** `.github/workflows/build.yml` builds with
+`CODE_SIGNING_ALLOWED=NO` and zips the `.app` by hand; that produces an ipa for
+Sideloadly, not something App Store Connect will accept. What is missing:
+
+1. **Register the bundle id** `com.s.gymplanner.app` in the developer account and
+   create the app record in App Store Connect.
+2. **Sign it.** Either build in Xcode on a Mac (Product → Archive → Distribute App →
+   TestFlight, letting Xcode manage signing), or in CI with an App Store Connect API
+   key (issuer id, key id, `.p8`) stored as repository secrets, `-allowProvisioningUpdates`
+   on `xcodebuild archive`, then `-exportArchive` with an `exportOptions.plist` whose
+   `method` is `app-store-connect`, then upload. Verify the current upload command
+   against Apple's docs before wiring it — Apple has changed the tooling more than once
+   and this file may be out of date.
+3. **Remove the signing overrides** from `ios/project.yml` for that build
+   (`CODE_SIGN_STYLE: Manual`, `CODE_SIGNING_ALLOWED: "NO"`,
+   `CODE_SIGNING_REQUIRED: "NO"`). Keep the unsigned path if you still want
+   sideloadable builds — make it a second workflow rather than changing this one.
+
+Already handled so they do not bite later:
+
+- `ITSAppUsesNonExemptEncryption: false` is declared, so App Store Connect stops asking
+  about encryption on every upload. This is correct for this app: it uses no
+  encryption of its own.
+- `CFBundleVersion` comes from `CURRENT_PROJECT_VERSION`, which CI sets to the GitHub
+  run number. Every upload therefore gets a build number no earlier upload used, which
+  App Store Connect requires. `CFBundleShortVersionString` comes from
+  `MARKETING_VERSION` and is bumped by hand.
+
+### The part that actually decides whether this ships
+
+**Internal TestFlight testers skip review. External testers do not.** Up to 100 people
+on your own team can install an internal build immediately. Anyone beyond that needs
+Beta App Review, which is lighter than full App Store review but is still a human
+looking at the app — and that is where the content matters.
+
+So for review, whether beta or full:
+
+- **Ship the app empty.** It must contain no list of substances: no preset catalogue,
+  no autocomplete, no seeded examples using real compound names. The user types their
+  own. This is the single biggest factor and it costs nothing, because the app already
+  starts empty.
+- **The reviewer reads the store metadata before opening the app.** App name, subtitle,
+  keywords, description and screenshots decide the first impression. Describe it as a
+  training and supplement log. Use screenshots with creatine and whey, not with the
+  owner's own data.
+- **Keep the dosage arithmetic out** (§7). Recording a number is logging; calculating
+  one is dosing.
+- **No health claims** — nothing about losing weight or building muscle.
+- **Age rating 17+** and a one-screen disclaimer on first run: a log, not medical
+  advice, talk to a doctor. That screen does not exist yet; it is worth adding before
+  submitting.
+- A rejection is not final. You get a reason and can reply in App Review; explain that
+  it is a general-purpose log with no catalogue of its own and no calculations.
+
+None of this guarantees approval. Reviewers also weigh what an app is used for in
+practice, and the guidelines move — read section 1.4 of the App Review Guidelines
+yourself before submitting rather than trusting this file.
