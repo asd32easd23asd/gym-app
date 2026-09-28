@@ -27,6 +27,9 @@
   --grid: #E2E8E7;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; }
 body {
@@ -1183,7 +1186,7 @@ function viewSheet() {
     return sheetShell("Record · " + esc(e.name),
       stepperHtml(sheet.amount, "kg", sheet.amount % 1 === 0 ? 0 : 1) +
       quickHtml([e.kg || 20, round((e.kg || 20) + 2.5), round((e.kg || 20) + 5)], sheet.amount, "kg") +
-      '<label class="f">Reps<input id="prReps" type="number" min="1" value="' + sheet.reps + '"></label>' +
+      '<label class="f">Reps<input id="prReps" type="text" inputmode="numeric" value="' + sheet.reps + '"></label>' +
       '<div class="hint" id="prHint" style="text-align:center">' + prHint(cur, sheet.amount) + "</div>" +
       sheetButtons("Save record", "pr"));
   }
@@ -1207,11 +1210,11 @@ function viewSheet() {
         return '<option value="' + kk + '"' + (f.kind === kk ? " selected" : "") + ">" + FORM[kk].label + " · " + FORM[kk].container + "</option>";
       }).join("") + "</select></label>" +
       '<div class="g3">' +
-      '<label class="f">Container<input id="iCont" type="number" step="any" min="0" value="' + esc(f.cont.n) + '"></label>' +
-      '<label class="f">Each time<input id="iDose" type="number" step="any" min="0" value="' + esc(f.dose.n) + '"></label>' +
-      '<label class="f">Per week<input id="iWeek" type="number" min="1" max="21" value="' + esc(f.perWeek || 7) + '"></label>' +
+      '<label class="f">Container<input id="iCont" type="text" inputmode="decimal" value="' + esc(f.cont.n) + '"></label>' +
+      '<label class="f">Each time<input id="iDose" type="text" inputmode="decimal" value="' + esc(f.dose.n) + '"></label>' +
+      '<label class="f">Per week<input id="iWeek" type="text" inputmode="numeric" value="' + esc(f.perWeek || 7) + '"></label>' +
       "</div>" +
-      (it ? '<label class="f">Left in ' + form(it).container + '<input id="iLeft" type="number" step="any" min="0" value="' + esc(f.left) + '"></label>' : "") +
+      (it ? '<label class="f">Left in ' + form(it).container + '<input id="iLeft" type="text" inputmode="decimal" value="' + esc(f.left) + '"></label>' : "") +
       '<label class="f">Default moment<select id="iMoment">' + MOMENTS.map(function (m) {
         return '<option' + (f.moment === m ? " selected" : "") + ">" + m + "</option>";
       }).join("") + "</select></label>" +
@@ -1234,7 +1237,7 @@ function viewSheet() {
           '<button type="button" class="xbtn" data-delstep="' + st.id + '" aria-label="Remove">✕</button></div>';
       }).join("") : '<div class="empty">No changes planned</div>') +
       '<div class="g2"><label class="f">From<input id="stFrom" type="date" value="' + today() + '"></label>' +
-      '<label class="f">Amount<input id="stN" type="number" step="any" min="0" placeholder="' + num(sp.dose.n) + '"></label></div>' +
+      '<label class="f">Amount<input id="stN" type="text" inputmode="decimal" placeholder="' + num(sp.dose.n) + '"></label></div>' +
       '<div class="btnrow"><button type="button" class="btn line" data-close="1">Close</button>' +
       '<button type="button" class="btn" data-save="step">Add</button></div>');
   }
@@ -1248,9 +1251,9 @@ function viewSheet() {
       '<div class="fields">' +
       '<label class="f">Exercise<input id="eNm" value="' + esc(ef.name) + '" placeholder="Bench press"></label>' +
       '<div class="g3">' +
-      '<label class="f">Sets<input id="eSets" type="number" min="1" max="20" value="' + esc(ef.sets) + '"></label>' +
-      '<label class="f">Reps<input id="eReps" type="number" min="1" max="100" value="' + esc(ef.reps) + '"></label>' +
-      '<label class="f">Kg<input id="eKg" type="number" step="any" min="0" value="' + esc(ef.kg) + '"></label>' +
+      '<label class="f">Sets<input id="eSets" type="text" inputmode="numeric" value="' + esc(ef.sets) + '"></label>' +
+      '<label class="f">Reps<input id="eReps" type="text" inputmode="numeric" value="' + esc(ef.reps) + '"></label>' +
+      '<label class="f">Kg<input id="eKg" type="text" inputmode="decimal" value="' + esc(ef.kg) + '"></label>' +
       "</div></div>" +
       (ex ? '<div class="btnrow"><button type="button" class="btn danger" data-delex="' + sheet.ex + '">Delete</button>' +
             '<button type="button" class="btn" data-save="ex">Save</button></div>'

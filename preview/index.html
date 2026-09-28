@@ -27,6 +27,9 @@
   --pg-acc: #45C9BA; --pg-acc-soft: #103230; --pg-warn-soft: #2E2612; --pg-warn-ink: #E3B341;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--pg-bg); color: var(--pg-txt);
@@ -1266,7 +1269,7 @@ function viewPrSheet() {
     '<div class="quick">' + [e.kg, roundAmt(e.kg + 2.5), roundAmt(e.kg + 5)].map(function (v) {
       return '<button type="button" data-amt="' + v + '" aria-pressed="' + (roundAmt(sheet.amount) === v) + '">' + nl(v) + " kg</button>";
     }).join("") + "</div>" +
-    '<div class="field"><label for="prReps">Reps</label><input id="prReps" type="number" min="1" value="' + sheet.reps + '"></div>' +
+    '<div class="field"><label for="prReps">Reps</label><input id="prReps" type="text" inputmode="numeric" value="' + sheet.reps + '"></div>' +
     '<div class="hintline" id="prHint">' + prHint(e, sheet.amount) + "</div>" +
     '<div class="btnrow"><button type="button" class="btn line" id="sheetCancel">Cancel</button>' +
     '<button type="button" class="btn" id="prSave">Save record</button></div>' +
