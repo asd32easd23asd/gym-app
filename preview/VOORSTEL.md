@@ -26,7 +26,7 @@ vial-ringetje met hoeveel mg er nog in zit. Dat is doordacht.
 | | Nu | Voorstel |
 |---|---|---|
 | Kleur | één groen voor alles | teal = de app, groen = gedaan, amber = let op, rood = gevaar |
-| Letter | Nunito, overal 700–900 | Archivo (koppen/cijfers), Plex Sans (tekst), Plex Mono (mg, IU, kg) |
+| Letter | Nunito, overal 700–900 | Archivo (koppen/cijfers), Plex Sans (tekst), Plex Mono (mg, g, kg) |
 | Overzicht | drie even zware kaarten | bovenaan één kaart met de stand van de dag |
 | Knoppen | ✕ en tekstknopjes ± 20 px | alles minimaal 44 × 44 px (richtlijn van Apple) |
 | Contrast | `--dim: #6a6a6a` haalt geen 4,5:1 | grijzen opnieuw gekozen |
@@ -46,15 +46,18 @@ magnesium en omega-3 passen daar niet in.
 Voorstel: elk item in je stack heeft een **vorm**, en die vorm bepaalt de eenheid en
 de rekensom.
 
-| Vorm | Verpakking | Dosis in | App rekent uit |
-|---|---|---|---|
-| **Injection** | vial | mg | IU op een U-100 spuit |
-| **Powder** | bus | g | aantal scoops |
-| **Pills** | pot | capsules | — |
-| **Liquid** | flesje | ml | aantal druppels |
+| Vorm | Verpakking | Hoeveelheid in |
+|---|---|---|
+| **Injection** | vial | mg |
+| **Powder** | bus | g |
+| **Pills** | pot | capsules |
+| **Liquid** | flesje | ml |
 
-Verder is alles hetzelfde: hoeveel er nog in zit, hoeveel per keer, hoe vaak per week.
+Verder is alles hetzelfde: hoeveel per keer, hoe vaak per week, hoeveel er nog in zit.
 Daaruit rekent de app **hoeveel dagen je nog hebt** — en waarschuwt onder de 14 dagen.
+
+Meer rekent de app niet uit. Geen IU, geen ml water, geen mg/ml, geen prikplekken.
+Dat is bewust, zie hoofdstuk 4.
 
 Je dag wordt ook opgedeeld in momenten: Morning, Post-workout, Evening. Creatine 's
 ochtends, whey na de training, magnesium 's avonds. Eén lange lijst werkt niet als je
@@ -66,16 +69,12 @@ zes dingen per dag neemt.
    de app niet wat je getild hebt en kan hij niet laten zien of je sterker wordt.
    Voorstel: vier vakjes voor vier sets, en eronder wat je vorige keer deed.
 2. **Rusttimer.** Start vanzelf als je een set aftikt. 90 seconden, met +30s.
-3. **Spuit-rekenaar (mg → IU).** Vial 20 mg + 2 ml water = 10 mg/ml, dus 2 mg = 20 IU
-   op een U-100 spuit. Dat reken je nu elke keer zelf uit.
-4. **Prikplek-rotatie.** De app onthoudt waar je de vorige keer prikte en zegt welke
-   plek nu aan de beurt is.
-5. **Lichaamsgewicht in een grafiek**, met een streepje waar je dosis omhoog ging.
+3. **Lichaamsgewicht in een grafiek**, met een streepje waar je dosis omhoog ging.
    Bij retatrutide is dat precies wat je wil zien, en het staat nu nergens in de app.
-6. **Totaal getild per week** (gewicht × reps × sets).
-7. **Claude in de app.** Nu: prompt kopiëren, naar Claude, JSON terugplakken. De app
+4. **Totaal getild per week** (gewicht × reps × sets).
+5. **Claude in de app.** Nu: prompt kopiëren, naar Claude, JSON terugplakken. De app
    praat al met Claude voor de opslag, dus dit kan één knop zijn.
-8. **Waarschuwing als iets bijna op is** — onder 14 dagen wordt de kaart amber, met
+6. **Waarschuwing als iets bijna op is** — onder 14 dagen wordt de kaart amber, met
    "bestel een nieuwe bus". Werkt voor vials, bussen en potten.
 
 ---
@@ -109,21 +108,28 @@ Deze zitten er nu echt in, los van het design.
 
 ## 4. Mag dit in de App Store?
 
-Kort antwoord: **zo niet.** Maar dat maakt weinig uit, want je zet hem er ook niet op.
+Je wilde alleen mg en hoe vaak per week, geen spuit-dingen. Dat is nu zo.
 
-- **App Store en TestFlight: vrijwel zeker afgewezen.** Apple heeft in de App Review
-  Guidelines een stuk over Physical Harm (sectie 1.4). Apps die een medicijndosering
-  uitrekenen moeten van een erkende instelling of fabrikant komen, met bron erbij.
-  Retatrutide en BPC-157 zijn geen goedgekeurde medicijnen, die zitten nog in
-  onderzoek. Een app die daar doses en spuit-eenheden voor uitrekent komt er niet door.
-- **Wat je nu doet, mag gewoon.** Sideloadly met je eigen Apple ID, alleen op je eigen
-  telefoon. Dat is geen release maar je eigen app op je eigen apparaat, daar komt geen
-  review aan te pas. Daarom moet je hem ook elke 7 dagen opnieuw ondertekenen.
-- **Wil je hem ooit wél in de store**, dan splits je hem: gym + supplementen erin,
-  peptides eruit. Creatine, eiwit, magnesium en omega-3 zijn gewone voedingssupplementen.
-  Omdat alles nu één model is met een `vorm`, is dat een schakelaar en geen herbouw.
-- Ik ken de exacte regelnummers niet uit mijn hoofd en Apple verandert ze. Lees sectie
-  1.4 van de App Review Guidelines op developer.apple.com voordat je iets indient.
+**Eruit gehaald:** de omrekening mg → IU, het aantal ml water, de sterkte in mg/ml, en
+het lichaamsplaatje met prikplekken. Dat zijn allemaal dingen die zeggen *hoe* je iets
+toedient, en daar zit Apple's regel op (App Review Guidelines, sectie 1.4, Physical
+Harm — apps die doseringen uitrekenen moeten van een erkende instelling komen).
+
+**Wat blijft:** naam, hoeveelheid per keer, hoe vaak per week, hoeveel er nog in de
+verpakking zit, en hoeveel dagen dat nog duurt. Dat is een logboek en een voorraadkast.
+Je schrijft op wat je gedaan hebt; de app rekent niks uit over toedienen.
+
+**Geen garantie.** De doseringskant is nu weg en dat scheelt het meest. Maar een app
+die draait om middelen die nog in onderzoek zijn kan nog steeds tegengehouden worden.
+Zeker weet je het pas als je hem indient. Ik ken de exacte regelnummers niet uit mijn
+hoofd en Apple verandert ze — lees sectie 1.4 op developer.apple.com.
+
+**De veiligste versie** is gym + supplementen, zonder de vorm `Injection`. Creatine,
+eiwitpoeder, magnesium en omega-3 zijn gewone voedingssupplementen. Omdat alles één
+model is, is dat een schakelaar en geen herbouw.
+
+**Wat je nu doet is sowieso geen probleem.** Sideloadly met je eigen Apple ID op je
+eigen telefoon is geen release, daar komt geen review aan te pas.
 
 ---
 
@@ -147,5 +153,5 @@ dit wil, bouw ik het in `app/index.html`, in stappen:
    elke bestaande peptide wordt gewoon vorm `Injection`)
 3. Nieuwe kleuren + letters + grotere knoppen (design, data blijft gelijk)
 4. Set-tracking + rusttimer (grootste stuk)
-5. Spuit-rekenaar, prikplek-rotatie, gewichtsgrafiek
+5. Gewichtsgrafiek en weekvolume
 6. Claude-knop in de app

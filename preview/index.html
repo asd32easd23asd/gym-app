@@ -254,12 +254,7 @@ h1 {
 }
 .card > .moment:first-of-type { border-top: 0; padding-top: 0; }
 
-.iu {
-  display: flex; align-items: baseline; gap: 6px; background: var(--raise); border-radius: 10px;
-  padding: 7px 11px; font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
-}
-.iu .v { font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -.02em; color: var(--acc); }
-.iu .u { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+
 
 /* rest timer */
 .rest {
@@ -297,11 +292,7 @@ h1 {
 .step.now .d1 { color: var(--acc); }
 .step .d2 { font-size: 11px; color: var(--dim); }
 
-/* site rotation */
-.sites { display: flex; gap: 14px; align-items: center; }
-.sitelegend { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
-.sitelegend div { display: flex; align-items: center; gap: 7px; color: var(--mut); }
-.sitelegend i { width: 9px; height: 9px; border-radius: 3px; display: block; }
+
 
 /* plan rows */
 .prow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); }
@@ -453,7 +444,7 @@ h1 {
         <p>Nu is bijna alles even zwaar: zelfde groen, zelfde dikke letter, zelfde ronde kaart. Daardoor valt niets op. Het voorstel geeft elke soort informatie een eigen vorm.</p>
         <ul class="items">
           <li><span class="mark">A</span><span><span class="t">Kleur betekent nu iets</span><div class="d">Teal is de app zelf (knoppen, actief). Groen is alleen "gedaan". Amber is "let op" — bijvoorbeeld een vial die bijna leeg is. Rood is gevaar. Nu is alles groen, dus je ziet niet waar je naar moet kijken.</div></span></li>
-          <li><span class="mark">B</span><span><span class="t">Drie letterstijlen in plaats van één</span><div class="d">Archivo voor koppen en cijfers, Plex Sans voor tekst, Plex Mono voor alles wat een eenheid heeft: mg, IU, 4 × 8, 80 kg. Cijfers staan daardoor netjes onder elkaar.</div></span></li>
+          <li><span class="mark">B</span><span><span class="t">Drie letterstijlen in plaats van één</span><div class="d">Archivo voor koppen en cijfers, Plex Sans voor tekst, Plex Mono voor alles wat een eenheid heeft: mg, g, 4 × 8, 80 kg. Cijfers staan daardoor netjes onder elkaar.</div></span></li>
           <li><span class="mark">C</span><span><span class="t">Bovenaan eerst het antwoord</span><div class="d">Eén kaart die zegt hoe de dag ervoor staat: sets gedaan, dosis genomen, gewicht. Nu moet je drie kaarten langs om dat te weten.</div></span></li>
           <li><span class="mark">D</span><span><span class="t">Knoppen die je met een duim kan raken</span><div class="d">De ✕ en de kleine tekstknopjes zijn nu ongeveer 20 pixels. Apple zegt minimaal 44. In het voorstel is alles 44 of groter.</div></span></li>
           <li><span class="mark">E</span><span><span class="t">Leesbaarder grijs</span><div class="d">De grijstint <code>#6a6a6a</code> op zwart haalt geen 4,5:1 contrast. Op je telefoon in de gym met licht erop lees je dat slecht. De grijzen zijn opnieuw gekozen.</div></span></li>
@@ -466,21 +457,20 @@ h1 {
         <h2><span class="n">02</span>Nieuwe dingen die de app echt beter maken</h2>
         <p>Twee grote gaten. De app kent alleen peptides, terwijl je ook creatine en eiwitpoeder neemt. En je vinkt een oefening af zonder je gewicht, dus de app kan niet laten zien of je sterker wordt.</p>
         <ul class="items">
-          <li><span class="mark">1</span><span><span class="t">Alles wat je inneemt, niet alleen peptides<span class="tag">groot</span></span><div class="d">Nu kent de app alleen vials met mg. Creatine, eiwitpoeder, magnesium en omega-3 passen daar niet in. In het voorstel heeft elk item een <b>vorm</b>, en die vorm bepaalt de eenheid en de rekensom:<br>
-            <b>Injection</b> — vial, mg, rekent naar IU op de spuit<br>
-            <b>Powder</b> — bus, gram, rekent naar scoops<br>
-            <b>Pills</b> — pot, capsules per keer<br>
-            <b>Liquid</b> — flesje, ml of druppels<br>
-            Verder hebben ze allemaal hetzelfde: hoeveel er nog in zit en hoe vaak per week. Daaruit rekent de app hoeveel dagen je nog hebt. Kijk bij het tabblad Supply.</div></span></li>
+          <li><span class="mark">1</span><span><span class="t">Alles wat je inneemt, niet alleen peptides<span class="tag">groot</span></span><div class="d">Nu kent de app alleen vials met mg. Creatine, eiwitpoeder, magnesium en omega-3 passen daar niet in. In het voorstel heeft elk item een <b>vorm</b>, en die vorm bepaalt de eenheid en de verpakking:<br>
+            <b>Injection</b> — vial, mg<br>
+            <b>Powder</b> — bus, gram<br>
+            <b>Pills</b> — pot, capsules<br>
+            <b>Liquid</b> — flesje, ml<br>
+            Verder hebben ze allemaal hetzelfde: hoeveel per keer, hoe vaak per week, en hoeveel er nog in zit. Daaruit rekent de app hoeveel dagen je nog hebt. Meer niet — zie hoofdstuk 4. Kijk bij het tabblad Supply.</div></span></li>
           <li><span class="mark">2</span><span><span class="t">Je dag op momenten, niet één lijst</span><div class="d">Morning, Post-workout, Evening. Creatine 's ochtends, whey na de training, magnesium 's avonds. Eén lange lijst werkt niet als je zes dingen per dag neemt.</div></span></li>
           <li><span class="mark">3</span><span><span class="t">Per set aftikken, met gewicht erbij<span class="tag">groot</span></span><div class="d">Vier vakjes voor vier sets. Je tikt ze af tijdens de training. Eronder staat wat je vorige keer deed, zodat je weet of je meer moet pakken. Dit is de basis voor progressive overload.</div></span></li>
           <li><span class="mark">4</span><span><span class="t">Rusttimer die zelf start<span class="tag">groot</span></span><div class="d">Tik een set af en de timer van 90 seconden begint. +30s als je meer nodig hebt. Geen aparte app meer nodig.</div></span></li>
-          <li><span class="mark">5</span><span><span class="t">Spuit-rekenaar: mg naar IU<span class="tag">groot</span></span><div class="d">Je vult in: vial 20 mg, 2 ml water. De app rekent uit: 10 mg/ml, dus 2 mg = <b>20 IU</b> op een U-100 spuit. Nu reken je dat elke keer zelf, en daar gaat het fout.</div></span></li>
-          <li><span class="mark">6</span><span><span class="t">Prikplek-rotatie</span><div class="d">De app houdt bij waar je de vorige keer geprikt hebt en zegt welke plek nu aan de beurt is. Zo prik je niet steeds dezelfde plek.</div></span></li>
-          <li><span class="mark">7</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
-          <li><span class="mark">8</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
-          <li><span class="mark">9</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
-          <li><span class="mark">10</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
+          
+          <li><span class="mark">5</span><span><span class="t">Lichaamsgewicht in een grafiek</span><div class="d">Met een streepje op de plek waar je dosis omhoog ging. Zo zie je of het werkt. Bij retatrutide is dat het hele punt, en nu staat je gewicht nergens in de app.</div></span></li>
+          <li><span class="mark">6</span><span><span class="t">Totaal getild per week</span><div class="d">Gewicht × reps × sets, opgeteld. Eén getal dat zegt of je harder werkt dan vorige maand.</div></span></li>
+          <li><span class="mark">7</span><span><span class="t">Claude in de app, niet meer kopiëren</span><div class="d">Nu moet je een prompt kopiëren, naar Claude gaan, JSON terugplakken. De app praat al met Claude (<code>claude.use("db")</code> voor opslag), dus dat kan in één knop: "Ask Claude to write my week".</div></span></li>
+          <li><span class="mark">8</span><span><span class="t">Waarschuwing als iets bijna op is</span><div class="d">Onder 14 dagen wordt de kaart amber: "nog 12 dagen — bestel een nieuwe bus". Geldt voor vials, poeders en potten capsules. Nu moet je zelf naar het ringetje kijken.</div></span></li>
         </ul>
       </section>
 
@@ -500,12 +490,13 @@ h1 {
 
       <section>
         <h2><span class="n">04</span>Mag dit in de App Store?</h2>
-        <p>Je vroeg het, dus eerlijk antwoord: <strong>zo niet.</strong> Maar dat maakt voor jou weinig uit, want je zet hem er ook niet op.</p>
+        <p>Je zei: alleen mg en hoe vaak per week, geen spuit-dingen. <strong>Dat is precies wat er nu in zit.</strong> Ik heb de spuit-rekenaar en de prikplek-kaart er weer uit gehaald.</p>
         <ul class="items">
-          <li><span class="mark">✕</span><span><span class="t">App Store: vrijwel zeker afgewezen</span><div class="d">Apple heeft in de App Review Guidelines een stuk over Physical Harm. Apps die een medicijndosering uitrekenen moeten van een erkende instelling of fabrikant komen, met bron erbij. Retatrutide en BPC-157 zijn geen goedgekeurde medicijnen — die zitten nog in onderzoek. Een app die daar doses en spuit-eenheden voor uitrekent komt er niet door. Bij TestFlight net zo, want daar zit dezelfde review op.</div></span></li>
-          <li><span class="mark">✓</span><span><span class="t">Wat je nu doet, mag gewoon</span><div class="d">Sideloadly met je eigen Apple ID, alleen op je eigen telefoon. Dat is geen release, dat is je eigen app op je eigen apparaat. Daar komt geen Apple-review aan te pas. Daarom moet je hem ook elke 7 dagen opnieuw ondertekenen.</div></span></li>
-          <li><span class="mark">→</span><span><span class="t">Wil je hem ooit wél in de store</span><div class="d">Dan splits je hem: gym + supplementen in de store-versie, peptides eruit. Creatine, eiwitpoeder, magnesium en omega-3 zijn gewone voedingssupplementen, daar is niks mis mee. De vorm <b>Injection</b> laat je dan weg. Omdat alles nu één model is, is dat een schakelaar en geen herbouw.</div></span></li>
-          <li><span class="mark">!</span><span><span class="t">Ik ken de regelnummers niet uit mijn hoofd</span><div class="d">En Apple verandert ze. Wil je het zeker weten, lees dan sectie 1.4 (Physical Harm) van de App Review Guidelines op developer.apple.com voordat je iets indient.</div></span></li>
+          <li><span class="mark">✕</span><span><span class="t">Eruit gehaald</span><div class="d">De omrekening mg → IU, het aantal ml water, de sterkte in mg/ml, en het lichaamsplaatje met prikplekken. Dat zijn allemaal dingen die zeggen <b>hoe</b> je iets toedient, en daar zit Apple's regel op.</div></span></li>
+          <li><span class="mark">✓</span><span><span class="t">Wat blijft</span><div class="d">De naam, de hoeveelheid per keer (mg, g of capsules), hoe vaak per week, hoeveel er nog in de verpakking zit, en hoeveel dagen dat nog duurt. Dat is een logboek en een voorraadkast — je schrijft op wat je gedaan hebt. De app rekent niks uit over toedienen.</div></span></li>
+          <li><span class="mark">~</span><span><span class="t">Maar geen garantie</span><div class="d">Apple's regel over Physical Harm (sectie 1.4) gaat vooral over apps die doseringen uitrekenen. Die kant is nu weg, en dat scheelt het meest. Maar een app die draait om middelen die nog in onderzoek zijn kan nog steeds tegengehouden worden. Zeker weten doe je het pas als je hem indient.</div></span></li>
+          <li><span class="mark">→</span><span><span class="t">De veiligste versie</span><div class="d">Alleen gym + supplementen: creatine, eiwitpoeder, magnesium, omega-3. Dat zijn gewone voedingssupplementen. Omdat alles één model is met een vorm, laat je dan de vorm <b>Injection</b> weg. Eén schakelaar, geen herbouw.</div></span></li>
+          <li><span class="mark">!</span><span><span class="t">Wat je nu doet is sowieso geen probleem</span><div class="d">Sideloadly met je eigen Apple ID op je eigen telefoon is geen release. Daar komt geen review aan te pas. Daarom moet je hem elke 7 dagen opnieuw ondertekenen.</div></span></li>
         </ul>
       </section>
 
@@ -552,18 +543,18 @@ var exercises = [
    they differ only in unit, container and how a serving is measured. */
 var stack = [
   { id: "reta", nm: "Retatrutide", kind: "inject", moment: "Morning",
-    cont: { n: 20, u: "mg" }, waterMl: 2, dose: { n: 2, u: "mg" }, left: 11.4, perWeek: 1, site: "R abdomen",
+    cont: { n: 20, u: "mg" }, dose: { n: 2, u: "mg" }, left: 11.4, perWeek: 1,
     steps: [ { mg: 1, when: "start · 20 Jul", st: "past" }, { mg: 2, when: "from 17 Aug", st: "now" }, { mg: 4, when: "from 12 Oct", st: "next" } ] },
   { id: "crea", nm: "Creatine mono", kind: "powder", moment: "Morning",
     cont: { n: 500, u: "g" }, dose: { n: 5, u: "g" }, left: 460, perWeek: 7, hint: "1 level tsp" },
   { id: "omega", nm: "Omega-3", kind: "capsule", moment: "Morning",
     cont: { n: 180, u: "caps" }, dose: { n: 2, u: "caps" }, left: 148, perWeek: 7, hint: "990 mg EPA + DHA" },
   { id: "whey", nm: "Whey protein", kind: "powder", moment: "Post-workout",
-    cont: { n: 1000, u: "g" }, dose: { n: 60, u: "g" }, left: 420, perWeek: 4, scoopG: 30, hint: "2 scoops · 48 g protein" },
+    cont: { n: 1000, u: "g" }, dose: { n: 60, u: "g" }, left: 420, perWeek: 4, hint: "48 g protein" },
   { id: "mag", nm: "Magnesium glycinate", kind: "capsule", moment: "Evening",
     cont: { n: 120, u: "caps" }, dose: { n: 2, u: "caps" }, left: 62, perWeek: 7, hint: "400 mg elemental" },
   { id: "bpc", nm: "BPC-157", kind: "inject", moment: "Evening",
-    cont: { n: 10, u: "mg" }, waterMl: 2, dose: { n: 0.25, u: "mg" }, left: 0.6, perWeek: 3, site: "L abdomen",
+    cont: { n: 10, u: "mg" }, dose: { n: 0.25, u: "mg" }, left: 0.6, perWeek: 3,
     steps: [ { mg: 0.25, when: "start · 1 Sep", st: "now" } ] }
 ];
 
@@ -632,26 +623,21 @@ function nl(n, d) {
 }
 /* the four forms a stack item can take — one name each, used everywhere */
 var FORM = {
-  inject:  { label: "Injection", container: "vial", unitHint: "mg · IU" },
-  powder:  { label: "Powder",    container: "tub",  unitHint: "g · scoops" },
-  capsule: { label: "Pills",     container: "jar",  unitHint: "caps" },
-  liquid:  { label: "Liquid",    container: "bottle", unitHint: "ml · drops" }
+  inject:  { label: "Injection", container: "vial",   unit: "mg" },
+  powder:  { label: "Powder",    container: "tub",    unit: "g" },
+  capsule: { label: "Pills",     container: "jar",    unit: "caps" },
+  liquid:  { label: "Liquid",    container: "bottle", unit: "ml" }
 };
 function form(p) { return FORM[p.kind]; }
 
 function item(id) { for (var i = 0; i < stack.length; i++) if (stack[i].id === id) return stack[i]; return null; }
-function conc(p) { return p.cont.n / p.waterMl; }                 /* mg per ml, injectables only */
-function iuFor(p) { return (p.dose.n / conc(p)) * 100; }          /* units on a U-100 syringe */
+/* the app records an amount and a weekly frequency. it never works out how to
+   administer anything — no syringe units, no concentrations, no injection guidance.
+   that is what keeps it on the right side of Apple's rules on physical harm. */
 function servings(p) { return Math.floor(p.left / p.dose.n + 1e-9); }
 function daysLeft(p) { return Math.floor(servings(p) * 7 / p.perWeek); }
 function isLow(p) { return daysLeft(p) <= 14; }
 function doseLabel(p) { return nl(p.dose.n) + " " + p.dose.u; }
-/* how a serving is actually measured, per kind */
-function servingLabel(p) {
-  if (p.kind === "inject") return nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + " IU";
-  if (p.kind === "powder") return p.scoopG ? (p.dose.n / p.scoopG) + " scoops" : p.hint;
-  return nl(p.dose.n) + " caps";
-}
 
 function tickRule(w) {
   /* the syringe-gradation motif: a measured rule, used as a divider */
@@ -823,12 +809,9 @@ function viewToday() {
       var i = intake.indexOf(x);
       var low = isLow(p);
       var sub = (x.done ? "taken " + esc(x.loggedAt) : "planned " + esc(x.at));
-      if (p.kind === "inject") sub += " · " + esc(p.site);
-      else if (p.hint) sub += " · " + esc(p.hint);
+      if (p.hint) sub += " · " + esc(p.hint);
       if (low) sub += ' · <span style="color:var(--warn)">' + daysLeft(p) + " days left</span>";
-      var readout = p.kind === "inject"
-        ? '<div class="iu"><span class="v">' + nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1) + '</span><span class="u">iu</span></div>'
-        : '<span class="chip">' + esc(servingLabel(p)) + "</span>";
+      var readout = '<span class="chip">' + esc(form(p).label) + "</span>";
       return '<div class="dose"><button type="button" class="tick' + (x.done ? " done" : "") + '" data-dose="' + i + '" ' +
         'aria-label="Log ' + esc(p.nm) + '" aria-pressed="' + x.done + '">' + (x.done ? check() : "") + "</button>" +
         '<div class="body"><div class="nm' + (x.done ? " strike" : "") + '">' + esc(p.nm) + " · " + doseLabel(p) + "</div>" +
@@ -836,7 +819,7 @@ function viewToday() {
     }).join("");
   });
   h += tickRule();
-  h += '<div class="chead"><span class="note">Next injection site · ' + esc(item("reta").site) + '</span><span class="note">U-100 syringe</span></div>';
+  h += '<div class="chead"><span class="note">' + (intake.length - dDone) + ' still to log today</span><span class="note">6 in your stack</span></div>';
   h += "</div>";
 
   /* notes */
@@ -930,12 +913,6 @@ function viewSupply() {
     var frac = Math.max(0, Math.min(1, p.left / p.cont.n));
     var C = 2 * Math.PI * 30;
     var ringCol = low ? "var(--warn)" : "var(--acc)";
-    var readLabel = p.kind === "inject" ? "Draw to" : "One serving";
-    var readUnit = p.kind === "inject" ? "iu · u-100"
-      : p.kind === "powder" ? (p.scoopG ? "scoops · " + nl(p.scoopG) + " g each" : "g") : "caps";
-    var readVal = p.kind === "inject" ? nl(iuFor(p), iuFor(p) % 1 === 0 ? 0 : 1)
-      : p.kind === "powder" ? (p.scoopG ? nl(p.dose.n / p.scoopG) : nl(p.dose.n)) : nl(p.dose.n);
-
     var s = '<div class="card"' + (low ? ' style="border-color:color-mix(in srgb, var(--warn) 45%, var(--line))"' : "") + ">" +
       '<div class="chead"><h3>' + esc(p.nm) + "</h3>" +
       '<span style="display:flex;gap:6px;align-items:center;flex-shrink:0">' +
@@ -948,15 +925,12 @@ function viewSupply() {
       '</svg><div class="inner"><span class="big" style="font-size:15px;color:' + ringCol + '">' + nl(p.left, p.left % 1 === 0 ? 0 : 1) + '</span><span class="cap">' + esc(p.cont.u) + "</span></div></div>" +
       '<div class="vialstats">' +
         '<div class="kv"><span class="k">' + form(p).container.charAt(0).toUpperCase() + form(p).container.slice(1) + '</span><span class="v">' + nl(p.cont.n) + " " + esc(p.cont.u) + "</span></div>" +
-        (p.kind === "inject"
-          ? '<div class="kv"><span class="k">Water</span><span class="v">' + nl(p.waterMl, 1) + ' ml</span></div>' +
-            '<div class="kv"><span class="k">Strength</span><span class="v">' + nl(conc(p), 1) + " mg/ml</span></div>"
-          : '<div class="kv"><span class="k">Servings left</span><span class="v">' + left + "</span></div>") +
+        '<div class="kv"><span class="k">Left</span><span class="v">' + left + " × " + doseLabel(p) + "</span></div>" +
         '<div class="kv"><span class="k">Dose</span><span class="v">' + doseLabel(p) + "</span></div>" +
         '<div class="kv"><span class="k">Per week</span><span class="v">' + p.perWeek + "×</span></div>" +
       "</div></div>" +
       tickRule() +
-      '<div class="chead"><span class="note">' + readLabel + '</span><div class="iu"><span class="v">' + readVal + '</span><span class="u">' + readUnit + "</span></div></div>";
+      (p.hint ? '<div class="chead"><span class="note">' + esc(p.hint) + " per serving</span></div>" : "");
 
     if (p.steps && p.steps.length > 1) {
       s += '<div class="steps">' + p.steps.map(function (st, si) {
@@ -975,24 +949,7 @@ function viewSupply() {
 
   h += '<button type="button" class="btn ghost">+ Add to stack</button>';
 
-  /* injection site rotation — only for the injectables in the stack */
-  h += '<div class="card"><div class="chead"><h3>Injection sites</h3><span class="chip acc">next · R abdomen</span></div>' +
-    '<div class="sites"><svg width="86" height="104" viewBox="0 0 86 104" aria-label="Body map with four injection zones" role="img">' +
-      '<rect x="27" y="4" width="32" height="26" rx="13" fill="var(--raise)"/>' +
-      '<rect x="18" y="32" width="50" height="40" rx="12" fill="var(--raise)"/>' +
-      '<rect x="20" y="74" width="20" height="28" rx="9" fill="var(--raise)"/>' +
-      '<rect x="46" y="74" width="20" height="28" rx="9" fill="var(--raise)"/>' +
-      '<circle cx="31" cy="50" r="7" fill="var(--acc)" fill-opacity="0.35" stroke="var(--acc)" stroke-width="1.5"/>' +
-      '<circle cx="55" cy="50" r="7" fill="var(--acc)" stroke="var(--surf)" stroke-width="2"/>' +
-      '<circle cx="30" cy="84" r="7" fill="none" stroke="var(--line)" stroke-width="1.5"/>' +
-      '<circle cx="56" cy="84" r="7" fill="none" stroke="var(--line)" stroke-width="1.5"/>' +
-    "</svg>" +
-    '<div class="sitelegend">' +
-      '<div><i style="background:var(--acc)"></i>Next · R abdomen</div>' +
-      '<div><i style="background:color-mix(in srgb, var(--acc) 35%, transparent)"></i>Last · L abdomen, 21 Sep</div>' +
-      '<div><i style="box-shadow:inset 0 0 0 1.5px var(--line)"></i>L thigh · 14 Sep</div>' +
-      '<div><i style="box-shadow:inset 0 0 0 1.5px var(--line)"></i>R thigh · 7 Sep</div>' +
-    "</div></div></div>";
+
 
   return h;
 }
