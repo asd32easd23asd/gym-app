@@ -31,12 +31,15 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
+html, body { height: 100%; touch-action: manipulation; }
 body {
   margin: 0; background: var(--bg); color: var(--txt);
   font-family: var(--sans); font-size: 15px; line-height: 1.45;
   -webkit-font-smoothing: antialiased; overflow: hidden;
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+  touch-action: manipulation; -webkit-user-select: none; user-select: none;
 }
+input, textarea, select { -webkit-user-select: text; user-select: text; }
 input, select, textarea, button { font-family: inherit; }
 [hidden] { display: none !important; }
 
@@ -1981,7 +1984,25 @@ function saveSheet(what) {
 /* ============================================================
    start
    ============================================================ */
+/* the viewport meta is not enough on every iOS version, so the gestures are
+   refused here too. the native side disables pinch on the scroll view as well. */
+function lockZoom() {
+  ["gesturestart", "gesturechange", "gestureend"].forEach(function (n) {
+    document.addEventListener(n, function (e) { e.preventDefault(); }, { passive: false });
+  });
+  var lastTouch = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastTouch < 320) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+  document.addEventListener("touchmove", function (e) {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+}
+
 function init() {
+  lockZoom();
   load();
   render();
 

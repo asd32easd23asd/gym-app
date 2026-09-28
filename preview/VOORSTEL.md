@@ -149,52 +149,63 @@ Apple verandert ze — lees sectie 1.4 op developer.apple.com voordat je indient
 
 ---
 
-## 5. Vrienden, groepen en een verdienmodel
+## 5. Social, challenges en het verdienmodel
 
-### Crew
-
-Vijfde tabblad. Vrienden, een groep met een maandchallenge, en een ranglijst op sets
-van deze week.
+Het tabblad heet **Social**. Je zit in meerdere groepen, wisselt bovenaan met knopjes,
+en maakt er zelf een aan. Per groep een ranglijst op sets en een challenge met een doel
+en een einddatum.
 
 - **Ranglijst op sets, niet op kilo's.** Op gewicht wint altijd de zwaarste persoon.
-  Op sets gaat het over opkomen dagen.
-- **Wat gedeeld wordt:** workouts, sets, streak. Lichaamsgewicht en supplementen staan
-  standaard uit.
-- **Vials staan standaard uit,** net als lichaamsgewicht en supplementen. Alleen workouts
-  staat standaard uit. Jij bepaalt wat er naar buiten gaat.
+- **Per groep bepaal je wat je deelt.** Workouts en streak aan; gewicht, supplementen en
+  vials uit — aan te zetten als je wil.
 
-### Verdienmodel
-
-Uitgangspunt: alles wat je voor jezelf bijhoudt blijft gratis. Je betaalt voor wat
-andere mensen nodig heeft of wat geld kost om te draaien.
+### Gratis of betaald
 
 | | Free | Plus |
 |---|---|---|
-| Prijs | €0 | €3,99/mnd · €29,99/jaar · €69,99 eenmalig |
-| Plan, loggen, voorraad, herinneringen | ✓ | ✓ |
+| Prijs | €0 | €1,99/mnd · €19,99/jaar · €44,99 eenmalig |
+| Alles voor jezelf bijhouden | ✓ | ✓ |
 | AI-plan met elke AI | ✓ | ✓ |
 | Export van al je data | ✓ | ✓ |
-| Eigen statistieken | 12 weken | tot 10 jaar terug |
-| Plannen tegelijk | 1 | meerdere |
-| AI-coach | — | later (nu `Soon`) |
-| Vrienden, groepen, ranglijsten | — | ✓ |
+| Groepen joinen | onbeperkt | onbeperkt |
+| Zelf groepen maken | 2 | onbeperkt |
+| Zien wat je groep tilt | ✓ | ✓ |
+| Meedoen aan challenges | ✓ | ✓ |
+| Zelf challenges maken | 1 per maand, 7 dagen | onbeperkt, elke lengte |
+| Eigen statistieken | 12 weken | tot 10 jaar |
 | Vergelijken in Stats | — | ✓ |
+| AI-coach | — | later (nu `Soon`) |
 
-Export staat bewust in Free. Je eigen gegevens achter een betaalmuur zetten is niet oké.
+Meedoen aan andermans challenge is altijd gratis. Anders betaalt niemand, want dan
+kunnen je vrienden niet meedoen.
 
-**Waarom juist deze dingen.** Niet willekeurig gekozen:
+### Misbruik tegenhouden
 
-- **Vrienden en groepen** hebben een server nodig. De app werkt nu volledig op de telefoon.
-- **De AI-coach** gaat straks op een echt model draaien en rekent per verzoek af. Zodra
-  hij werkt hoort hij bij Plus — maar zolang hij `Soon` is verkoop je hem niet mee.
+Deze regels moeten **op de server** staan, niet in de app — anders zet iemand gewoon de
+datum van zijn telefoon terug.
 
-De AI-prompt kost niks, dus die blijft gratis. Een functie achter de muur zetten die
-jou niks kost, dat voelen mensen meteen.
+1. **De teller zit op je account**, niet op de groep. Eén gratis challenge per account
+   per kalendermaand. Honderd groepen maken helpt dus niks.
+2. **Ook max één gratis challenge per groep per maand.** Dit dicht het echte gat: vier
+   vrienden in één groep die om de beurt hun gratis challenge inzetten.
+3. **Opgebruikt is opgebruikt.** Challenge of groep verwijderen geeft hem niet terug.
+   De teller loopt op bij het aanmaken.
+4. **Minimaal 3 leden die in 14 dagen echt gelogd hebben**, anders begint de challenge
+   niet te tellen. Nepaccounts maken is dan geen truc meer maar werk.
+5. **Gratis: zelf maximaal 2 groepen.** Joinen mag onbeperkt.
+6. **Eén Apple ID = één account** (Sign in with Apple), plus een limiet op nieuwe
+   accounts per apparaat.
+7. **De gratis challenge is vast 7 dagen**, niet te verlengen of herstarten.
 
-Apple pakt 15% zolang je onder het miljoen per jaar zit — daarvoor moet je je wel
-aanmelden voor het Small Business Program, dat gaat niet vanzelf. 1000 betalende
-gebruikers op €29,99 per jaar is ruwweg €25.000 netto. De eenmalige €69,99 is ongeveer
-2,3 jaar abonnement; dat is waar mensen op klikken die geen abonnement willen.
+### Waarom dit eerlijk is
+
+Groepen en challenges hebben een server nodig — de app draait nu volledig op je
+telefoon, dus dat is een echte kostenpost die er nu nog niet is. De AI-prompt kost niks
+en blijft gratis.
+
+Eén ding om rekening mee te houden: omdat meedoen gratis is, betaalt er meestal één
+iemand per groep. Je inkomsten schalen dus met het aantal groepen, niet met het aantal
+gebruikers. 1000 betalers op €19,99 per jaar is na Apple's 15% ruwweg €17.000 netto.
 
 ---
 
@@ -220,4 +231,4 @@ dit wil, bouw ik het in `app/index.html`, in stappen:
 4. Set-tracking + rusttimer (grootste stuk)
 5. Gewichtsgrafiek en weekvolume
 6. Claude-knop in de app
-7. Crew + AI-coach + Plus (dit heeft een server nodig, dus als laatste)
+7. Social + challenges + Plus (dit heeft een server nodig, dus als laatste)

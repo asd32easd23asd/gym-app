@@ -2,7 +2,7 @@ import UIKit
 import WebKit
 import UserNotifications
 
-class ViewController: UIViewController, WKScriptMessageHandler {
+class ViewController: UIViewController, WKScriptMessageHandler, UIScrollViewDelegate {
     var webView: WKWebView!
 
     override func viewDidLoad() {
@@ -21,6 +21,14 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         webView.backgroundColor = view.backgroundColor
         webView.scrollView.backgroundColor = view.backgroundColor
         webView.scrollView.contentInsetAdjustmentBehavior = .never
+
+        // no zooming: the web side refuses the gestures, this refuses them again
+        webView.scrollView.minimumZoomScale = 1
+        webView.scrollView.maximumZoomScale = 1
+        webView.scrollView.bouncesZoom = false
+        webView.scrollView.pinchGestureRecognizer?.isEnabled = false
+        webView.scrollView.delegate = self
+
         view.addSubview(webView)
 
         if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
@@ -28,7 +36,10 @@ class ViewController: UIViewController, WKScriptMessageHandler {
         }
     }
 
-    // receives the upcoming dose list from the web app and (re)schedules local notifications
+    // the scroll view has nothing to zoom, so a pinch that slips through does nothing
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? { return nil }
+
+    // receives the upcoming list from the web app and (re)schedules local notifications
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage) {
         guard message.name == "notify",
